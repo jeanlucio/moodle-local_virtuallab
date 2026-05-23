@@ -28,7 +28,7 @@ import {add as addNotification} from 'core/notification';
  * Initialises the copy-to-clipboard button for the panel URL.
  */
 export const init = () => {
-    const btn   = document.getElementById('local-labvirtual-copy-link');
+    const btn = document.getElementById('local-labvirtual-copy-link');
     const input = document.getElementById('local-labvirtual-panel-url');
 
     if (!btn || !input) {
