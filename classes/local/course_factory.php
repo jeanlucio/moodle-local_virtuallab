@@ -52,21 +52,46 @@ class course_factory {
         require_once($CFG->dirroot . '/course/lib.php');
         require_once($CFG->libdir . '/enrollib.php');
 
-        $batch          = $DB->get_record('local_labvirtual_batches', ['id' => $batchid], '*', MUST_EXIST);
-        $enrolplugin    = enrol_get_plugin('self');
-        $teacherroleid  = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
-        $studentroleid  = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
-        $existingcount  = $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]);
+        $batch         = $DB->get_record('local_labvirtual_batches', ['id' => $batchid], '*', MUST_EXIST);
+        $enrolplugin   = enrol_get_plugin('self');
+        $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
+        $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
+        $existingcount = $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]);
 
         $createdcourseids = [];
+
+        // Bulk-load existing shortnames matching this batch prefix to avoid N+1 queries in the loop.
+        $prefix = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $batch->nameprefix));
+        $prefix = trim($prefix, '-');
+        $prefix = substr($prefix, 0, 20);
+        $basepattern = sprintf('%s-b%d-%%', $prefix, $batch->id);
+
+        $existingshortnames = [];
+        $rows = $DB->get_records_sql(
+            "SELECT shortname FROM {course} WHERE shortname LIKE :pattern",
+            ['pattern' => $basepattern]
+        );
+        foreach ($rows as $row) {
+            $existingshortnames[$row->shortname] = true;
+        }
 
         for ($i = 1; $i <= $labcount; $i++) {
             $labnum  = $existingcount + $i;
             $labname = sprintf('%s %02d', $batch->nameprefix, $labnum);
 
+            // Resolve shortname collisions using the in-memory set — no extra DB queries.
+            $base      = sprintf('%s-b%d-lab%02d', $prefix, $batch->id, $labnum);
+            $shortname = $base;
+            $suffix    = 1;
+            while (isset($existingshortnames[$shortname])) {
+                $shortname = $base . '-' . $suffix;
+                $suffix++;
+            }
+            $existingshortnames[$shortname] = true;
+
             $coursedata            = new \stdClass();
             $coursedata->fullname  = $labname;
-            $coursedata->shortname = $this->unique_shortname($batch, $labnum);
+            $coursedata->shortname = $shortname;
             $coursedata->category  = $batch->categoryid;
             $coursedata->format    = 'topics';
             $coursedata->visible   = 1;
@@ -101,30 +126,5 @@ class course_factory {
         }
 
         return $createdcourseids;
-    }
-
-    /**
-     * Generates a unique course shortname for a lab within a batch.
-     *
-     * @param \stdClass $batch  Batch record.
-     * @param int       $labnum Sequential lab number within the batch.
-     * @return string Unique shortname.
-     */
-    private function unique_shortname(\stdClass $batch, int $labnum): string {
-        global $DB;
-
-        $prefix    = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $batch->nameprefix));
-        $prefix    = trim($prefix, '-');
-        $prefix    = substr($prefix, 0, 20);
-        $base      = sprintf('%s-b%d-lab%02d', $prefix, $batch->id, $labnum);
-        $shortname = $base;
-        $suffix    = 1;
-
-        while ($DB->record_exists('course', ['shortname' => $shortname])) {
-            $shortname = $base . '-' . $suffix;
-            $suffix++;
-        }
-
-        return $shortname;
     }
 }

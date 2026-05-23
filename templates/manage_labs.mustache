@@ -40,6 +40,9 @@
                 <button class="btn btn-outline-secondary"
                         type="button"
                         id="local-labvirtual-copy-link"
+                        data-action="copytoclipboard"
+                        data-clipboard-target="#local-labvirtual-panel-url"
+                        data-clipboard-success-message="{{#str}} panel_url_copied, local_labvirtual {{/str}}"
                         aria-label="{{#str}} copy_panel_link, local_labvirtual {{/str}}">
                     <i class="fa fa-clipboard" aria-hidden="true"></i>
                     {{#str}} copy_panel_link, local_labvirtual {{/str}}
@@ -63,7 +66,7 @@
                     <th scope="col">Lab</th>
                     <th scope="col">Shortname</th>
                     <th scope="col">Último reset</th>
-                    <th scope="col"></th>
+                    <th scope="col" aria-label="{{#str}} actions, core {{/str}}"></th>
                 </tr>
             </thead>
             <tbody>
@@ -85,3 +88,6 @@
     <p class="text-body-secondary">{{#str}} nolabs, local_labvirtual {{/str}}</p>
     {{/haslabs}}
 </div>
+{{#js}}
+require(['core/copy_to_clipboard']);
+{{/js}}

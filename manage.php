@@ -101,8 +101,6 @@ if ($batchid) {
 
     $renderer = $PAGE->get_renderer('local_labvirtual');
 
-    $PAGE->requires->js_call_amd('local_labvirtual/copy_panel_link', 'init');
-
     echo $OUTPUT->header();
     echo $renderer->render_labs_list($batch, $labs, $panelurl, $createurl->out(false));
     echo $OUTPUT->footer();
