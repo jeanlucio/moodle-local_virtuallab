@@ -94,7 +94,7 @@ $batchforrender->middlename        = $teacher->middlename;
 $batchforrender->alternatename     = $teacher->alternatename;
 
 $repository = new panel_repository();
-$labs       = $repository->get_panel_data($batchid);
+$labs       = $repository->get_panel_data($batchid, $USER->id);
 
 $renderer = $PAGE->get_renderer('local_labvirtual');
 

@@ -36,27 +36,31 @@ class panel_repository {
     /** @var bool Whether to show keys in the panel. */
     private bool $showkeys;
 
+    /** @var int Role ID for editingteacher, cached to avoid repeated queries. */
+    private int $teacherroleid;
+
     /**
      * Constructor reads plugin settings once.
      */
     public function __construct() {
-        $this->maxteachers = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
-        $this->showkeys    = (bool) get_config('local_labvirtual', 'show_keys_in_panel');
+        global $DB;
+        $this->maxteachers   = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
+        $this->showkeys      = (bool) get_config('local_labvirtual', 'show_keys_in_panel');
         if ((string) get_config('local_labvirtual', 'show_keys_in_panel') === '') {
-            $this->showkeys = true; // Default on.
+            $this->showkeys = true;
         }
+        $this->teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
     }
 
     /**
      * Returns enriched lab data for all labs in the batch, ready for Mustache rendering.
      *
      * @param int $batchid Batch ID.
+     * @param int $userid  Current user ID (used to detect existing enrolments).
      * @return array[] Array of associative arrays, one per lab, ordered by lab ID.
      */
-    public function get_panel_data(int $batchid): array {
+    public function get_panel_data(int $batchid, int $userid): array {
         global $DB;
-
-        $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
 
         $sql = "SELECT lc.id          AS labid,
                        lc.courseid,
@@ -90,34 +94,76 @@ class panel_repository {
 
         $rows = $DB->get_records_sql($sql, [
             'contextlevel' => CONTEXT_COURSE,
-            'roleid'       => $teacherroleid,
+            'roleid'       => $this->teacherroleid,
             'batchid'      => $batchid,
         ]);
 
-        return $this->aggregate($rows);
+        $userenrolments = $this->get_user_enrolments($batchid, $userid);
+
+        return $this->aggregate($rows, $userenrolments['enrolled'], $userenrolments['iseditoranywhere']);
+    }
+
+    /**
+     * Returns which labs in the batch the user is already enrolled in, and whether they
+     * hold the editingteacher role in any of them.
+     *
+     * @param int $batchid Batch ID.
+     * @param int $userid  User ID to check.
+     * @return array{enrolled: array<int,bool>, iseditoranywhere: bool}
+     */
+    private function get_user_enrolments(int $batchid, int $userid): array {
+        global $DB;
+
+        $sql = "SELECT ra.id, lc.courseid, ra.roleid
+                  FROM {local_labvirtual_courses} lc
+                  JOIN {context} ctx ON ctx.instanceid  = lc.courseid
+                                    AND ctx.contextlevel = :contextlevel
+                  JOIN {role_assignments} ra ON ra.contextid = ctx.id
+                                            AND ra.userid    = :userid
+                 WHERE lc.batchid = :batchid";
+
+        $rows = $DB->get_records_sql($sql, [
+            'contextlevel' => CONTEXT_COURSE,
+            'userid'       => $userid,
+            'batchid'      => $batchid,
+        ]);
+
+        $enrolled         = [];
+        $iseditoranywhere = false;
+        foreach ($rows as $row) {
+            $enrolled[(int) $row->courseid] = true;
+            if ((int) $row->roleid === $this->teacherroleid) {
+                $iseditoranywhere = true;
+            }
+        }
+        return ['enrolled' => $enrolled, 'iseditoranywhere' => $iseditoranywhere];
     }
 
     /**
      * Aggregates flat SQL rows into one array entry per lab, computing status.
      *
-     * @param \stdClass[] $rows Raw rows from the query.
+     * @param \stdClass[]      $rows               Raw rows from the query.
+     * @param array<int, bool> $enrolledcourseids  Course IDs where the user is already enrolled.
+     * @param bool             $useriseditoranywhere Whether the user holds editingteacher in any batch lab.
      * @return array[] Enriched lab data for Mustache.
      */
-    private function aggregate(array $rows): array {
+    private function aggregate(array $rows, array $enrolledcourseids, bool $useriseditoranywhere): array {
         $labs = [];
 
         foreach ($rows as $row) {
             if (!isset($labs[$row->courseid])) {
                 $labs[$row->courseid] = [
-                    'labid'            => $row->labid,
-                    'courseid'         => $row->courseid,
-                    'coursename'       => format_string($row->coursename),
-                    'teacher_enrolid'  => $row->teacher_enrolid,
-                    'student_enrolid'  => $row->student_enrolid,
-                    'teacherkey'       => $this->showkeys ? s($row->teacherkey) : '',
-                    'studentkey'       => $this->showkeys ? s($row->studentkey) : '',
-                    'showkeys'         => $this->showkeys,
-                    'editors'          => [],
+                    'labid'                   => $row->labid,
+                    'courseid'                => $row->courseid,
+                    'coursename'              => format_string($row->coursename),
+                    'teacher_enrolid'         => $row->teacher_enrolid,
+                    'student_enrolid'         => $row->student_enrolid,
+                    'teacherkey'              => $this->showkeys ? s($row->teacherkey) : '',
+                    'studentkey'              => $this->showkeys ? s($row->studentkey) : '',
+                    'showkeys'                => $this->showkeys,
+                    'user_enrolled_here'      => !empty($enrolledcourseids[(int) $row->courseid]),
+                    'user_is_editor_anywhere' => $useriseditoranywhere,
+                    'editors'                 => [],
                 ];
             }
 
@@ -150,11 +196,14 @@ class panel_repository {
         foreach ($labs as $lab) {
             $editorcount         = count($lab['editors']);
             $lab['editorcount']  = $editorcount;
-            $lab['status_available'] = ($editorcount === 0);
-            $lab['status_in_use']    = ($editorcount > 0 && $editorcount < $this->maxteachers);
-            $lab['status_full']      = ($editorcount >= $this->maxteachers);
-            $lab['can_enrol_editor'] = !$lab['status_full'];
-            $lab['statuslabel']      = $this->status_label($lab);
+            $lab['status_available']   = ($editorcount === 0);
+            $lab['status_in_use']     = ($editorcount > 0 && $editorcount < $this->maxteachers);
+            $lab['status_full']       = ($editorcount >= $this->maxteachers);
+            $lab['can_enrol_editor']  = !$lab['status_full']
+                && !$lab['user_enrolled_here']
+                && !$lab['user_is_editor_anywhere'];
+            $lab['can_enrol_visitor'] = !$lab['user_enrolled_here'];
+            $lab['statuslabel']       = $this->status_label($lab);
 
             if ($lab['status_full']) {
                 $lab['teacherkey'] = '';

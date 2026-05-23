@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['access_as_editor'] = 'Acessar {$a} como editor';
 $string['access_as_visitor'] = 'Acessar {$a} como visitante';
+$string['already_enrolled'] = 'Inscrito';
 $string['batch_category'] = 'Categoria de destino';
 $string['batch_created'] = 'Turma criada com sucesso.';
 $string['batch_name'] = 'Nome da turma';

@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['access_as_editor'] = 'Access {$a} as editor';
 $string['access_as_visitor'] = 'Access {$a} as visitor';
+$string['already_enrolled'] = 'Enrolled';
 $string['batch_category'] = 'Destination category';
 $string['batch_created'] = 'Batch created successfully.';
 $string['batch_name'] = 'Batch name';
