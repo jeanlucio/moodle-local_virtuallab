@@ -10,6 +10,7 @@
         "batchid": 1,
         "sesskey": "abc123",
         "viewurl": "/local/labvirtual/view.php?batchid=1",
+        "showkeys": true,
         "haslabs": true,
         "labs": [
             {
@@ -46,14 +47,14 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th scope="col">{{#str}} pluginname, local_labvirtual {{/str}}</th>
+                    <th scope="col">Ambiente</th>
                     <th scope="col">Status</th>
                     <th scope="col">{{#str}} currenteditors, local_labvirtual {{/str}}</th>
-                    {{#labs}}{{#showkeys}}
+                    {{#showkeys}}
                     <th scope="col">{{#str}} key_editor, local_labvirtual {{/str}}</th>
                     <th scope="col">{{#str}} key_visitor, local_labvirtual {{/str}}</th>
-                    {{/showkeys}}{{/labs}}
-                    <th scope="col">{{#str}} view_panel, local_labvirtual {{/str}}</th>
+                    {{/showkeys}}
+                    <th scope="col">Acesso</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,7 +84,7 @@
                         {{^studentkey}}<span class="text-body-secondary">—</span>{{/studentkey}}
                     </td>
                     {{/showkeys}}
-                    <td>
+                    <td class="text-nowrap">
                         {{#can_enrol_editor}}
                         <form method="post" action="{{viewurl}}" class="d-inline">
                             <input type="hidden" name="action" value="enrol">
@@ -94,7 +95,7 @@
                             <button type="submit"
                                     class="btn btn-sm btn-primary me-1"
                                     aria-label="{{#str}} access_as_editor, local_labvirtual, {{coursename}} {{/str}}">
-                                {{#str}} key_editor, local_labvirtual {{/str}}
+                                Editor
                             </button>
                         </form>
                         {{/can_enrol_editor}}
@@ -103,7 +104,7 @@
                                 class="btn btn-sm btn-primary me-1"
                                 disabled
                                 aria-label="{{#str}} lab_full, local_labvirtual {{/str}}">
-                            {{#str}} key_editor, local_labvirtual {{/str}}
+                            Editor
                         </button>
                         {{/can_enrol_editor}}
                         <form method="post" action="{{viewurl}}" class="d-inline">
@@ -115,7 +116,7 @@
                             <button type="submit"
                                     class="btn btn-sm btn-outline-secondary"
                                     aria-label="{{#str}} access_as_visitor, local_labvirtual, {{coursename}} {{/str}}">
-                                {{#str}} key_visitor, local_labvirtual {{/str}}
+                                Visitante
                             </button>
                         </form>
                     </td>

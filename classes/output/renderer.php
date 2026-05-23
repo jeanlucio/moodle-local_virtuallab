@@ -39,12 +39,15 @@ class renderer extends plugin_renderer_base {
      * @return string Rendered HTML.
      */
     public function render_labs_panel(\stdClass $batch, array $labs, int $batchid): string {
+        $showkeys = !empty($labs) && !empty($labs[array_key_first($labs)]['showkeys']);
+
         $context = [
             'batchname'   => format_string($batch->name),
             'teachername' => format_string(fullname($batch)),
             'batchid'     => $batchid,
             'sesskey'     => sesskey(),
             'viewurl'     => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
+            'showkeys'    => $showkeys,
             'haslabs'     => !empty($labs),
             'labs'        => array_values($labs),
         ];
