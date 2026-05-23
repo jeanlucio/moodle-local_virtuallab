@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/labvirtual/db" VERSION="20260523"
+    COMMENT="XMLDB file for local plugin labvirtual"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+  <TABLES>
+    <TABLE NAME="local_labvirtual_batches" COMMENT="Lab Virtual batches (turmas de laboratório)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Batch name (e.g. Projeto de Interface 2026/1)"/>
+        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK user.id — responsible teacher"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle course_categories.id where labs are created"/>
+        <FIELD NAME="nameprefix" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Lab name prefix (e.g. Lab EAD → Lab EAD 01)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of batch creation"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="teacherid" UNIQUE="false" FIELDS="teacherid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_labvirtual_courses" COMMENT="Lab Virtual individual labs (sandbox courses)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="batchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK local_labvirtual_batches.id"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK course.id — managed sandbox course"/>
+        <FIELD NAME="teacher_enrolid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK enrol.id — enrol_self instance with editingteacher role"/>
+        <FIELD NAME="student_enrolid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK enrol.id — enrol_self instance with student role"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of lab creation — base for lifecycle"/>
+        <FIELD NAME="lastreset" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last successful reset (0 = never)"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="courseid" UNIQUE="true" FIELDS="courseid"/>
+        <INDEX NAME="batchid" UNIQUE="false" FIELDS="batchid"/>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="teacher_enrolid" UNIQUE="false" FIELDS="teacher_enrolid"/>
+        <INDEX NAME="student_enrolid" UNIQUE="false" FIELDS="student_enrolid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

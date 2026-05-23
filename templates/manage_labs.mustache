@@ -1,0 +1,87 @@
+{{!
+    @template local_labvirtual/manage_labs
+
+    List of labs within a batch for the admin management page.
+
+    Example context (json):
+    {
+        "batchname": "Projeto de Interface 2026/1",
+        "batchid": 1,
+        "labs": [
+            {
+                "id": 1,
+                "coursename": "Lab EAD 01",
+                "shortname": "lab-ead-b1-lab01",
+                "courseurl": "/course/view.php?id=42",
+                "lastreset": "—"
+            }
+        ],
+        "haslabs": true,
+        "panelurl": "https://moodle.example.com/local/labvirtual/view.php?batchid=1",
+        "createurl": "/local/labvirtual/manage.php?batchid=1&action=createlabs",
+        "strpanelhelp": "Share this URL with students..."
+    }
+}}
+<div class="local-labvirtual-manage-labs">
+    <div class="card mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <i class="fa fa-link me-1" aria-hidden="true"></i>
+            {{#str}} panel_url, local_labvirtual {{/str}}
+        </div>
+        <div class="card-body">
+            <p class="text-body-secondary small mb-2">{{strpanelhelp}}</p>
+            <div class="input-group">
+                <input type="text"
+                       id="local-labvirtual-panel-url"
+                       class="form-control"
+                       readonly
+                       value="{{panelurl}}"
+                       aria-label="{{#str}} panel_url, local_labvirtual {{/str}}">
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        id="local-labvirtual-copy-link"
+                        aria-label="{{#str}} copy_panel_link, local_labvirtual {{/str}}">
+                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                    {{#str}} copy_panel_link, local_labvirtual {{/str}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3 d-flex justify-content-end">
+        <a href="{{createurl}}" class="btn btn-success">
+            <i class="fa fa-plus me-1" aria-hidden="true"></i>
+            {{#str}} create_labs, local_labvirtual {{/str}}
+        </a>
+    </div>
+
+    {{#haslabs}}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Lab</th>
+                    <th scope="col">Shortname</th>
+                    <th scope="col">Último reset</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#labs}}
+                <tr>
+                    <td>
+                        <a href="{{courseurl}}">{{coursename}}</a>
+                    </td>
+                    <td><code>{{shortname}}</code></td>
+                    <td>{{lastreset}}</td>
+                    <td></td>
+                </tr>
+                {{/labs}}
+            </tbody>
+        </table>
+    </div>
+    {{/haslabs}}
+    {{^haslabs}}
+    <p class="text-body-secondary">{{#str}} nolabs, local_labvirtual {{/str}}</p>
+    {{/haslabs}}
+</div>

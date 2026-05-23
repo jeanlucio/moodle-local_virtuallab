@@ -1,0 +1,62 @@
+{{!
+    @template local_labvirtual/manage_batches
+
+    List of Lab Virtual batches for the admin management page.
+
+    Example context (json):
+    {
+        "batches": [
+            {
+                "id": 1,
+                "name": "Projeto de Interface 2026/1",
+                "teachername": "Jean Lúcio",
+                "categoryname": "Disciplinas EAD",
+                "labcount": 5,
+                "manageurl": "/local/labvirtual/manage.php?batchid=1"
+            }
+        ],
+        "hasbatches": true,
+        "createurl": "/local/labvirtual/manage.php?action=createbatch"
+    }
+}}
+<div class="local-labvirtual-manage-batches">
+    <div class="mb-3 d-flex justify-content-end">
+        <a href="{{createurl}}" class="btn btn-primary">
+            <i class="fa fa-plus me-1" aria-hidden="true"></i>
+            {{#str}} create_batch, local_labvirtual {{/str}}
+        </a>
+    </div>
+    {{#hasbatches}}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">{{#str}} batch_name, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} batch_teacher, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} batch_category, local_labvirtual {{/str}}</th>
+                    <th scope="col">Labs</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#batches}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>{{teachername}}</td>
+                    <td>{{categoryname}}</td>
+                    <td>{{labcount}}</td>
+                    <td>
+                        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary">
+                            {{#str}} manage_labs, local_labvirtual, {{name}} {{/str}}
+                        </a>
+                    </td>
+                </tr>
+                {{/batches}}
+            </tbody>
+        </table>
+    </div>
+    {{/hasbatches}}
+    {{^hasbatches}}
+    <p class="text-body-secondary">{{#str}} nobatches, local_labvirtual {{/str}}</p>
+    {{/hasbatches}}
+</div>
