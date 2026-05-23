@@ -39,17 +39,26 @@ class renderer extends plugin_renderer_base {
      * @return string Rendered HTML.
      */
     public function render_labs_panel(\stdClass $batch, array $labs, int $batchid): string {
-        $showkeys = !empty($labs) && !empty($labs[array_key_first($labs)]['showkeys']);
+        $firstlab = !empty($labs) ? $labs[array_key_first($labs)] : null;
+        $showkeys = $firstlab && !empty($firstlab['showkeys']);
+
+        $labrows = [];
+        foreach ($labs as $lab) {
+            $lab['courseurl'] = (new \moodle_url('/course/view.php', ['id' => $lab['courseid']]))->out(false);
+            $labrows[] = $lab;
+        }
 
         $context = [
-            'batchname'   => format_string($batch->name),
-            'teachername' => format_string(fullname($batch)),
-            'batchid'     => $batchid,
-            'sesskey'     => sesskey(),
-            'viewurl'     => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
-            'showkeys'    => $showkeys,
-            'haslabs'     => !empty($labs),
-            'labs'        => array_values($labs),
+            'batchname'       => format_string($batch->name),
+            'teachername'     => format_string(fullname($batch)),
+            'batchid'         => $batchid,
+            'sesskey'         => sesskey(),
+            'viewurl'         => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
+            'showkeys'        => $showkeys,
+            'batchteacherkey' => $firstlab ? $firstlab['teacherkey'] : '',
+            'batchstudentkey' => $firstlab ? $firstlab['studentkey'] : '',
+            'haslabs'         => !empty($labs),
+            'labs'            => $labrows,
         ];
 
         return $this->render_from_template('local_labvirtual/labs_panel', $context);

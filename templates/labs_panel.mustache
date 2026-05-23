@@ -11,17 +11,17 @@
         "sesskey": "abc123",
         "viewurl": "/local/labvirtual/view.php?batchid=1",
         "showkeys": true,
+        "batchteacherkey": "prof_ead261",
+        "batchstudentkey": "est_ead261",
         "haslabs": true,
         "labs": [
             {
                 "labid": 1,
                 "courseid": 42,
                 "coursename": "Lab EAD 01",
+                "courseurl": "/course/view.php?id=42",
                 "teacher_enrolid": 10,
                 "student_enrolid": 11,
-                "teacherkey": "ABC123",
-                "studentkey": "XYZ789",
-                "showkeys": true,
                 "can_enrol_editor": true,
                 "can_enrol_visitor": true,
                 "user_enrolled_here": false,
@@ -38,11 +38,17 @@
 }}
 <div class="local-labvirtual-panel">
     <div class="page-header mb-4">
-        <h2>{{batchname}}</h2>
-        <p class="text-body-secondary">
+        <p class="mb-1">
             <i class="fa fa-user-tie me-1" aria-hidden="true"></i>
             {{teachername}}
         </p>
+        {{#showkeys}}
+        <p class="mb-0 small text-body-secondary">
+            {{#str}} batch_keys, local_labvirtual {{/str}}:
+            <span class="me-3">{{#str}} key_editor, local_labvirtual {{/str}}: <code>{{batchteacherkey}}</code></span>
+            <span>{{#str}} key_visitor, local_labvirtual {{/str}}: <code>{{batchstudentkey}}</code></span>
+        </p>
+        {{/showkeys}}
     </div>
 
     {{#haslabs}}
@@ -53,11 +59,8 @@
                     <th scope="col">Ambiente</th>
                     <th scope="col">Status</th>
                     <th scope="col">{{#str}} currenteditors, local_labvirtual {{/str}}</th>
-                    {{#showkeys}}
-                    <th scope="col">{{#str}} key_editor, local_labvirtual {{/str}}</th>
-                    <th scope="col">{{#str}} key_visitor, local_labvirtual {{/str}}</th>
-                    {{/showkeys}}
-                    <th scope="col">Acesso</th>
+                    <th scope="col">{{#str}} view_course, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} enrol_join, local_labvirtual {{/str}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,16 +80,14 @@
                             <span class="text-body-secondary">—</span>
                         {{/editors}}
                     </td>
-                    {{#showkeys}}
                     <td>
-                        {{#teacherkey}}<code>{{teacherkey}}</code>{{/teacherkey}}
-                        {{^teacherkey}}<span class="text-body-secondary">—</span>{{/teacherkey}}
+                        <a href="{{courseurl}}"
+                           class="btn btn-sm btn-outline-secondary"
+                           aria-label="{{#str}} view_course_label, local_labvirtual, {{coursename}} {{/str}}">
+                            <i class="fa fa-eye me-1" aria-hidden="true"></i>
+                            {{#str}} view_course, local_labvirtual {{/str}}
+                        </a>
                     </td>
-                    <td>
-                        {{#studentkey}}<code>{{studentkey}}</code>{{/studentkey}}
-                        {{^studentkey}}<span class="text-body-secondary">—</span>{{/studentkey}}
-                    </td>
-                    {{/showkeys}}
                     <td class="text-nowrap">
                         {{#user_enrolled_here}}
                         <span class="badge bg-secondary">
