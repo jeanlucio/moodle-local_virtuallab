@@ -47,3 +47,15 @@
 .path-local-labvirtual .badge.lv-badge-enrolled {
     color: var(--bs-dark, #000);
 }
+
+.path-local-labvirtual .local-labvirtual-select-col {
+    width: 2.5rem;
+}
+
+.path-local-labvirtual .local-labvirtual-bulk-actions {
+    gap: 0.5rem;
+}
+
+.path-local-labvirtual .local-labvirtual-bulk-select {
+    width: auto;
+}

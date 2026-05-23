@@ -84,6 +84,36 @@ class course_registry {
     }
 
     /**
+     * Returns lab records for a given set of lab IDs, validated against a batch.
+     *
+     * Fetches all matching rows in one query. Used by bulk operations to pre-validate
+     * ownership and avoid per-lab round-trips.
+     *
+     * @param int[] $labids  Array of local_labvirtual_courses row IDs to fetch.
+     * @param int   $batchid Batch all labs must belong to.
+     * @return \stdClass[] Indexed by lab ID. Only rows matching both labids and batchid are returned.
+     */
+    public function get_labs_for_batch_bulk(array $labids, int $batchid): array {
+        global $DB;
+
+        if (empty($labids)) {
+            return [];
+        }
+
+        [$insql, $params] = $DB->get_in_or_equal($labids, SQL_PARAMS_NAMED, 'labid');
+        $params['batchid'] = $batchid;
+
+        $sql = "SELECT lc.*, c.fullname AS coursename, c.shortname
+                  FROM {local_labvirtual_courses} lc
+                  JOIN {course} c ON c.id = lc.courseid
+                 WHERE lc.id $insql
+                   AND lc.batchid = :batchid
+              ORDER BY lc.id ASC";
+
+        return $DB->get_records_sql($sql, $params);
+    }
+
+    /**
      * Validates that the given enrolment instance belongs to the given course in this batch.
      *
      * Used to prevent cross-course or cross-batch enrolment injection.

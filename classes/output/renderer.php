@@ -85,6 +85,12 @@ class renderer extends plugin_renderer_base {
                     '/local/labvirtual/manage.php',
                     ['batchid' => $batch->id]
                 ))->out(false),
+                'deleteurl'    => (new \moodle_url('/local/labvirtual/manage.php', [
+                    'action'        => 'deletebatch',
+                    'targetbatchid' => $batch->id,
+                ]))->out(false),
+                'deletelabel'  => get_string('delete_batch_label', 'local_labvirtual',
+                    format_string($batch->name)),
             ];
         }
 
@@ -98,11 +104,11 @@ class renderer extends plugin_renderer_base {
     }
 
     /**
-     * Renders the admin labs list for a batch.
+     * Renders the admin labs list for a batch, including reset/delete actions and bulk form.
      *
-     * @param \stdClass $batch   Batch record.
-     * @param array     $labs    Lab records from course_registry::list_labs().
-     * @param string    $panelurl Absolute URL to the student panel for this batch.
+     * @param \stdClass $batch     Batch record.
+     * @param array     $labs      Lab records from course_registry::list_labs().
+     * @param string    $panelurl  Absolute URL to the student panel for this batch.
      * @param string    $createurl URL for the "Create labs" action.
      * @return string Rendered HTML.
      */
@@ -123,16 +129,32 @@ class renderer extends plugin_renderer_base {
                 'lastreset'   => $lab->lastreset > 0
                     ? userdate($lab->lastreset, get_string('strftimedatetime', 'langconfig'))
                     : '—',
+                'reseturl'    => (new \moodle_url('/local/labvirtual/manage.php', [
+                    'batchid' => $batch->id,
+                    'action'  => 'resetlab',
+                    'labid'   => $lab->id,
+                ]))->out(false),
+                'deleteurl'   => (new \moodle_url('/local/labvirtual/manage.php', [
+                    'batchid' => $batch->id,
+                    'action'  => 'deletelab',
+                    'labid'   => $lab->id,
+                ]))->out(false),
+                'resetlabel'  => get_string('reset_lab_label', 'local_labvirtual',
+                    format_string($lab->coursename)),
+                'deletelabel' => get_string('delete_lab_label', 'local_labvirtual',
+                    format_string($lab->coursename)),
             ];
         }
 
         $context = [
-            'batchname'  => format_string($batch->name),
-            'batchid'    => $batch->id,
-            'labs'       => $rows,
-            'haslabs'    => !empty($rows),
-            'panelurl'   => $panelurl,
-            'createurl'  => $createurl,
+            'batchname'    => format_string($batch->name),
+            'batchid'      => $batch->id,
+            'manageurl'    => (new \moodle_url('/local/labvirtual/manage.php'))->out(false),
+            'labs'         => $rows,
+            'haslabs'      => !empty($rows),
+            'panelurl'     => $panelurl,
+            'createurl'    => $createurl,
+            'sesskey'      => sesskey(),
             'strpanelhelp' => get_string('panel_url_help', 'local_labvirtual'),
         ];
 

@@ -12,7 +12,9 @@
                 "teachername": "Jean Lúcio",
                 "categoryname": "Disciplinas EAD",
                 "labcount": 5,
-                "manageurl": "/local/labvirtual/manage.php?batchid=1"
+                "manageurl": "/local/labvirtual/manage.php?batchid=1",
+                "deleteurl": "/local/labvirtual/manage.php?action=deletebatch&targetbatchid=1",
+                "deletelabel": "Delete batch: Projeto de Interface 2026/1"
             }
         ],
         "hasbatches": true,
@@ -45,9 +47,15 @@
                     <td>{{teachername}}</td>
                     <td>{{categoryname}}</td>
                     <td>{{labcount}}</td>
-                    <td>
-                        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary">
+                    <td class="text-end text-nowrap">
+                        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary me-1">
                             {{#str}} manage_labs, local_labvirtual, {{name}} {{/str}}
+                        </a>
+                        <a href="{{deleteurl}}"
+                           class="btn btn-sm btn-outline-danger"
+                           aria-label="{{deletelabel}}">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                            {{#str}} delete_batch, local_labvirtual {{/str}}
                         </a>
                     </td>
                 </tr>

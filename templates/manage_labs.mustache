@@ -2,23 +2,30 @@
     @template local_labvirtual/manage_labs
 
     List of labs within a batch for the admin management page.
+    Includes per-row reset/delete actions and a bulk action form.
 
     Example context (json):
     {
         "batchname": "Projeto de Interface 2026/1",
         "batchid": 1,
+        "manageurl": "/local/labvirtual/manage.php",
         "labs": [
             {
                 "id": 1,
                 "coursename": "Lab EAD 01",
                 "shortname": "lab-ead-b1-lab01",
                 "courseurl": "/course/view.php?id=42",
-                "lastreset": "—"
+                "lastreset": "—",
+                "reseturl": "/local/labvirtual/manage.php?batchid=1&action=resetlab&labid=1",
+                "deleteurl": "/local/labvirtual/manage.php?batchid=1&action=deletelab&labid=1",
+                "resetlabel": "Reset lab: Lab EAD 01",
+                "deletelabel": "Delete lab: Lab EAD 01"
             }
         ],
         "haslabs": true,
         "panelurl": "https://moodle.example.com/local/labvirtual/view.php?batchid=1",
         "createurl": "/local/labvirtual/manage.php?batchid=1&action=createlabs",
+        "sesskey": "abc123",
         "strpanelhelp": "Share this URL with students..."
     }
 }}
@@ -59,35 +66,90 @@
     </div>
 
     {{#haslabs}}
-    <div class="table-responsive">
-        <table class="table table-hover table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Lab</th>
-                    <th scope="col">Shortname</th>
-                    <th scope="col">Último reset</th>
-                    <th scope="col" aria-label="{{#str}} actions, core {{/str}}"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#labs}}
-                <tr>
-                    <td>
-                        <a href="{{courseurl}}">{{coursename}}</a>
-                    </td>
-                    <td><code>{{shortname}}</code></td>
-                    <td>{{lastreset}}</td>
-                    <td></td>
-                </tr>
-                {{/labs}}
-            </tbody>
-        </table>
-    </div>
+    <form id="local-labvirtual-bulk-form"
+          method="post"
+          action="{{manageurl}}">
+        <input type="hidden" name="batchid" value="{{batchid}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center local-labvirtual-select-col">
+                            <input type="checkbox"
+                                   id="local-labvirtual-selectall"
+                                   data-action="toggle"
+                                   data-togglegroup="labs-select"
+                                   data-toggle="master"
+                                   aria-label="{{#str}} selectall, core {{/str}}">
+                        </th>
+                        <th scope="col">Lab</th>
+                        <th scope="col">Shortname</th>
+                        <th scope="col">{{#str}} lastreset, local_labvirtual {{/str}}</th>
+                        <th scope="col" class="text-end"
+                            aria-label="{{#str}} actions, core {{/str}}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#labs}}
+                    <tr>
+                        <td class="text-center">
+                            <input type="checkbox"
+                                   class="local-labvirtual-lab-checkbox"
+                                   name="labids[]"
+                                   value="{{id}}"
+                                   data-action="toggle"
+                                   data-togglegroup="labs-select"
+                                   data-toggle="slave"
+                                   aria-label="{{coursename}}">
+                        </td>
+                        <td>
+                            <a href="{{courseurl}}">{{coursename}}</a>
+                        </td>
+                        <td><code>{{shortname}}</code></td>
+                        <td>{{lastreset}}</td>
+                        <td class="text-end text-nowrap">
+                            <a href="{{reseturl}}"
+                               class="btn btn-sm btn-outline-warning me-1"
+                               aria-label="{{resetlabel}}">
+                                <i class="fa fa-rotate-right" aria-hidden="true"></i>
+                                {{#str}} reset_lab, local_labvirtual {{/str}}
+                            </a>
+                            <a href="{{deleteurl}}"
+                               class="btn btn-sm btn-outline-danger"
+                               aria-label="{{deletelabel}}">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                {{#str}} delete_lab, local_labvirtual {{/str}}
+                            </a>
+                        </td>
+                    </tr>
+                    {{/labs}}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex align-items-center local-labvirtual-bulk-actions mt-2">
+            <label for="local-labvirtual-bulkaction" class="mb-0 text-nowrap">
+                {{#str}} bulk_action, local_labvirtual {{/str}}:
+            </label>
+            <select id="local-labvirtual-bulkaction"
+                    name="bulkaction"
+                    class="form-select form-select-sm local-labvirtual-bulk-select">
+                <option value="">—</option>
+                <option value="reset">{{#str}} bulk_action_reset, local_labvirtual {{/str}}</option>
+                <option value="delete">{{#str}} bulk_action_delete, local_labvirtual {{/str}}</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-secondary">
+                {{#str}} go, core {{/str}}
+            </button>
+        </div>
+    </form>
     {{/haslabs}}
     {{^haslabs}}
     <p class="text-body-secondary">{{#str}} nolabs, local_labvirtual {{/str}}</p>
     {{/haslabs}}
 </div>
 {{#js}}
-require(['core/copy_to_clipboard']);
+require(['core/copy_to_clipboard', 'core/checkbox-toggleall']);
 {{/js}}
