@@ -29,7 +29,7 @@ use plugin_renderer_base;
 /**
  * Renders Mustache templates for the plugin.
  */
-class panel_renderer extends plugin_renderer_base {
+class renderer extends plugin_renderer_base {
     /**
      * Renders the student panel for a batch.
      *
