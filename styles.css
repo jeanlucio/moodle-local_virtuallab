@@ -43,3 +43,7 @@
 .path-local-labvirtual .local-labvirtual-manage-labs .card-header {
     font-weight: 600;
 }
+
+.path-local-labvirtual .badge.lv-badge-enrolled {
+    color: var(--bs-dark, #000);
+}
