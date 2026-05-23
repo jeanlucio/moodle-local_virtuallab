@@ -70,7 +70,11 @@ class panel_repository {
                        enrs.password   AS studentkey,
                        u.id            AS editorid,
                        u.firstname,
-                       u.lastname
+                       u.lastname,
+                       u.firstnamephonetic,
+                       u.lastnamephonetic,
+                       u.middlename,
+                       u.alternatename
                   FROM {local_labvirtual_courses} lc
                   JOIN {course} c    ON c.id    = lc.courseid
                   JOIN {enrol} enrt  ON enrt.id = lc.teacher_enrolid
@@ -120,8 +124,12 @@ class panel_repository {
             if (!empty($row->editorid)) {
                 $labs[$row->courseid]['editors'][] = [
                     'fullname' => s(fullname((object) [
-                        'firstname' => $row->firstname,
-                        'lastname'  => $row->lastname,
+                        'firstname'         => $row->firstname,
+                        'lastname'          => $row->lastname,
+                        'firstnamephonetic' => $row->firstnamephonetic,
+                        'lastnamephonetic'  => $row->lastnamephonetic,
+                        'middlename'        => $row->middlename,
+                        'alternatename'     => $row->alternatename,
                     ])),
                 ];
             }
