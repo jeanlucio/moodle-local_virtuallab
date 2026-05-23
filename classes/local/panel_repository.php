@@ -142,9 +142,9 @@ class panel_repository {
     /**
      * Aggregates flat SQL rows into one array entry per lab, computing status.
      *
-     * @param \stdClass[]      $rows               Raw rows from the query.
-     * @param array<int, bool> $enrolledcourseids  Course IDs where the user is already enrolled.
-     * @param bool             $useriseditoranywhere Whether the user holds editingteacher in any batch lab.
+     * @param \stdClass[] $rows               Raw rows from the query.
+     * @param bool[]      $enrolledcourseids  Keyed by course ID; true if the user is enrolled.
+     * @param bool        $useriseditoranywhere Whether the user holds editingteacher in any batch lab.
      * @return array[] Enriched lab data for Mustache.
      */
     private function aggregate(array $rows, array $enrolledcourseids, bool $useriseditoranywhere): array {
