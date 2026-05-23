@@ -83,10 +83,15 @@ if ($action === 'enrol' && $enrolid && $courseid) {
 }
 
 // Render panel.
-$teacher = $DB->get_record('user', ['id' => $batch->teacherid], 'id, firstname, lastname', MUST_EXIST);
+$userfields  = 'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename';
+$teacher     = $DB->get_record('user', ['id' => $batch->teacherid], $userfields, MUST_EXIST);
 $batchforrender = clone $batch;
-$batchforrender->firstname = $teacher->firstname;
-$batchforrender->lastname  = $teacher->lastname;
+$batchforrender->firstname         = $teacher->firstname;
+$batchforrender->lastname          = $teacher->lastname;
+$batchforrender->firstnamephonetic = $teacher->firstnamephonetic;
+$batchforrender->lastnamephonetic  = $teacher->lastnamephonetic;
+$batchforrender->middlename        = $teacher->middlename;
+$batchforrender->alternatename     = $teacher->alternatename;
 
 $repository = new panel_repository();
 $labs       = $repository->get_panel_data($batchid);

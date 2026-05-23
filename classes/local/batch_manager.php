@@ -86,6 +86,10 @@ class batch_manager {
                        b.timecreated,
                        u.firstname,
                        u.lastname,
+                       u.firstnamephonetic,
+                       u.lastnamephonetic,
+                       u.middlename,
+                       u.alternatename,
                        cat.name AS categoryname,
                        COUNT(lc.id) AS labcount
                   FROM {local_labvirtual_batches} b
@@ -100,6 +104,10 @@ class batch_manager {
                        b.timecreated,
                        u.firstname,
                        u.lastname,
+                       u.firstnamephonetic,
+                       u.lastnamephonetic,
+                       u.middlename,
+                       u.alternatename,
                        cat.name
               ORDER BY b.timecreated DESC";
 
