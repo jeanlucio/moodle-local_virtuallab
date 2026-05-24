@@ -89,8 +89,7 @@ class renderer extends plugin_renderer_base {
                     'action'        => 'deletebatch',
                     'targetbatchid' => $batch->id,
                 ]))->out(false),
-                'deletelabel'  => get_string('delete_batch_label', 'local_labvirtual',
-                    format_string($batch->name)),
+                'deletelabel'  => get_string('delete_batch_label', 'local_labvirtual', format_string($batch->name)),
             ];
         }
 
@@ -139,10 +138,8 @@ class renderer extends plugin_renderer_base {
                     'action'  => 'deletelab',
                     'labid'   => $lab->id,
                 ]))->out(false),
-                'resetlabel'  => get_string('reset_lab_label', 'local_labvirtual',
-                    format_string($lab->coursename)),
-                'deletelabel' => get_string('delete_lab_label', 'local_labvirtual',
-                    format_string($lab->coursename)),
+                'resetlabel'  => get_string('reset_lab_label', 'local_labvirtual', format_string($lab->coursename)),
+                'deletelabel' => get_string('delete_lab_label', 'local_labvirtual', format_string($lab->coursename)),
             ];
         }
 
