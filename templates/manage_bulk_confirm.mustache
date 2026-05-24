@@ -1,0 +1,38 @@
+{{!
+    @template local_labvirtual/manage_bulk_confirm
+
+    Bulk action confirmation form for reset or delete of selected labs.
+
+    Example context (json):
+    {
+        "confirmstring": "Are you sure you want to reset 3 selected lab(s)?",
+        "formaction": "/local/labvirtual/manage.php",
+        "batchid": 1,
+        "bulkaction": "reset",
+        "sesskey": "abc123",
+        "cancelurl": "/local/labvirtual/manage.php?batchid=1",
+        "labids": [
+            {"labid": 2},
+            {"labid": 5},
+            {"labid": 8}
+        ]
+    }
+}}
+<div class="generalbox local-labvirtual-bulk-confirm">
+    <p>{{confirmstring}}</p>
+    <form method="post" action="{{formaction}}">
+        <input type="hidden" name="batchid"    value="{{batchid}}">
+        <input type="hidden" name="bulkaction" value="{{bulkaction}}">
+        <input type="hidden" name="confirm"    value="1">
+        <input type="hidden" name="sesskey"    value="{{sesskey}}">
+        {{#labids}}
+        <input type="hidden" name="labids[]" value="{{labid}}">
+        {{/labids}}
+        <button type="submit" class="btn btn-danger me-2">
+            {{#str}} yes {{/str}}
+        </button>
+        <a href="{{cancelurl}}" class="btn btn-secondary">
+            {{#str}} no {{/str}}
+        </a>
+    </form>
+</div>

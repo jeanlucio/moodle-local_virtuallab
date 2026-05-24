@@ -31,6 +31,43 @@ use plugin_renderer_base;
  */
 class renderer extends plugin_renderer_base {
     /**
+     * Renders the bulk action confirmation form.
+     *
+     * @param string $confirmstring Translated confirmation message.
+     * @param string $formaction    URL the confirmation form posts to.
+     * @param int    $batchid       Batch ID carried through as a hidden field.
+     * @param string $bulkaction    Bulk action key ('reset' or 'delete').
+     * @param int[]  $labids        Lab IDs selected for the operation.
+     * @param string $cancelurl     URL for the Cancel button.
+     * @return string Rendered HTML.
+     */
+    public function render_bulk_confirm(
+        string $confirmstring,
+        string $formaction,
+        int $batchid,
+        string $bulkaction,
+        array $labids,
+        string $cancelurl
+    ): string {
+        $labrows = [];
+        foreach ($labids as $lid) {
+            $labrows[] = ['labid' => (int) $lid];
+        }
+
+        $context = [
+            'confirmstring' => $confirmstring,
+            'formaction'    => $formaction,
+            'batchid'       => $batchid,
+            'bulkaction'    => $bulkaction,
+            'sesskey'       => sesskey(),
+            'cancelurl'     => $cancelurl,
+            'labids'        => $labrows,
+        ];
+
+        return $this->render_from_template('local_labvirtual/manage_bulk_confirm', $context);
+    }
+
+    /**
      * Renders the student panel for a batch.
      *
      * @param \stdClass $batch     Batch record with teacher name pre-populated.

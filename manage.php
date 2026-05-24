@@ -194,53 +194,16 @@ if ($batchid) {
                 ? get_string('confirm_bulk_reset', 'local_labvirtual', $count)
                 : get_string('confirm_bulk_delete', 'local_labvirtual', $count);
 
-            $labidsinputs = '';
-            foreach (array_keys($validlabs) as $lid) {
-                $labidsinputs .= html_writer::empty_tag('input', [
-                    'type'  => 'hidden',
-                    'name'  => 'labids[]',
-                    'value' => $lid,
-                ]);
-            }
-
-            $formcontent =
-                html_writer::empty_tag('input', [
-                    'type' => 'hidden', 'name' => 'batchid', 'value' => $batchid,
-                ]) .
-                html_writer::empty_tag('input', [
-                    'type' => 'hidden', 'name' => 'bulkaction', 'value' => $bulkaction,
-                ]) .
-                html_writer::empty_tag('input', [
-                    'type' => 'hidden', 'name' => 'confirm', 'value' => 1,
-                ]) .
-                html_writer::empty_tag('input', [
-                    'type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey(),
-                ]) .
-                $labidsinputs .
-                html_writer::tag(
-                    'button',
-                    get_string('yes'),
-                    ['type' => 'submit', 'class' => 'btn btn-danger me-2']
-                );
-
-            $confirmform = html_writer::tag(
-                'form',
-                $formcontent,
-                ['method' => 'post', 'action' => $level2url->out(false)]
-            );
-
-            $cancelbutton = html_writer::link(
-                $level2url,
-                get_string('no'),
-                ['class' => 'btn btn-secondary']
-            );
+            $renderer = $PAGE->get_renderer('local_labvirtual');
 
             echo $OUTPUT->header();
-            echo $OUTPUT->box(
-                html_writer::tag('p', $confirmstring) .
-                $confirmform .
-                $cancelbutton,
-                'generalbox'
+            echo $renderer->render_bulk_confirm(
+                $confirmstring,
+                $level2url->out(false),
+                $batchid,
+                $bulkaction,
+                array_keys($validlabs),
+                $level2url->out(false)
             );
             echo $OUTPUT->footer();
             exit;
