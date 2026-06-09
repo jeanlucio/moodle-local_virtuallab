@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version definition.
+ * Scheduled task definitions for local_labvirtual.
  *
  * @package    local_labvirtual
  * @copyright  2026 Jean Lúcio
@@ -24,9 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_labvirtual';
-$plugin->version   = 2026060901;
-$plugin->requires  = 2024042200; // Moodle 4.5+.
-$plugin->supported = [405, 502];
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '4.0.0';
+$tasks = [
+    [
+        'classname' => \local_labvirtual\task\maintenance_task::class,
+        'blocking'  => 0,
+        'minute'    => '0',
+        'hour'      => '2',
+        'day'       => '*',
+        'month'     => '*',
+        'dayofweek' => '*',
+    ],
+];

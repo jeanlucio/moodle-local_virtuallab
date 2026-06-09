@@ -48,6 +48,32 @@ if ($hassiteconfig) {
     ));
 
     $settings->add(new admin_setting_heading(
+        'local_labvirtual/heading_lifecycle',
+        get_string('settings_lifecycle', 'local_labvirtual'),
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'local_labvirtual/lifecycle_months',
+        get_string('settings_lifecycle_months', 'local_labvirtual'),
+        get_string('settings_lifecycle_months_desc', 'local_labvirtual'),
+        0,
+        PARAM_INT
+    ));
+
+    $settings->add(new admin_setting_configselect(
+        'local_labvirtual/lifecycle_action',
+        get_string('settings_lifecycle_action', 'local_labvirtual'),
+        get_string('settings_lifecycle_action_desc', 'local_labvirtual'),
+        0,
+        [
+            0 => get_string('settings_lifecycle_action_none', 'local_labvirtual'),
+            1 => get_string('settings_lifecycle_action_reset', 'local_labvirtual'),
+            2 => get_string('settings_lifecycle_action_delete', 'local_labvirtual'),
+        ]
+    ));
+
+    $settings->add(new admin_setting_heading(
         'local_labvirtual/heading_manage',
         '',
         \html_writer::link(
