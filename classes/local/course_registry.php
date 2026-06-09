@@ -41,22 +41,23 @@ class course_registry {
     }
 
     /**
-     * Returns the lab record for the given course ID, validating it belongs to the given batch.
+     * Returns the lab record for the given lab row ID, validating it belongs to the given batch.
      *
-     * @param int $courseid Moodle course ID.
-     * @param int $batchid  Expected batch ID (ownership check).
-     * @return \stdClass Lab record.
-     * @throws \moodle_exception If the course is not managed or does not belong to the batch.
+     * @param int $labid   Row ID in local_labvirtual_courses (PK).
+     * @param int $batchid Expected batch ID (ownership check).
+     * @return \stdClass Lab record with coursename populated.
+     * @throws \moodle_exception If the lab does not exist or belongs to a different batch.
      */
-    public function get_lab_for_batch(int $courseid, int $batchid): \stdClass {
+    public function get_lab_for_batch(int $labid, int $batchid): \stdClass {
         global $DB;
 
-        $sql = "SELECT lc.*
+        $sql = "SELECT lc.*, c.fullname AS coursename, c.shortname
                   FROM {local_labvirtual_courses} lc
-                 WHERE lc.courseid = :courseid
-                   AND lc.batchid  = :batchid";
+                  JOIN {course} c ON c.id = lc.courseid
+                 WHERE lc.id      = :id
+                   AND lc.batchid = :batchid";
 
-        $record = $DB->get_record_sql($sql, ['courseid' => $courseid, 'batchid' => $batchid]);
+        $record = $DB->get_record_sql($sql, ['id' => $labid, 'batchid' => $batchid]);
 
         if (!$record) {
             throw new \moodle_exception('error_course_not_managed', 'local_labvirtual');
