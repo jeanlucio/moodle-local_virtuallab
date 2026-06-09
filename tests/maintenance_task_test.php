@@ -1,0 +1,218 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * PHPUnit tests for maintenance_task.
+ *
+ * @package    local_labvirtual
+ * @copyright  2026 Jean Lúcio
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_labvirtual;
+
+use advanced_testcase;
+use local_labvirtual\local\batch_manager;
+use local_labvirtual\local\course_factory;
+use local_labvirtual\task\maintenance_task;
+
+/**
+ * Tests for the lifecycle scheduled task: disabled states, reset, delete, and date logic.
+ *
+ * @package    local_labvirtual
+ * @copyright  2026 Jean Lúcio
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversNothing
+ */
+final class maintenance_task_test extends advanced_testcase {
+    #[\Override]
+    protected function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        $this->setAdminUser();
+    }
+
+    /**
+     * Creates a batch with the given number of labs and returns their IDs.
+     *
+     * @param int $labcount Number of labs to create.
+     * @return array{batchid: int, courseids: int[]}
+     */
+    private function create_batch_with_labs(int $labcount = 1): array {
+        $user     = $this->getDataGenerator()->create_user();
+        $category = $this->getDataGenerator()->create_category();
+        $mgr      = new batch_manager();
+        $batchid  = $mgr->create_batch('Task Test Batch', $user->id, $category->id, 'Lab');
+        $factory  = new course_factory();
+        $courseids = $factory->create_labs($batchid, $labcount, 'tkey', 'skey');
+        return ['batchid' => $batchid, 'courseids' => $courseids];
+    }
+
+    /**
+     * Sets timecreated of all labs in a batch to $months months in the past.
+     *
+     * @param int $batchid Target batch.
+     * @param int $months  How many months back to set the timestamp.
+     */
+    private function backdate_labs(int $batchid, int $months): void {
+        global $DB;
+        $past = mktime(0, 0, 0, (int)date('n') - $months, (int)date('j'), (int)date('Y'));
+        $DB->set_field('local_labvirtual_courses', 'timecreated', $past, ['batchid' => $batchid]);
+    }
+
+    /**
+     * Runs the task, suppressing mtrace output.
+     */
+    private function run_task(): void {
+        ob_start();
+        (new maintenance_task())->execute();
+        ob_end_clean();
+    }
+
+    /**
+     * The task does nothing when lifecycle_months = 0 (feature disabled).
+     */
+    public function test_execute_does_nothing_when_months_zero(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 0, 'local_labvirtual');
+        set_config('lifecycle_action', 1, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 12);
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertEquals(0, (int) $lab->lastreset);
+    }
+
+    /**
+     * The task does nothing when lifecycle_action = 0 (action disabled).
+     */
+    public function test_execute_does_nothing_when_action_zero(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', 0, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 12);
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertEquals(0, (int) $lab->lastreset);
+    }
+
+    /**
+     * An overdue lab is reset (lastreset updated, course kept) when action = reset.
+     */
+    public function test_execute_resets_overdue_lab(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+
+        ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 7);
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertGreaterThan(0, (int) $lab->lastreset, 'lastreset should have been updated.');
+        $this->assertTrue($DB->record_exists('course', ['id' => $courseids[0]]), 'Course should still exist after reset.');
+    }
+
+    /**
+     * An overdue lab is deleted (course and registry row removed) when action = delete.
+     */
+    public function test_execute_deletes_overdue_lab(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_DELETE, 'local_labvirtual');
+
+        ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 7);
+
+        $this->run_task();
+
+        $this->assertFalse($DB->record_exists('local_labvirtual_courses', ['batchid' => $batchid]));
+        $this->assertFalse($DB->record_exists('course', ['id' => $courseids[0]]));
+    }
+
+    /**
+     * A lab created recently (within the lifecycle window) is not touched by the task.
+     */
+    public function test_execute_skips_recent_lab(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        // No backdating: timecreated is now, which is within the 6-month window.
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertEquals(0, (int) $lab->lastreset, 'Recent lab should not have been reset.');
+    }
+
+    /**
+     * The task uses lastreset (not timecreated) when lastreset > 0, so a recently-reset
+     * lab with an old timecreated is not processed again.
+     */
+    public function test_execute_uses_lastreset_over_timecreated(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 12);
+
+        $recentreset = time() - DAYSECS;
+        $DB->set_field('local_labvirtual_courses', 'lastreset', $recentreset, ['batchid' => $batchid]);
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertEquals($recentreset, (int) $lab->lastreset, 'lastreset should not have changed.');
+    }
+
+    /**
+     * All labs in a batch are processed when multiple labs are overdue.
+     */
+    public function test_execute_processes_all_overdue_labs(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs(3);
+        $this->backdate_labs($batchid, 7);
+
+        $this->run_task();
+
+        $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertCount(3, $labs);
+        foreach ($labs as $lab) {
+            $this->assertGreaterThan(0, (int) $lab->lastreset, "Lab $lab->id should have been reset.");
+        }
+    }
+}
