@@ -216,7 +216,8 @@ class maintenance_service {
         $data->reset_completion         = 1;
         $data->reset_roles_overrides    = 1;
         $data->reset_roles_local        = 1;
-        $data->reset_gradebook_grades   = 1;
+        // Grade cleanup happens via enrol_self::unenrol_user(); grade_course_reset() warns on false when no items exist.
+        $data->reset_gradebook_grades   = 0;
         $data->reset_gradebook_items    = 0;
         $data->reset_groups_remove      = 0;
         $data->reset_groupings_remove   = 0;
