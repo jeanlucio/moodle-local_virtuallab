@@ -208,9 +208,8 @@ class maintenance_service {
         $roleids = array_keys($roles);
 
         $data = new \stdClass();
-        $data->courseid                 = $courseid;
-        $data->reset_start_date         = 1;
-        $data->reset_start_date_time    = time();
+        $data->id                       = $courseid;
+        $data->reset_start_date         = 0;
         $data->reset_events             = 1;
         $data->reset_notes              = 1;
         $data->delete_blog_associations = 1;

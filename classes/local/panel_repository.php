@@ -92,11 +92,16 @@ class panel_repository {
                  WHERE lc.batchid = :batchid
               ORDER BY lc.id ASC, u.lastname ASC, u.firstname ASC";
 
-        $rows = $DB->get_records_sql($sql, [
+        $recordset = $DB->get_recordset_sql($sql, [
             'contextlevel' => CONTEXT_COURSE,
             'roleid'       => $this->teacherroleid,
             'batchid'      => $batchid,
         ]);
+        $rows = [];
+        foreach ($recordset as $row) {
+            $rows[] = $row;
+        }
+        $recordset->close();
 
         $userenrolments = $this->get_user_enrolments($batchid, $userid);
 

@@ -98,6 +98,13 @@ class course_factory {
 
             $course = create_course($coursedata);
 
+            // Remove any default self-enrolment instance added by create_course() so we
+            // end up with exactly two instances (teacher + student) as the plugin expects.
+            $defaults = $DB->get_records('enrol', ['courseid' => $course->id, 'enrol' => 'self']);
+            foreach ($defaults as $default) {
+                $enrolplugin->delete_instance($default);
+            }
+
             $teacherinstance = $enrolplugin->add_instance($course, [
                 'roleid'   => $teacherroleid,
                 'password' => $teacherkey,
