@@ -52,6 +52,7 @@ $string['delete_batch_label'] = 'Delete batch: {$a}';
 $string['delete_lab'] = 'Delete';
 $string['delete_lab_label'] = 'Delete lab: {$a}';
 $string['enrol_join'] = 'Enrol and join';
+$string['error_already_editor_in_batch'] = 'You are already enrolled as an editor in another lab in this batch.';
 $string['error_batch_not_found'] = 'Batch not found or does not belong to this site.';
 $string['error_course_not_managed'] = 'This course is not managed by Lab Virtual.';
 $string['error_enrol_mismatch'] = 'Enrollment instance does not match the requested lab.';

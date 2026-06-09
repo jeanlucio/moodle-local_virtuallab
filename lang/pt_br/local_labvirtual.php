@@ -52,6 +52,7 @@ $string['delete_batch_label'] = 'Excluir turma: {$a}';
 $string['delete_lab'] = 'Excluir';
 $string['delete_lab_label'] = 'Excluir laboratório: {$a}';
 $string['enrol_join'] = 'Acessar e ingressar';
+$string['error_already_editor_in_batch'] = 'Você já está inscrito como editor em outro laboratório desta turma.';
 $string['error_batch_not_found'] = 'Turma não encontrada ou não pertence a este site.';
 $string['error_course_not_managed'] = 'Este curso não é gerenciado pelo Lab Virtual.';
 $string['error_enrol_mismatch'] = 'Instância de inscrição não corresponde ao laboratório solicitado.';

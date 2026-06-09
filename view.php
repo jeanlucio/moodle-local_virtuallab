@@ -58,7 +58,7 @@ if ($action === 'enrol' && $enrolid && $courseid) {
     $isteacher = ($enrolid === (int) $lab->teacher_enrolid);
 
     if ($isteacher) {
-        $maxteachers = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
+        $maxteachers   = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
         $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
         $coursecontext = context_course::instance($courseid);
         $editors       = get_enrolled_users($coursecontext, 'moodle/course:update');
@@ -67,6 +67,33 @@ if ($action === 'enrol' && $enrolid && $courseid) {
             redirect(
                 $viewurl,
                 get_string('error_lab_full', 'local_labvirtual'),
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
+        }
+
+        $editorsql = "SELECT ra.id
+                        FROM {local_labvirtual_courses} lc
+                        JOIN {context} ctx ON ctx.instanceid  = lc.courseid
+                                         AND ctx.contextlevel = :ctxlevel
+                        JOIN {role_assignments} ra ON ra.contextid = ctx.id
+                                                  AND ra.userid    = :userid
+                                                  AND ra.roleid    = :roleid
+                       WHERE lc.batchid   = :batchid
+                         AND lc.courseid != :currentcourse";
+
+        $iseditorelsewhere = $DB->record_exists_sql($editorsql, [
+            'ctxlevel'      => CONTEXT_COURSE,
+            'userid'        => $USER->id,
+            'roleid'        => $teacherroleid,
+            'batchid'       => $batchid,
+            'currentcourse' => $courseid,
+        ]);
+
+        if ($iseditorelsewhere) {
+            redirect(
+                $viewurl,
+                get_string('error_already_editor_in_batch', 'local_labvirtual'),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
