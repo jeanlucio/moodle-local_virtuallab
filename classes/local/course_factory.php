@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Course factory — creates lab courses with two enrol_self instances.
+ * Course factory — creates lab courses enrolled through a manual instance.
  *
  * @package    local_labvirtual
  * @copyright  2026 Jean Lúcio
@@ -31,11 +31,10 @@ class course_factory {
     /**
      * Creates N lab courses for the given batch and registers them.
      *
-     * Each lab gets two enrol_self instances used only programmatically by the student
-     * panel. Self-enrolment via the standard course form is disabled (newenrols = 0), so
-     * no enrolment key is needed:
-     *   - one with role editingteacher (editor channel)
-     *   - one with role student (visitor channel)
+     * Each lab keeps only the course manual enrolment instance; the student panel enrols
+     * users through it programmatically, choosing the role (editingteacher or student) at
+     * enrolment time. The self-enrolment instance is removed so the standard "enrolment
+     * options" page offers nothing self-service.
      *
      * @param int $batchid  Batch to attach labs to.
      * @param int $labcount Number of labs to create.
@@ -51,9 +50,8 @@ class course_factory {
         require_once($CFG->libdir . '/enrollib.php');
 
         $batch         = $DB->get_record('local_labvirtual_batches', ['id' => $batchid], '*', MUST_EXIST);
-        $enrolplugin   = enrol_get_plugin('self');
-        $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
-        $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
+        $selfplugin    = enrol_get_plugin('self');
+        $manualplugin  = enrol_get_plugin('manual');
         $existingcount = $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]);
 
         $createdcourseids = [];
@@ -96,36 +94,26 @@ class course_factory {
 
             $course = create_course($coursedata);
 
-            // Remove any default self-enrolment instance added by create_course() so we
-            // end up with exactly two instances (teacher + student) as the plugin expects.
-            $defaults = $DB->get_records('enrol', ['courseid' => $course->id, 'enrol' => 'self']);
-            foreach ($defaults as $default) {
-                $enrolplugin->delete_instance($default);
+            // Remove the default self-enrolment instance so the manual instance is the only
+            // channel; the panel enrols programmatically and the standard enrolment-options
+            // page then offers nothing self-service.
+            $selfs = $DB->get_records('enrol', ['courseid' => $course->id, 'enrol' => 'self']);
+            foreach ($selfs as $self) {
+                $selfplugin->delete_instance($self);
             }
 
-            // Self-enrolment via the standard course form is disabled (newenrols = 0).
-            // The panel enrols programmatically with enrol_user(), bypassing that check.
-            $teacherinstance = $enrolplugin->add_instance($course, [
-                'roleid'     => $teacherroleid,
-                'name'       => get_string('key_editor', 'local_labvirtual'),
-                'status'     => ENROL_INSTANCE_ENABLED,
-                'customint6' => 0,
-            ]);
-
-            $studentinstance = $enrolplugin->add_instance($course, [
-                'roleid'     => $studentroleid,
-                'name'       => get_string('key_visitor', 'local_labvirtual'),
-                'status'     => ENROL_INSTANCE_ENABLED,
-                'customint6' => 0,
-            ]);
+            $manual = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
+            if (!$manual) {
+                $manualid = $manualplugin->add_instance($course);
+                $manual   = $DB->get_record('enrol', ['id' => $manualid], '*', MUST_EXIST);
+            }
 
             $record = (object) [
-                'batchid'         => $batchid,
-                'courseid'        => $course->id,
-                'teacher_enrolid' => $teacherinstance,
-                'student_enrolid' => $studentinstance,
-                'timecreated'     => time(),
-                'lastreset'       => 0,
+                'batchid'     => $batchid,
+                'courseid'    => $course->id,
+                'enrolid'     => $manual->id,
+                'timecreated' => time(),
+                'lastreset'   => 0,
             ];
 
             $DB->insert_record('local_labvirtual_courses', $record);

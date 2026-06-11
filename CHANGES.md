@@ -11,6 +11,7 @@
 - Removed enrolment keys entirely: lab courses are now created with self-enrolment disabled (newenrols = 0) and no enrolment key, so the "Create labs" form no longer asks for editor/visitor keys. The panel enrols users programmatically. An upgrade step normalises existing labs.
 - A batch can now have more than one responsible teacher. The batch form accepts multiple teachers, the panel shows all of them, and lifecycle emails are sent to every responsible teacher. A new join table replaces the single teacher column (existing batches are migrated automatically).
 - Lifecycle warning and summary emails are now also sent to the editors of each affected course (one email per editor, listing their own labs). The administrator copy is now optional via the new "Send a copy to the administrator" setting (off by default).
+- Labs now enrol users through the course manual enrolment instance instead of two self-enrolment instances. The panel chooses the role (editor or visitor) at enrolment time, and the standard course "enrolment options" page no longer shows the confusing disabled key blocks. The single teacher_enrolid/student_enrolid columns become one enrolid (existing labs migrated). The self-enrolment observer was removed as it is no longer reachable.
 - New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
 
 ## 0.4.0-alpha (2026-06-09)

@@ -95,8 +95,8 @@ class maintenance_service {
     }
 
     /**
-     * Deletes a batch and all its labs: removes every lab course, their enrol
-     * instances, all registry rows, and the batch record itself.
+     * Deletes a batch and all its labs: removes every lab course (and its enrolments),
+     * all registry rows, and the batch record itself.
      *
      * @param int $batchid Batch ID.
      * @throws \dml_exception If the batch record does not exist.
@@ -109,27 +109,10 @@ class maintenance_service {
         $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
 
         if ($labs) {
-            // Pre-fetch all enrol instances in one query to avoid N+1.
-            $enrolids = [];
-            foreach ($labs as $lab) {
-                $enrolids[] = $lab->teacher_enrolid;
-                $enrolids[] = $lab->student_enrolid;
-            }
-            [$insql, $params] = $DB->get_in_or_equal(array_unique($enrolids), SQL_PARAMS_NAMED);
-            $enrolinstances = $DB->get_records_select('enrol', "id $insql", $params);
-
-            $enrolplugin = enrol_get_plugin('self');
-
-            // Delete each lab course; delete_course() is a per-course Moodle API call so the loop is unavoidable.
+            // Deleting the course also removes its enrolment instances; the loop is
+            // unavoidable because delete_course() is a per-course Moodle API call.
             foreach ($labs as $lab) {
                 $context = \context_course::instance($lab->courseid, IGNORE_MISSING);
-
-                // Remove enrol instances before course deletion.
-                foreach ([$lab->teacher_enrolid, $lab->student_enrolid] as $enrolid) {
-                    if (isset($enrolinstances[$enrolid])) {
-                        $enrolplugin->delete_instance($enrolinstances[$enrolid]);
-                    }
-                }
 
                 $event = course_deleted::create([
                     'objectid' => $lab->id,
@@ -166,18 +149,6 @@ class maintenance_service {
         global $DB;
 
         $context = \context_course::instance($lab->courseid, IGNORE_MISSING);
-
-        // Fetch both enrol instances in one query.
-        [$insql, $params] = $DB->get_in_or_equal(
-            [$lab->teacher_enrolid, $lab->student_enrolid],
-            SQL_PARAMS_NAMED
-        );
-        $enrolinstances = $DB->get_records_select('enrol', "id $insql", $params);
-
-        $enrolplugin = enrol_get_plugin('self');
-        foreach ($enrolinstances as $instance) {
-            $enrolplugin->delete_instance($instance);
-        }
 
         $event = course_deleted::create([
             'objectid' => $lab->id,
@@ -221,7 +192,7 @@ class maintenance_service {
         $data->reset_completion         = 1;
         $data->reset_roles_overrides    = 1;
         $data->reset_roles_local        = 1;
-        // Grade cleanup happens via enrol_self::unenrol_user(); grade_course_reset() warns on false when no items exist.
+        // Grade cleanup happens when users are unenrolled; grade_course_reset() warns on false when no items exist.
         $data->reset_gradebook_grades   = 0;
         $data->reset_gradebook_items    = 0;
         $data->reset_groups_remove      = 0;

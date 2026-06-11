@@ -96,9 +96,10 @@ class behat_local_labvirtual extends behat_base {
             throw new \Exception("Batch '{$name}' has no labs to enrol into.");
         }
 
-        $instance = $DB->get_record('enrol', ['id' => $lab->teacher_enrolid], '*', MUST_EXIST);
-        $plugin   = enrol_get_plugin('self');
-        $plugin->enrol_user($instance, (int) $user->id, (int) $instance->roleid);
+        $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
+        $instance      = $DB->get_record('enrol', ['id' => $lab->enrolid], '*', MUST_EXIST);
+        $plugin        = enrol_get_plugin('manual');
+        $plugin->enrol_user($instance, (int) $user->id, (int) $teacherroleid);
     }
 
     /**

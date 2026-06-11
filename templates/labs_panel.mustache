@@ -17,8 +17,6 @@
                 "courseid": 42,
                 "coursename": "Lab EAD 01",
                 "courseurl": "/course/view.php?id=42",
-                "teacher_enrolid": 10,
-                "student_enrolid": 11,
                 "can_enrol_editor": true,
                 "can_enrol_visitor": true,
                 "user_enrolled_here": false,
@@ -90,7 +88,7 @@
                             <input type="hidden" name="action" value="enrol">
                             <input type="hidden" name="batchid" value="{{batchid}}">
                             <input type="hidden" name="courseid" value="{{courseid}}">
-                            <input type="hidden" name="enrolid" value="{{teacher_enrolid}}">
+                            <input type="hidden" name="role" value="editor">
                             <input type="hidden" name="sesskey" value="{{sesskey}}">
                             <button type="submit"
                                     class="btn btn-sm btn-primary me-1"
@@ -111,7 +109,7 @@
                             <input type="hidden" name="action" value="enrol">
                             <input type="hidden" name="batchid" value="{{batchid}}">
                             <input type="hidden" name="courseid" value="{{courseid}}">
-                            <input type="hidden" name="enrolid" value="{{student_enrolid}}">
+                            <input type="hidden" name="role" value="visitor">
                             <input type="hidden" name="sesskey" value="{{sesskey}}">
                             <button type="submit"
                                     class="btn btn-sm btn-outline-secondary"

@@ -111,5 +111,88 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061110, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061120) {
+        $table = new xmldb_table('local_labvirtual_courses');
+
+        // Single manual enrolment instance replaces the two enrol_self instances.
+        $enrolfield = new xmldb_field('enrolid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'courseid');
+        if (!$dbman->field_exists($table, $enrolfield)) {
+            $dbman->add_field($table, $enrolfield);
+        }
+
+        // Populate enrolid with each course's manual enrolment instance.
+        $labs = $DB->get_records('local_labvirtual_courses');
+        if ($labs) {
+            $courseids = array_map(fn($lab) => $lab->courseid, $labs);
+            [$insql, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+            $params['enrol'] = 'manual';
+            $manuals = $DB->get_records_select('enrol', "courseid $insql AND enrol = :enrol", $params, '', 'id, courseid');
+
+            $bycourse = [];
+            foreach ($manuals as $manual) {
+                $bycourse[$manual->courseid] = $manual->id;
+            }
+
+            $manualplugin = enrol_get_plugin('manual');
+            foreach ($labs as $lab) {
+                $enrolid = $bycourse[$lab->courseid] ?? 0;
+                if (!$enrolid) {
+                    $course = $DB->get_record('course', ['id' => $lab->courseid]);
+                    if ($course) {
+                        $enrolid = (int) $manualplugin->add_instance($course);
+                    }
+                }
+                $DB->set_field('local_labvirtual_courses', 'enrolid', $enrolid, ['id' => $lab->id]);
+            }
+        }
+
+        $enrolindex = new xmldb_index('enrolid', XMLDB_INDEX_NOTUNIQUE, ['enrolid']);
+        if (!$dbman->index_exists($table, $enrolindex)) {
+            $dbman->add_index($table, $enrolindex);
+        }
+
+        // Drop the obsolete enrol_self instance columns.
+        foreach (['teacher_enrolid', 'student_enrolid'] as $fieldname) {
+            $oldindex = new xmldb_index($fieldname, XMLDB_INDEX_NOTUNIQUE, [$fieldname]);
+            if ($dbman->index_exists($table, $oldindex)) {
+                $dbman->drop_index($table, $oldindex);
+            }
+            $oldfield = new xmldb_field($fieldname);
+            if ($dbman->field_exists($table, $oldfield)) {
+                $dbman->drop_field($table, $oldfield);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026061120, 'local', 'labvirtual');
+    }
+
+    if ($oldversion < 2026061121) {
+        // Remove the obsolete self-enrolment instances from managed courses so the standard
+        // enrolment page no longer shows the disabled key blocks. Any remaining self
+        // enrolments are moved to the manual instance first so access is preserved. The
+        // per-course loop is acceptable here as this is a one-off migration.
+        $labs = $DB->get_records('local_labvirtual_courses', null, '', 'id, courseid, enrolid');
+        if ($labs) {
+            $manualplugin = enrol_get_plugin('manual');
+            $selfplugin   = enrol_get_plugin('self');
+
+            foreach ($labs as $lab) {
+                $manualinstance = $lab->enrolid ? $DB->get_record('enrol', ['id' => $lab->enrolid]) : null;
+                $selfs = $DB->get_records('enrol', ['courseid' => $lab->courseid, 'enrol' => 'self']);
+
+                foreach ($selfs as $self) {
+                    if ($manualinstance) {
+                        foreach ($DB->get_records('user_enrolments', ['enrolid' => $self->id]) as $ue) {
+                            $manualplugin->enrol_user($manualinstance, $ue->userid, (int) $self->roleid);
+                        }
+                    }
+                    $selfplugin->delete_instance($self);
+                }
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026061121, 'local', 'labvirtual');
+    }
+
     return true;
 }

@@ -77,9 +77,9 @@ final class course_factory_test extends advanced_testcase {
     }
 
     /**
-     * Each lab gets exactly two enrol_self instances, one per role (editingteacher + student).
+     * Each lab records the course manual enrolment instance and keeps no self-enrolment instance.
      */
-    public function test_create_labs_creates_two_enrol_instances_per_lab(): void {
+    public function test_create_labs_uses_manual_enrolment(): void {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch();
@@ -87,39 +87,17 @@ final class course_factory_test extends advanced_testcase {
         $factory   = new course_factory();
         $courseids = $factory->create_labs($batchid, 2);
 
-        $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
-        $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student']);
-
         foreach ($courseids as $courseid) {
-            $enrols = $DB->get_records('enrol', ['courseid' => $courseid, 'enrol' => 'self']);
-            $this->assertCount(2, $enrols, "Course $courseid should have exactly 2 enrol_self instances.");
+            $lab    = $DB->get_record('local_labvirtual_courses', ['courseid' => $courseid]);
+            $manual = $DB->get_record('enrol', ['id' => $lab->enrolid], '*', MUST_EXIST);
 
-            $roleids = array_column((array) $enrols, 'roleid');
-            $this->assertContains((string) $teacherroleid, $roleids);
-            $this->assertContains((string) $studentroleid, $roleids);
+            $this->assertSame('manual', $manual->enrol);
+            $this->assertEquals($courseid, (int) $manual->courseid);
+            $this->assertFalse(
+                $DB->record_exists('enrol', ['courseid' => $courseid, 'enrol' => 'self']),
+                "Course $courseid should have no self-enrolment instance."
+            );
         }
-    }
-
-    /**
-     * Self-enrolment via the standard course form is disabled (newenrols = 0) and no
-     * enrolment key is stored; the panel enrols programmatically instead.
-     */
-    public function test_create_labs_disables_self_enrolment(): void {
-        global $DB;
-
-        ['batchid' => $batchid] = $this->create_batch();
-
-        $factory = new course_factory();
-        $factory->create_labs($batchid, 1);
-
-        $lab     = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
-        $teacher = $DB->get_record('enrol', ['id' => $lab->teacher_enrolid]);
-        $student = $DB->get_record('enrol', ['id' => $lab->student_enrolid]);
-
-        $this->assertEmpty($teacher->password);
-        $this->assertEmpty($student->password);
-        $this->assertEquals(0, (int) $teacher->customint6);
-        $this->assertEquals(0, (int) $student->customint6);
     }
 
     /**

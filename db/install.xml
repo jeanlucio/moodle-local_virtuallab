@@ -35,8 +35,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="batchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK local_labvirtual_batches.id"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK course.id — managed sandbox course"/>
-        <FIELD NAME="teacher_enrolid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK enrol.id — enrol_self instance with editingteacher role"/>
-        <FIELD NAME="student_enrolid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK enrol.id — enrol_self instance with student role"/>
+        <FIELD NAME="enrolid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="FK enrol.id — manual enrolment instance used by the panel"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of lab creation — base for lifecycle"/>
         <FIELD NAME="lastreset" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last successful reset (0 = never)"/>
         <FIELD NAME="lastwarn" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last lifecycle warning email sent to the teacher (0 = never)"/>
@@ -48,8 +47,7 @@
         <INDEX NAME="courseid" UNIQUE="true" FIELDS="courseid"/>
         <INDEX NAME="batchid" UNIQUE="false" FIELDS="batchid"/>
         <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
-        <INDEX NAME="teacher_enrolid" UNIQUE="false" FIELDS="teacher_enrolid"/>
-        <INDEX NAME="student_enrolid" UNIQUE="false" FIELDS="student_enrolid"/>
+        <INDEX NAME="enrolid" UNIQUE="false" FIELDS="enrolid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

@@ -158,80 +158,44 @@ final class course_registry_test extends advanced_testcase {
     }
 
     /**
-     * validate_enrol_instance accepts the teacher enrolment instance.
+     * get_lab_for_enrol returns the lab when the course belongs to the batch.
      */
-    public function test_validate_enrol_instance_accepts_teacher_enrolid(): void {
+    public function test_get_lab_for_enrol_returns_lab(): void {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
         $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
 
         $registry = new course_registry();
-        $result   = $registry->validate_enrol_instance(
-            (int) $lab->teacher_enrolid,
-            (int) $lab->courseid,
-            $batchid
-        );
+        $result   = $registry->get_lab_for_enrol((int) $lab->courseid, $batchid);
 
         $this->assertEquals((int) $lab->id, (int) $result->id);
+        $this->assertEquals((int) $lab->enrolid, (int) $result->enrolid);
     }
 
     /**
-     * validate_enrol_instance accepts the student enrolment instance.
+     * get_lab_for_enrol throws when the course belongs to a different batch.
      */
-    public function test_validate_enrol_instance_accepts_student_enrolid(): void {
+    public function test_get_lab_for_enrol_rejects_cross_batch(): void {
         global $DB;
 
-        ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
-
-        $registry = new course_registry();
-        $result   = $registry->validate_enrol_instance(
-            (int) $lab->student_enrolid,
-            (int) $lab->courseid,
-            $batchid
-        );
-
-        $this->assertEquals((int) $lab->id, (int) $result->id);
-    }
-
-    /**
-     * validate_enrol_instance throws when the enrol ID belongs to a different lab in the batch.
-     */
-    public function test_validate_enrol_instance_rejects_cross_lab_enrolid(): void {
-        global $DB;
-
-        ['batchid' => $batchid] = $this->create_batch_with_labs(2);
-
-        $labs = array_values($DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]));
-        $lab1 = $labs[0];
-        $lab2 = $labs[1];
-
-        // Pass lab2's enrol ID but lab1's courseid — validation must fail.
-        $registry = new course_registry();
-        $this->expectException(\moodle_exception::class);
-        $registry->validate_enrol_instance(
-            (int) $lab2->teacher_enrolid,
-            (int) $lab1->courseid,
-            $batchid
-        );
-    }
-
-    /**
-     * validate_enrol_instance throws when the batch ID does not match the course.
-     */
-    public function test_validate_enrol_instance_rejects_wrong_batch(): void {
-        global $DB;
-
-        ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        ['batchid' => $batch1] = $this->create_batch_with_labs(1);
+        ['batchid' => $batch2] = $this->create_batch_with_labs(1);
+        $lab2 = $DB->get_record('local_labvirtual_courses', ['batchid' => $batch2]);
 
         $registry = new course_registry();
         $this->expectException(\moodle_exception::class);
-        $registry->validate_enrol_instance(
-            (int) $lab->teacher_enrolid,
-            (int) $lab->courseid,
-            99999
-        );
+        $registry->get_lab_for_enrol((int) $lab2->courseid, $batch1);
+    }
+
+    /**
+     * get_lab_for_enrol throws when the course is not managed at all.
+     */
+    public function test_get_lab_for_enrol_rejects_unknown_course(): void {
+        ['batchid' => $batchid] = $this->create_batch_with_labs(1);
+
+        $registry = new course_registry();
+        $this->expectException(\moodle_exception::class);
+        $registry->get_lab_for_enrol(99999, $batchid);
     }
 }

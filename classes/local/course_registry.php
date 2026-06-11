@@ -115,30 +115,22 @@ class course_registry {
     }
 
     /**
-     * Validates that the given enrolment instance belongs to the given course in this batch.
+     * Returns the lab for the given course, validating it belongs to the given batch.
      *
-     * Used to prevent cross-course or cross-batch enrolment injection.
+     * Used by the panel before enrolling, so a forged course ID cannot target a course
+     * outside the batch.
      *
-     * @param int $enrolid   Enrolment instance ID to validate.
-     * @param int $courseid  Expected Moodle course ID.
-     * @param int $batchid   Expected batch ID.
-     * @return \stdClass The lab record.
-     * @throws \moodle_exception If validation fails.
+     * @param int $courseid Expected Moodle course ID.
+     * @param int $batchid  Expected batch ID.
+     * @return \stdClass The lab record, including its manual enrolid.
+     * @throws \moodle_exception If the course does not belong to the batch.
      */
-    public function validate_enrol_instance(int $enrolid, int $courseid, int $batchid): \stdClass {
+    public function get_lab_for_enrol(int $courseid, int $batchid): \stdClass {
         global $DB;
 
-        $sql = "SELECT lc.*
-                  FROM {local_labvirtual_courses} lc
-                 WHERE lc.courseid = :courseid
-                   AND lc.batchid  = :batchid
-                   AND (lc.teacher_enrolid = :eid1 OR lc.student_enrolid = :eid2)";
-
-        $record = $DB->get_record_sql($sql, [
+        $record = $DB->get_record('local_labvirtual_courses', [
             'courseid' => $courseid,
             'batchid'  => $batchid,
-            'eid1'     => $enrolid,
-            'eid2'     => $enrolid,
         ]);
 
         if (!$record) {
