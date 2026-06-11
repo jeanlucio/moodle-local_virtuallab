@@ -30,14 +30,22 @@ use local_labvirtual\local\panel_repository;
 
 $batchid = required_param('batchid', PARAM_INT);
 
+$viewurl = new moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]);
+
 require_login();
+
+// The panel requires a real account to self-enrol into a lab; send guests to log in.
+if (isguestuser()) {
+    $SESSION->wantsurl = $viewurl->out(false);
+    redirect(new moodle_url('/login/index.php'));
+}
+
 $context = context_system::instance();
 require_capability('local/labvirtual:view', $context);
 
 $batchmgr = new batch_manager();
 $batch    = $batchmgr->get_batch($batchid);
 
-$viewurl = new moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]);
 $PAGE->set_context($context);
 $PAGE->set_url($viewurl);
 $PAGE->set_pagelayout('standard');
