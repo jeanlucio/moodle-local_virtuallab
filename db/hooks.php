@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $callbacks = [
     [
         'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
-        'callback' => [\local_labvirtual\hook_callbacks::class, 'before_standard_top_of_body_html'],
+        'callback' => 'local_labvirtual\hook_callbacks::before_standard_top_of_body_html',
     ],
 ];
