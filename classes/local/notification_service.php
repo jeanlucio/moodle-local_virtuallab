@@ -334,8 +334,8 @@ class notification_service {
     /**
      * Inverts a course-to-editors map into one entry per editor with their course IDs.
      *
-     * @param array<int, \stdClass[]> $editorsbycourse Editors indexed by course ID.
-     * @return array<int, array{user: \stdClass, courseids: int[]}> Indexed by user ID.
+     * @param array $editorsbycourse Editors indexed by course ID (course ID => user records).
+     * @return array Indexed by user ID; each value is ['user' => \stdClass, 'courseids' => int[]].
      */
     private function group_courses_by_editor(array $editorsbycourse): array {
         $byeditor = [];
