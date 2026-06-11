@@ -118,15 +118,8 @@ if ($action === 'enrol' && $enrolid && $courseid) {
 }
 
 // Render panel.
-$userfields  = 'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename';
-$teacher     = $DB->get_record('user', ['id' => $batch->teacherid], $userfields, MUST_EXIST);
-$batchforrender = clone $batch;
-$batchforrender->firstname         = $teacher->firstname;
-$batchforrender->lastname          = $teacher->lastname;
-$batchforrender->firstnamephonetic = $teacher->firstnamephonetic;
-$batchforrender->lastnamephonetic  = $teacher->lastnamephonetic;
-$batchforrender->middlename        = $teacher->middlename;
-$batchforrender->alternatename     = $teacher->alternatename;
+$teachers     = $batchmgr->get_teachers($batchid);
+$teachernames = implode(', ', array_map(fn($teacher) => fullname($teacher), $teachers));
 
 $repository = new panel_repository();
 $labs       = $repository->get_panel_data($batchid, $USER->id);
@@ -134,5 +127,5 @@ $labs       = $repository->get_panel_data($batchid, $USER->id);
 $renderer = $PAGE->get_renderer('local_labvirtual');
 
 echo $OUTPUT->header();
-echo $renderer->render_labs_panel($batchforrender, $labs, $batchid);
+echo $renderer->render_labs_panel($batch, $teachernames, $labs, $batchid);
 echo $OUTPUT->footer();

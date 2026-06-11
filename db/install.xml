@@ -8,7 +8,6 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Batch name (e.g. Projeto de Interface 2026/1)"/>
-        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK user.id — responsible teacher"/>
         <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle course_categories.id where labs are created"/>
         <FIELD NAME="nameprefix" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Lab name prefix (e.g. Lab EAD → Lab EAD 01)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of batch creation"/>
@@ -16,8 +15,19 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="local_labvirtual_batch_teachers" COMMENT="Responsible teachers per batch (N-to-N)">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="batchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK local_labvirtual_batches.id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK user.id — responsible teacher"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
       <INDEXES>
-        <INDEX NAME="teacherid" UNIQUE="false" FIELDS="teacherid"/>
+        <INDEX NAME="batchid-userid" UNIQUE="true" FIELDS="batchid, userid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_labvirtual_courses" COMMENT="Lab Virtual individual labs (sandbox courses)">

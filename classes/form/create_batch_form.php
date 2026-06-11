@@ -48,18 +48,18 @@ class create_batch_form extends \moodleform {
         $mform->addRule('name', null, 'required', null, 'client');
 
         $options = [
-            'ajax'             => 'core_user/form_user_selector',
-            'multiple'         => false,
+            'ajax'              => 'core_user/form_user_selector',
+            'multiple'          => true,
             'noselectionstring' => get_string('search'),
         ];
         $mform->addElement(
             'autocomplete',
-            'teacherid',
+            'teacherids',
             get_string('batch_teacher', 'local_labvirtual'),
             [],
             $options
         );
-        $mform->addRule('teacherid', null, 'required', null, 'client');
+        $mform->addRule('teacherids', null, 'required', null, 'client');
 
         $categories = core_course_category::make_categories_list('', 0, ' / ');
         $mform->addElement(

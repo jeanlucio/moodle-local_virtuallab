@@ -53,7 +53,7 @@ final class course_factory_test extends advanced_testcase {
         $user     = $this->getDataGenerator()->create_user();
         $category = $this->getDataGenerator()->create_category();
         $mgr      = new batch_manager();
-        $batchid  = $mgr->create_batch('Test Batch', $user->id, $category->id, 'Lab');
+        $batchid  = $mgr->create_batch('Test Batch', [$user->id], $category->id, 'Lab');
         return ['batchid' => $batchid, 'categoryid' => $category->id];
     }
 

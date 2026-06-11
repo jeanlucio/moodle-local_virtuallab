@@ -268,12 +268,12 @@ if ($action === 'createbatch') {
 
     if ($data = $form->get_data()) {
         require_sesskey();
-        $teacherid = is_array($data->teacherid) ? (int) reset($data->teacherid) : (int) $data->teacherid;
+        $teacherids = array_map('intval', (array) $data->teacherids);
 
         $batchmgr = new batch_manager();
         $batchmgr->create_batch(
             $data->name,
-            $teacherid,
+            $teacherids,
             (int) $data->categoryid,
             $data->nameprefix
         );

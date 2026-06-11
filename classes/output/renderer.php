@@ -70,12 +70,13 @@ class renderer extends plugin_renderer_base {
     /**
      * Renders the student panel for a batch.
      *
-     * @param \stdClass $batch     Batch record with teacher name pre-populated.
-     * @param array     $labs      Enriched lab data from panel_repository.
-     * @param int       $batchid   Batch ID (for form actions).
+     * @param \stdClass $batch        Batch record.
+     * @param string    $teachernames Comma-separated names of the responsible teachers.
+     * @param array     $labs         Enriched lab data from panel_repository.
+     * @param int       $batchid      Batch ID (for form actions).
      * @return string Rendered HTML.
      */
-    public function render_labs_panel(\stdClass $batch, array $labs, int $batchid): string {
+    public function render_labs_panel(\stdClass $batch, string $teachernames, array $labs, int $batchid): string {
         $labrows = [];
         foreach ($labs as $lab) {
             $lab['courseurl'] = (new \moodle_url('/course/view.php', ['id' => $lab['courseid']]))->out(false);
@@ -84,7 +85,7 @@ class renderer extends plugin_renderer_base {
 
         $context = [
             'batchname'       => format_string($batch->name),
-            'teachername'     => format_string(fullname($batch)),
+            'teachername'     => $teachernames,
             'batchid'         => $batchid,
             'sesskey'         => sesskey(),
             'viewurl'         => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
@@ -109,7 +110,7 @@ class renderer extends plugin_renderer_base {
             $rows[] = [
                 'id'           => $batch->id,
                 'name'         => format_string($batch->name),
-                'teachername'  => format_string(fullname($batch)),
+                'teachername'  => $batch->teachernames,
                 'categoryname' => format_string($batch->categoryname),
                 'labcount'     => (int) $batch->labcount,
                 'manageurl'    => (new \moodle_url(

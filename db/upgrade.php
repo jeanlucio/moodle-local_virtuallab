@@ -71,5 +71,45 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061103, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061110) {
+        // New join table for multiple responsible teachers per batch.
+        $table = new xmldb_table('local_labvirtual_batch_teachers');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('batchid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('batchid-userid', XMLDB_INDEX_UNIQUE, ['batchid', 'userid']);
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Migrate the single teacherid into the new table.
+        $batchtable = new xmldb_table('local_labvirtual_batches');
+        $teacherfield = new xmldb_field('teacherid');
+
+        if ($dbman->field_exists($batchtable, $teacherfield)) {
+            $batches = $DB->get_records('local_labvirtual_batches', null, '', 'id, teacherid');
+            $rows = [];
+            foreach ($batches as $batch) {
+                if ((int) $batch->teacherid > 0) {
+                    $rows[] = (object) ['batchid' => $batch->id, 'userid' => $batch->teacherid];
+                }
+            }
+            if ($rows) {
+                $DB->insert_records('local_labvirtual_batch_teachers', $rows);
+            }
+
+            $teacherindex = new xmldb_index('teacherid', XMLDB_INDEX_NOTUNIQUE, ['teacherid']);
+            if ($dbman->index_exists($batchtable, $teacherindex)) {
+                $dbman->drop_index($batchtable, $teacherindex);
+            }
+            $dbman->drop_field($batchtable, $teacherfield);
+        }
+
+        upgrade_plugin_savepoint(true, 2026061110, 'local', 'labvirtual');
+    }
+
     return true;
 }

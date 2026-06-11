@@ -66,7 +66,6 @@ class notification_service {
                 continue;
             }
 
-            $teacher = $teachers[$batchid];
             $subject = get_string('email_warning_subject', 'local_labvirtual', (object) [
                 'action' => $actionlabel,
                 'days'   => $days,
@@ -91,7 +90,9 @@ class notification_service {
 
             $text = html_to_text($html);
 
-            email_to_user($teacher, $from, $subject, $text, $html);
+            foreach ($teachers[$batchid] as $teacher) {
+                email_to_user($teacher, $from, $subject, $text, $html);
+            }
         }
     }
 
@@ -130,7 +131,9 @@ class notification_service {
             );
             $text = html_to_text($html);
 
-            email_to_user($teachers[$batchid], $from, $subject, $text, $html);
+            foreach ($teachers[$batchid] as $teacher) {
+                email_to_user($teacher, $from, $subject, $text, $html);
+            }
         }
 
         $admin = get_admin();
@@ -148,10 +151,10 @@ class notification_service {
     }
 
     /**
-     * Returns the responsible teacher (full user record) for each batch ID in one query.
+     * Returns the responsible teachers (full user records) for each batch ID in one query.
      *
      * @param int[] $batchids Batch IDs to resolve.
-     * @return \stdClass[] Indexed by batch ID; each value is a user record (id = teacher).
+     * @return array<int, \stdClass[]> Indexed by batch ID; each value is a list of user records.
      */
     private function get_teachers_by_batch(array $batchids): array {
         global $DB;
@@ -162,14 +165,19 @@ class notification_service {
 
         [$insql, $params] = $DB->get_in_or_equal($batchids, SQL_PARAMS_NAMED);
 
-        $sql = "SELECT b.id AS batchid, u.*, b.name AS batchname
-                  FROM {local_labvirtual_batches} b
-                  JOIN {user} u ON u.id = b.teacherid
-                 WHERE b.id $insql
+        $sql = "SELECT bt.id AS rowid, bt.batchid, u.*
+                  FROM {local_labvirtual_batch_teachers} bt
+                  JOIN {user} u ON u.id = bt.userid
+                 WHERE bt.batchid $insql
                    AND u.deleted = 0
                    AND u.suspended = 0";
 
-        return $DB->get_records_sql($sql, $params);
+        $bybatch = [];
+        foreach ($DB->get_records_sql($sql, $params) as $row) {
+            $bybatch[$row->batchid][] = $row;
+        }
+
+        return $bybatch;
     }
 
     /**

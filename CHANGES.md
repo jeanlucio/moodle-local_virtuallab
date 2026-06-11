@@ -9,6 +9,7 @@
 - The student panel now sends guests to the login page (returning to the panel afterwards) instead of failing a capability check
 - Removed enrolment key display from the student panel: enrolment is automatic via the panel buttons, so the keys are no longer shown to anyone (they remain set on the enrol instances to prevent direct self-enrolment). The "Show enrolment keys in student panel" setting was removed.
 - Removed enrolment keys entirely: lab courses are now created with self-enrolment disabled (newenrols = 0) and no enrolment key, so the "Create labs" form no longer asks for editor/visitor keys. The panel enrols users programmatically. An upgrade step normalises existing labs.
+- A batch can now have more than one responsible teacher. The batch form accepts multiple teachers, the panel shows all of them, and lifecycle emails are sent to every responsible teacher. A new join table replaces the single teacher column (existing batches are migrated automatically).
 - New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
 
 ## 0.4.0-alpha (2026-06-09)
