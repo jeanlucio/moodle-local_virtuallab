@@ -61,10 +61,9 @@ class behat_local_labvirtual extends behat_base {
         global $DB;
 
         $teacher  = $DB->get_record('user', ['username' => $username], '*', MUST_EXIST);
-        $category = \testing_util::get_data_generator()->create_category(['name' => 'Lab Virtual category']);
 
         $batchmgr = new batch_manager();
-        $batchid  = $batchmgr->create_batch($name, [(int) $teacher->id], (int) $category->id, 'Lab EAD');
+        $batchid  = $batchmgr->create_batch($name, [(int) $teacher->id], 'Lab EAD');
 
         if ((int) $count > 0) {
             $factory = new course_factory();

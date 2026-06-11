@@ -53,9 +53,8 @@ final class maintenance_service_test extends advanced_testcase {
      */
     private function create_batch_with_labs(int $labcount = 2): array {
         $user     = $this->getDataGenerator()->create_user();
-        $category = $this->getDataGenerator()->create_category();
         $mgr      = new batch_manager();
-        $batchid  = $mgr->create_batch('Test Batch', [$user->id], $category->id, 'Lab');
+        $batchid  = $mgr->create_batch('Test Batch', [$user->id], 'Lab');
         $factory  = new course_factory();
         $courseids = $factory->create_labs($batchid, $labcount);
         return ['batchid' => $batchid, 'courseids' => $courseids];

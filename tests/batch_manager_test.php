@@ -40,26 +40,32 @@ final class batch_manager_test extends advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        $this->setAdminUser();
     }
 
     /**
      * Creating a batch persists all fields, the responsible teacher and can be retrieved by ID.
      */
     public function test_create_and_get_batch(): void {
-        $user     = $this->getDataGenerator()->create_user();
-        $category = $this->getDataGenerator()->create_category();
+        global $DB;
+
+        $user = $this->getDataGenerator()->create_user();
 
         $mgr = new batch_manager();
-        $id  = $mgr->create_batch('Projeto de Interface 2026/1', [$user->id], $category->id, 'Lab EAD');
+        $id  = $mgr->create_batch('Projeto de Interface 2026/1', [$user->id], 'Lab EAD');
 
         $this->assertIsInt($id);
         $this->assertGreaterThan(0, $id);
 
         $batch = $mgr->get_batch($id);
         $this->assertSame('Projeto de Interface 2026/1', $batch->name);
-        $this->assertEquals($category->id, (int) $batch->categoryid);
         $this->assertSame('Lab EAD', $batch->nameprefix);
         $this->assertGreaterThan(0, (int) $batch->timecreated);
+
+        // The batch lives in its own auto-created subcategory named after it.
+        $this->assertGreaterThan(0, (int) $batch->categoryid);
+        $subcategory = $DB->get_record('course_categories', ['id' => $batch->categoryid], 'name', MUST_EXIST);
+        $this->assertSame('Projeto de Interface 2026/1', $subcategory->name);
 
         $teachers = $mgr->get_teachers($id);
         $this->assertCount(1, $teachers);
@@ -73,10 +79,9 @@ final class batch_manager_test extends advanced_testcase {
         $user1    = $this->getDataGenerator()->create_user();
         $user2    = $this->getDataGenerator()->create_user();
         $user3    = $this->getDataGenerator()->create_user();
-        $category = $this->getDataGenerator()->create_category();
 
         $mgr = new batch_manager();
-        $id  = $mgr->create_batch('Turma Multi', [$user1->id, $user2->id], $category->id, 'Lab');
+        $id  = $mgr->create_batch('Turma Multi', [$user1->id, $user2->id], 'Lab');
 
         $teachers = $mgr->get_teachers($id);
         $this->assertCount(2, $teachers);
@@ -93,14 +98,34 @@ final class batch_manager_test extends advanced_testcase {
     }
 
     /**
+     * Responsible teachers get :manage at their own batch subcategory, and set_teachers
+     * keeps the role assignments in sync. An unrelated user gets nothing.
+     */
+    public function test_teacher_role_isolated_to_own_batch(): void {
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $mgr     = new batch_manager();
+        $id      = $mgr->create_batch('Turma Papel', [$user1->id], 'Lab');
+        $context = $mgr->get_batch_context($id);
+
+        $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user1->id));
+        $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user2->id));
+
+        $mgr->set_teachers($id, [$user2->id]);
+
+        $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user1->id));
+        $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user2->id));
+    }
+
+    /**
      * list_batches returns the joined teacher names, category name and correct lab count.
      */
     public function test_list_batches_returns_joined_data(): void {
         $user     = $this->getDataGenerator()->create_user();
-        $category = $this->getDataGenerator()->create_category();
 
         $mgr = new batch_manager();
-        $id  = $mgr->create_batch('Turma Teste', [$user->id], $category->id, 'Lab');
+        $id  = $mgr->create_batch('Turma Teste', [$user->id], 'Lab');
 
         $batches = $mgr->list_batches();
         $this->assertArrayHasKey($id, $batches);
@@ -108,7 +133,7 @@ final class batch_manager_test extends advanced_testcase {
         $batch = $batches[$id];
         $this->assertStringContainsString($user->firstname, $batch->teachernames);
         $this->assertStringContainsString($user->lastname, $batch->teachernames);
-        $this->assertSame($category->name, $batch->categoryname);
+        $this->assertSame('Turma Teste', $batch->categoryname);
         $this->assertEquals(0, (int) $batch->labcount);
     }
 

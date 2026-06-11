@@ -19,7 +19,6 @@ Feature: Manage Lab Virtual batches
     And I follow "New batch"
     And I set the field "Batch name" to "Interface 2026/1"
     And I set the field "Responsible teacher" to "Teacher One"
-    And I set the field "Destination category" to "Labs Cat"
     And I set the field "Lab name prefix" to "Lab EAD"
     And I press "New batch"
     Then I should see "Batch created successfully"

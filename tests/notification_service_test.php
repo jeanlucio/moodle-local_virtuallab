@@ -56,9 +56,8 @@ final class notification_service_test extends advanced_testcase {
         global $DB;
 
         $teacher  = $this->getDataGenerator()->create_user();
-        $category = $this->getDataGenerator()->create_category();
         $mgr      = new batch_manager();
-        $batchid  = $mgr->create_batch('Notif Test Batch', [$teacher->id], $category->id, 'Lab');
+        $batchid  = $mgr->create_batch('Notif Test Batch', [$teacher->id], 'Lab');
         $factory  = new course_factory();
         $factory->create_labs($batchid, $labcount);
         $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);

@@ -104,7 +104,7 @@ class maintenance_service {
     public function delete_batch(int $batchid): void {
         global $DB;
 
-        $DB->get_record('local_labvirtual_batches', ['id' => $batchid], 'id', MUST_EXIST);
+        $batch = $DB->get_record('local_labvirtual_batches', ['id' => $batchid], 'id, categoryid', MUST_EXIST);
 
         $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
 
@@ -129,6 +129,9 @@ class maintenance_service {
         }
 
         $DB->delete_records('local_labvirtual_batches', ['id' => $batchid]);
+
+        // Remove the now-empty batch subcategory (its context and role assignments go with it).
+        category_manager::delete_category((int) $batch->categoryid);
 
         $event = batch_deleted::create([
             'objectid' => $batchid,

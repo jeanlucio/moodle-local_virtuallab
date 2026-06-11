@@ -45,16 +45,15 @@ final class course_factory_test extends advanced_testcase {
     }
 
     /**
-     * Creates a batch and returns its ID alongside a freshly-created category and user.
+     * Creates a batch and returns its ID.
      *
-     * @return array{batchid: int, categoryid: int}
+     * @return array{batchid: int}
      */
     private function create_batch(): array {
         $user     = $this->getDataGenerator()->create_user();
-        $category = $this->getDataGenerator()->create_category();
         $mgr      = new batch_manager();
-        $batchid  = $mgr->create_batch('Test Batch', [$user->id], $category->id, 'Lab');
-        return ['batchid' => $batchid, 'categoryid' => $category->id];
+        $batchid  = $mgr->create_batch('Test Batch', [$user->id], 'Lab');
+        return ['batchid' => $batchid];
     }
 
     /**

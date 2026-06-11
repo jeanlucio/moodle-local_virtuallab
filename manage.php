@@ -42,10 +42,13 @@ $bulkaction = optional_param('bulkaction', '', PARAM_ALPHA);
 $labids     = optional_param_array('labids', [], PARAM_INT);
 
 require_login();
-$context = context_system::instance();
-require_capability('local/labvirtual:manage', $context);
+$systemcontext = context_system::instance();
 
-$PAGE->set_context($context);
+// System-level managers (admins) manage every batch; delegated teachers manage only the
+// batches whose subcategory grants them :manage. Per-action checks enforce this below.
+$canmanageall = has_capability('local/labvirtual:manage', $systemcontext);
+
+$PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('admin');
 
 $manageurl = new moodle_url('/local/labvirtual/manage.php');
@@ -54,6 +57,7 @@ $manageurl = new moodle_url('/local/labvirtual/manage.php');
 if ($batchid) {
     $batchmgr  = new batch_manager();
     $batch     = $batchmgr->get_batch($batchid);
+    require_capability('local/labvirtual:manage', context_coursecat::instance($batch->categoryid));
     $level2url = new moodle_url('/local/labvirtual/manage.php', ['batchid' => $batchid]);
     $createurl = new moodle_url(
         '/local/labvirtual/manage.php',
@@ -258,8 +262,10 @@ $PAGE->set_heading(get_string('manage_batches', 'local_labvirtual'));
 
 $createurl = new moodle_url('/local/labvirtual/manage.php', ['action' => 'createbatch']);
 
-// Create batch.
+// Create batch (system-level managers only).
 if ($action === 'createbatch') {
+    require_capability('local/labvirtual:manage', $systemcontext);
+
     $form = new create_batch_form($createurl->out(false));
 
     if ($form->is_cancelled()) {
@@ -274,7 +280,6 @@ if ($action === 'createbatch') {
         $batchmgr->create_batch(
             $data->name,
             $teacherids,
-            (int) $data->categoryid,
             $data->nameprefix
         );
         redirect(
@@ -300,6 +305,7 @@ if ($action === 'deletebatch') {
 
     $batchmgr    = new batch_manager();
     $targetbatch = $batchmgr->get_batch($targetbatchid);
+    require_capability('local/labvirtual:manage', context_coursecat::instance($targetbatch->categoryid));
 
     if (!$confirm) {
         $confirmurl = new moodle_url('/local/labvirtual/manage.php', [
@@ -332,8 +338,14 @@ if ($action === 'deletebatch') {
 // Default: batches listing.
 $batchmgr = new batch_manager();
 $batches  = $batchmgr->list_batches();
+
+// A delegated teacher who manages no batch has no business on this page.
+if (!$canmanageall && empty($batches)) {
+    throw new required_capability_exception($systemcontext, 'local/labvirtual:manage', 'nopermissions', '');
+}
+
 $renderer = $PAGE->get_renderer('local_labvirtual');
 
 echo $OUTPUT->header();
-echo $renderer->render_batches_list($batches, $createurl->out(false));
+echo $renderer->render_batches_list($batches, $createurl->out(false), $canmanageall);
 echo $OUTPUT->footer();

@@ -103,7 +103,7 @@ class renderer extends plugin_renderer_base {
      * @param string $createurl    URL for the "New batch" action.
      * @return string Rendered HTML.
      */
-    public function render_batches_list(array $batches, string $createurl): string {
+    public function render_batches_list(array $batches, string $createurl, bool $cancreate = false): string {
         $rows = [];
 
         foreach ($batches as $batch) {
@@ -128,6 +128,7 @@ class renderer extends plugin_renderer_base {
         $context = [
             'batches'    => $rows,
             'hasbatches' => !empty($rows),
+            'cancreate'  => $cancreate,
             'createurl'  => $createurl,
         ];
 

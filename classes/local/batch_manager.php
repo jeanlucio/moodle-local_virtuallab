@@ -29,21 +29,21 @@ namespace local_labvirtual\local;
  */
 class batch_manager {
     /**
-     * Creates a new batch (turma) and returns its ID.
+     * Creates a new batch (turma) in its own subcategory and returns its ID.
      *
      * @param string $name       Human-readable batch name.
      * @param int[]  $teacherids User IDs of the responsible teachers.
-     * @param int    $categoryid Moodle course category ID.
-     * @param string $nameprefix Prefix used to name labs (e.g. "Lab EAD").
+     * @param string $nameprefix Prefix used to name labs (e.g. "Lab EAD"), may be empty.
      * @return int New batch ID.
      */
     public function create_batch(
         string $name,
         array $teacherids,
-        int $categoryid,
         string $nameprefix
     ): int {
         global $DB;
+
+        $categoryid = category_manager::create_batch_category($name);
 
         $record = (object) [
             'name'        => $name,
@@ -56,6 +56,18 @@ class batch_manager {
         $this->set_teachers($batchid, $teacherids);
 
         return $batchid;
+    }
+
+    /**
+     * Returns the category context of a batch (its own subcategory).
+     *
+     * @param int $batchid Batch ID.
+     * @return \context_coursecat
+     */
+    public function get_batch_context(int $batchid): \context_coursecat {
+        $batch = $this->get_batch($batchid);
+
+        return \context_coursecat::instance($batch->categoryid);
     }
 
     /**
@@ -80,15 +92,51 @@ class batch_manager {
     public function set_teachers(int $batchid, array $teacherids): void {
         global $DB;
 
+        $teacherids = array_values(array_unique(array_filter(array_map('intval', $teacherids))));
+
         $DB->delete_records('local_labvirtual_batch_teachers', ['batchid' => $batchid]);
 
         $rows = [];
-        foreach (array_unique(array_filter(array_map('intval', $teacherids))) as $userid) {
+        foreach ($teacherids as $userid) {
             $rows[] = (object) ['batchid' => $batchid, 'userid' => $userid];
         }
 
         if ($rows) {
             $DB->insert_records('local_labvirtual_batch_teachers', $rows);
+        }
+
+        $this->sync_teacher_roles($batchid, $teacherids);
+    }
+
+    /**
+     * Synchronises the delegated batch-manager role assignments with the teacher list,
+     * at the batch subcategory context.
+     *
+     * @param int   $batchid    Batch ID.
+     * @param int[] $teacherids Current responsible teacher user IDs.
+     */
+    private function sync_teacher_roles(int $batchid, array $teacherids): void {
+        global $CFG, $DB;
+
+        require_once($CFG->dirroot . '/lib/accesslib.php');
+
+        $categoryid = (int) $DB->get_field('local_labvirtual_batches', 'categoryid', ['id' => $batchid]);
+        $context    = $categoryid ? \context_coursecat::instance($categoryid, IGNORE_MISSING) : false;
+        if (!$context) {
+            return;
+        }
+
+        $roleid = role_provisioner::get_role_id();
+
+        role_unassign_all([
+            'roleid'    => $roleid,
+            'contextid' => $context->id,
+            'component' => 'local_labvirtual',
+            'itemid'    => $batchid,
+        ]);
+
+        foreach ($teacherids as $userid) {
+            role_assign($roleid, $userid, $context->id, 'local_labvirtual', $batchid);
         }
     }
 
@@ -142,9 +190,29 @@ class batch_manager {
 
         if ($batches) {
             $this->attach_teacher_names($batches);
+            $batches = $this->filter_manageable($batches);
         }
 
         return $batches;
+    }
+
+    /**
+     * Keeps only the batches the current user may manage: all of them for a system-level
+     * manager (admin), otherwise just those whose subcategory grants them :manage.
+     *
+     * @param \stdClass[] $batches Batches indexed by ID.
+     * @return \stdClass[] Filtered batches.
+     */
+    private function filter_manageable(array $batches): array {
+        if (has_capability('local/labvirtual:manage', \context_system::instance())) {
+            return $batches;
+        }
+
+        return array_filter($batches, static function (\stdClass $batch): bool {
+            $context = \context_coursecat::instance($batch->categoryid, IGNORE_MISSING);
+
+            return $context && has_capability('local/labvirtual:manage', $context);
+        });
     }
 
     /**

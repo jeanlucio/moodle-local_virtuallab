@@ -24,8 +24,6 @@
 
 namespace local_labvirtual\form;
 
-use core_course_category;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($GLOBALS['CFG']->libdir . '/formslib.php');
@@ -60,15 +58,6 @@ class create_batch_form extends \moodleform {
             $options
         );
         $mform->addRule('teacherids', null, 'required', null, 'client');
-
-        $categories = core_course_category::make_categories_list('', 0, ' / ');
-        $mform->addElement(
-            'select',
-            'categoryid',
-            get_string('batch_category', 'local_labvirtual'),
-            $categories
-        );
-        $mform->addRule('categoryid', null, 'required', null, 'client');
 
         $mform->addElement(
             'text',

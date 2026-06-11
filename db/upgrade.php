@@ -194,5 +194,12 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061121, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061130) {
+        // Provision the delegated batch-manager role for existing installs.
+        \local_labvirtual\local\role_provisioner::ensure_role();
+
+        upgrade_plugin_savepoint(true, 2026061130, 'local', 'labvirtual');
+    }
+
     return true;
 }

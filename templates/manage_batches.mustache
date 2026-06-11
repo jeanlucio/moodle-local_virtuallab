@@ -18,16 +18,19 @@
             }
         ],
         "hasbatches": true,
+        "cancreate": true,
         "createurl": "/local/labvirtual/manage.php?action=createbatch"
     }
 }}
 <div class="local-labvirtual-manage-batches">
+    {{#cancreate}}
     <div class="mb-3 d-flex justify-content-end">
         <a href="{{createurl}}" class="btn btn-primary">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
             {{#str}} create_batch, local_labvirtual {{/str}}
         </a>
     </div>
+    {{/cancreate}}
     {{#hasbatches}}
     <div class="table-responsive">
         <table class="table table-hover table-striped">

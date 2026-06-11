@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = [
     'local/labvirtual:manage' => [
         'captype'      => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
+        'contextlevel' => CONTEXT_COURSECAT,
         'archetypes'   => [
             'manager' => CAP_ALLOW,
         ],
