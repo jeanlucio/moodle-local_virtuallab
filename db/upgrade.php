@@ -53,5 +53,23 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061100, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061103) {
+        // Normalise existing lab enrol instances: disable self-enrolment (newenrols = 0)
+        // and clear the now-unused enrolment keys. The panel enrols programmatically.
+        $enrolids = $DB->get_fieldset_sql(
+            "SELECT teacher_enrolid FROM {local_labvirtual_courses}
+             UNION
+             SELECT student_enrolid FROM {local_labvirtual_courses}"
+        );
+
+        if ($enrolids) {
+            [$insql, $params] = $DB->get_in_or_equal($enrolids, SQL_PARAMS_NAMED);
+            $DB->set_field_select('enrol', 'customint6', 0, "id $insql", $params);
+            $DB->set_field_select('enrol', 'password', '', "id $insql", $params);
+        }
+
+        upgrade_plugin_savepoint(true, 2026061103, 'local', 'labvirtual');
+    }
+
     return true;
 }

@@ -60,7 +60,7 @@ final class notification_service_test extends advanced_testcase {
         $mgr      = new batch_manager();
         $batchid  = $mgr->create_batch('Notif Test Batch', $teacher->id, $category->id, 'Lab');
         $factory  = new course_factory();
-        $factory->create_labs($batchid, $labcount, 'tkey', 'skey');
+        $factory->create_labs($batchid, $labcount);
         $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
 
         return ['teacher' => $teacher, 'batchid' => $batchid, 'labs' => $labs];

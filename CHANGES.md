@@ -8,6 +8,7 @@
 - Fixed capability language string keys (`labvirtual:view` / `labvirtual:manage`) so failed permission checks render the standard message instead of a fatal error
 - The student panel now sends guests to the login page (returning to the panel afterwards) instead of failing a capability check
 - Removed enrolment key display from the student panel: enrolment is automatic via the panel buttons, so the keys are no longer shown to anyone (they remain set on the enrol instances to prevent direct self-enrolment). The "Show enrolment keys in student panel" setting was removed.
+- Removed enrolment keys entirely: lab courses are now created with self-enrolment disabled (newenrols = 0) and no enrolment key, so the "Create labs" form no longer asks for editor/visitor keys. The panel enrols users programmatically. An upgrade step normalises existing labs.
 - New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
 
 ## 0.4.0-alpha (2026-06-09)

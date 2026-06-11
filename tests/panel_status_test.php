@@ -57,7 +57,7 @@ final class panel_status_test extends advanced_testcase {
         $mgr      = new batch_manager();
         $batchid  = $mgr->create_batch('Panel Test Batch', $user->id, $category->id, 'Lab');
         $factory  = new course_factory();
-        $courseids = $factory->create_labs($batchid, $labcount, 'edkey', 'viskey');
+        $courseids = $factory->create_labs($batchid, $labcount);
         return ['batchid' => $batchid, 'courseids' => $courseids];
     }
 

@@ -80,9 +80,7 @@ if ($batchid) {
             $factory = new course_factory();
             $created = $factory->create_labs(
                 (int) $data->batchid,
-                (int) $data->labcount,
-                $data->teacherkey,
-                $data->studentkey
+                (int) $data->labcount
             );
             redirect(
                 $level2url,

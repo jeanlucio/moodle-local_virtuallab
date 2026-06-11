@@ -68,7 +68,7 @@ class behat_local_labvirtual extends behat_base {
 
         if ((int) $count > 0) {
             $factory = new course_factory();
-            $factory->create_labs($batchid, (int) $count, 'editkey', 'viskey');
+            $factory->create_labs($batchid, (int) $count);
         }
 
         $this->batchids[$name] = $batchid;

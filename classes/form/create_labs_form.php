@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($GLOBALS['CFG']->libdir . '/formslib.php');
 
 /**
- * Labs creation form (quantity + enrolment keys).
+ * Labs creation form (quantity only).
  */
 class create_labs_form extends \moodleform {
     #[\Override]
@@ -49,24 +49,6 @@ class create_labs_form extends \moodleform {
         $mform->addRule('labcount', null, 'required', null, 'client');
         $mform->addRule('labcount', null, 'numeric', null, 'client');
         $mform->setDefault('labcount', 5);
-
-        $mform->addElement(
-            'text',
-            'teacherkey',
-            get_string('key_editor', 'local_labvirtual'),
-            ['size' => 30, 'maxlength' => 255]
-        );
-        $mform->setType('teacherkey', PARAM_TEXT);
-        $mform->addRule('teacherkey', null, 'required', null, 'client');
-
-        $mform->addElement(
-            'text',
-            'studentkey',
-            get_string('key_visitor', 'local_labvirtual'),
-            ['size' => 30, 'maxlength' => 255]
-        );
-        $mform->setType('studentkey', PARAM_TEXT);
-        $mform->addRule('studentkey', null, 'required', null, 'client');
 
         $this->add_action_buttons(true, get_string('create_labs', 'local_labvirtual'));
     }

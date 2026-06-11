@@ -31,21 +31,19 @@ class course_factory {
     /**
      * Creates N lab courses for the given batch and registers them.
      *
-     * Each lab gets two enrol_self instances:
-     *   - one with role editingteacher + editor key
-     *   - one with role student + visitor key
+     * Each lab gets two enrol_self instances used only programmatically by the student
+     * panel. Self-enrolment via the standard course form is disabled (newenrols = 0), so
+     * no enrolment key is needed:
+     *   - one with role editingteacher (editor channel)
+     *   - one with role student (visitor channel)
      *
-     * @param int    $batchid    Batch to attach labs to.
-     * @param int    $labcount   Number of labs to create.
-     * @param string $teacherkey Enrolment password for the editingteacher instance.
-     * @param string $studentkey Enrolment password for the student instance.
+     * @param int $batchid  Batch to attach labs to.
+     * @param int $labcount Number of labs to create.
      * @return int[] Array of created course IDs.
      */
     public function create_labs(
         int $batchid,
-        int $labcount,
-        string $teacherkey,
-        string $studentkey
+        int $labcount
     ): array {
         global $CFG, $DB;
 
@@ -105,18 +103,20 @@ class course_factory {
                 $enrolplugin->delete_instance($default);
             }
 
+            // Self-enrolment via the standard course form is disabled (newenrols = 0).
+            // The panel enrols programmatically with enrol_user(), bypassing that check.
             $teacherinstance = $enrolplugin->add_instance($course, [
-                'roleid'   => $teacherroleid,
-                'password' => $teacherkey,
-                'name'     => get_string('key_editor', 'local_labvirtual'),
-                'status'   => ENROL_INSTANCE_ENABLED,
+                'roleid'     => $teacherroleid,
+                'name'       => get_string('key_editor', 'local_labvirtual'),
+                'status'     => ENROL_INSTANCE_ENABLED,
+                'customint6' => 0,
             ]);
 
             $studentinstance = $enrolplugin->add_instance($course, [
-                'roleid'   => $studentroleid,
-                'password' => $studentkey,
-                'name'     => get_string('key_visitor', 'local_labvirtual'),
-                'status'   => ENROL_INSTANCE_ENABLED,
+                'roleid'     => $studentroleid,
+                'name'       => get_string('key_visitor', 'local_labvirtual'),
+                'status'     => ENROL_INSTANCE_ENABLED,
+                'customint6' => 0,
             ]);
 
             $record = (object) [

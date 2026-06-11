@@ -57,7 +57,7 @@ final class maintenance_task_test extends advanced_testcase {
         $mgr      = new batch_manager();
         $batchid  = $mgr->create_batch('Task Test Batch', $user->id, $category->id, 'Lab');
         $factory  = new course_factory();
-        $courseids = $factory->create_labs($batchid, $labcount, 'tkey', 'skey');
+        $courseids = $factory->create_labs($batchid, $labcount);
         return ['batchid' => $batchid, 'courseids' => $courseids];
     }
 

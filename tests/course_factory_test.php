@@ -66,7 +66,7 @@ final class course_factory_test extends advanced_testcase {
         ['batchid' => $batchid] = $this->create_batch();
 
         $factory    = new course_factory();
-        $courseids  = $factory->create_labs($batchid, 3, 'teacherkey', 'studentkey');
+        $courseids  = $factory->create_labs($batchid, 3);
 
         $this->assertCount(3, $courseids);
         $this->assertEquals(3, $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]));
@@ -85,7 +85,7 @@ final class course_factory_test extends advanced_testcase {
         ['batchid' => $batchid] = $this->create_batch();
 
         $factory   = new course_factory();
-        $courseids = $factory->create_labs($batchid, 2, 'edkey', 'viskey');
+        $courseids = $factory->create_labs($batchid, 2);
 
         $teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
         $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student']);
@@ -101,22 +101,25 @@ final class course_factory_test extends advanced_testcase {
     }
 
     /**
-     * Enrolment keys are stored in {enrol}.password, not in the plugin table.
+     * Self-enrolment via the standard course form is disabled (newenrols = 0) and no
+     * enrolment key is stored; the panel enrols programmatically instead.
      */
-    public function test_create_labs_stores_enrol_keys(): void {
+    public function test_create_labs_disables_self_enrolment(): void {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch();
 
-        $factory  = new course_factory();
-        $factory->create_labs($batchid, 1, 'TEACHERPASS', 'STUDENTPASS');
+        $factory = new course_factory();
+        $factory->create_labs($batchid, 1);
 
-        $lab        = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
-        $teacherkey = $DB->get_field('enrol', 'password', ['id' => $lab->teacher_enrolid]);
-        $studentkey = $DB->get_field('enrol', 'password', ['id' => $lab->student_enrolid]);
+        $lab     = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $teacher = $DB->get_record('enrol', ['id' => $lab->teacher_enrolid]);
+        $student = $DB->get_record('enrol', ['id' => $lab->student_enrolid]);
 
-        $this->assertSame('TEACHERPASS', $teacherkey);
-        $this->assertSame('STUDENTPASS', $studentkey);
+        $this->assertEmpty($teacher->password);
+        $this->assertEmpty($student->password);
+        $this->assertEquals(0, (int) $teacher->customint6);
+        $this->assertEquals(0, (int) $student->customint6);
     }
 
     /**
@@ -128,7 +131,7 @@ final class course_factory_test extends advanced_testcase {
         ['batchid' => $batchid] = $this->create_batch();
 
         $factory   = new course_factory();
-        $courseids = $factory->create_labs($batchid, 4, 'k1', 'k2');
+        $courseids = $factory->create_labs($batchid, 4);
 
         foreach ($courseids as $courseid) {
             $this->assertTrue(
