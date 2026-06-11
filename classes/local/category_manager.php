@@ -91,14 +91,33 @@ class category_manager {
     }
 
     /**
-     * Deletes a batch subcategory and anything left in it, ignoring a missing category.
+     * Deletes a batch subcategory, but only when it is safe to do so.
+     *
+     * As a safeguard against legacy or shared categories, the deletion only happens when
+     * the category is a direct child of the plugin parent category and is already empty
+     * (no courses and no subcategories). Otherwise it is left untouched.
      *
      * @param int $categoryid Subcategory ID.
      */
     public static function delete_category(int $categoryid): void {
-        $category = core_course_category::get($categoryid, IGNORE_MISSING, true);
-        if ($category) {
-            $category->delete_full(false);
+        global $DB;
+
+        $parentid = (int) get_config('local_labvirtual', self::PARENT_CONFIG);
+        $category = $DB->get_record('course_categories', ['id' => $categoryid]);
+
+        if (!$category || !$parentid || (int) $category->parent !== $parentid) {
+            return;
+        }
+
+        $hascourses    = $DB->record_exists('course', ['category' => $categoryid]);
+        $hassubcats    = $DB->record_exists('course_categories', ['parent' => $categoryid]);
+        if ($hascourses || $hassubcats) {
+            return;
+        }
+
+        $coursecat = core_course_category::get($categoryid, IGNORE_MISSING, true);
+        if ($coursecat) {
+            $coursecat->delete_full(false);
         }
     }
 }
