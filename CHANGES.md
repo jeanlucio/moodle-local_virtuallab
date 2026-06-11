@@ -4,6 +4,7 @@
 
 - Lifecycle warning emails: the responsible teacher is notified a configurable number of days before a lab is reset or deleted (new "Warning days before action" setting, default 7; 0 disables)
 - Post-action summary emails sent to each responsible teacher and to the site administrator after the maintenance task runs
+- Lifecycle emails include a direct link: the batch panel for teachers and the management page for the administrator
 - New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
 
 ## 0.4.0-alpha (2026-06-09)

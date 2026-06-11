@@ -84,6 +84,10 @@ class notification_service {
 
             $html = \html_writer::tag('p', s($intro));
             $html .= $this->render_list($items);
+            $html .= $this->link_paragraph(
+                new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]),
+                'email_panel_link'
+            );
 
             $text = html_to_text($html);
 
@@ -120,6 +124,10 @@ class notification_service {
 
             $html = \html_writer::tag('p', s($intro));
             $html .= $this->render_list($this->summary_lines($batchresults));
+            $html .= $this->link_paragraph(
+                new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]),
+                'email_panel_link'
+            );
             $text = html_to_text($html);
 
             email_to_user($teachers[$batchid], $from, $subject, $text, $html);
@@ -129,6 +137,10 @@ class notification_service {
         if ($admin) {
             $html = \html_writer::tag('p', s($intro));
             $html .= $this->render_list($this->summary_lines($results));
+            $html .= $this->link_paragraph(
+                new \moodle_url('/local/labvirtual/manage.php'),
+                'email_manage_link'
+            );
             $text = html_to_text($html);
 
             email_to_user($admin, $from, $subject, $text, $html);
@@ -214,6 +226,17 @@ class notification_service {
         }
 
         return $lines;
+    }
+
+    /**
+     * Builds a paragraph containing a single localised link.
+     *
+     * @param \moodle_url $url       Link target.
+     * @param string      $stringkey Language string key for the link text.
+     * @return string HTML markup.
+     */
+    private function link_paragraph(\moodle_url $url, string $stringkey): string {
+        return \html_writer::tag('p', \html_writer::link($url, get_string($stringkey, 'local_labvirtual')));
     }
 
     /**
