@@ -94,8 +94,11 @@ class maintenance_task extends \core\task\scheduled_task {
         $label = $action === self::ACTION_RESET ? 'reset' : 'delete';
         mtrace('Lab Virtual maintenance: ' . count($labs) . " lab(s) due for {$label}.");
 
-        // Capture course names before deletion so the summary can list deleted labs.
-        $coursenames = $this->get_course_names($labs);
+        // Capture course names and editors before deletion so the summary can list deleted
+        // labs and notify their editors (enrolments disappear when a course is deleted).
+        $coursenames     = $this->get_course_names($labs);
+        $notification    = new notification_service();
+        $editorsbycourse = $notification->get_course_editors(array_map(fn($lab) => $lab->courseid, $labs));
 
         $service = new maintenance_service();
         $results = [];
@@ -122,16 +125,17 @@ class maintenance_task extends \core\task\scheduled_task {
                 $ok = false;
             }
             $results[] = [
-                'lab'    => $lab,
-                'name'   => $name,
-                'action' => $label,
-                'ok'     => $ok,
+                'lab'     => $lab,
+                'name'    => $name,
+                'action'  => $label,
+                'ok'      => $ok,
+                'editors' => $editorsbycourse[$lab->courseid] ?? [],
             ];
         }
 
-        // Phase 2 — post-action summary to teachers and admin.
+        // Phase 2 — post-action summary to teachers, course editors and (optionally) admin.
         if (!empty($results)) {
-            (new notification_service())->send_summary($results);
+            $notification->send_summary($results);
         }
 
         mtrace("Lab Virtual maintenance: done. {$success} succeeded, {$errors} failed.");

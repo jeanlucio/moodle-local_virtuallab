@@ -67,6 +67,19 @@ final class notification_service_test extends advanced_testcase {
     }
 
     /**
+     * Enrols a new user as editingteacher in the given course and returns the user.
+     *
+     * @param int $courseid Course to enrol the editor into.
+     * @return \stdClass The created user.
+     */
+    private function enrol_editor(int $courseid): \stdClass {
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $courseid, 'editingteacher');
+
+        return $user;
+    }
+
+    /**
      * send_warnings sends a single email to the responsible teacher.
      */
     public function test_send_warnings_emails_teacher(): void {
@@ -99,9 +112,11 @@ final class notification_service_test extends advanced_testcase {
     }
 
     /**
-     * send_summary emails both the teacher and the site administrator.
+     * send_summary copies the administrator when notify_admin_copy is enabled.
      */
     public function test_send_summary_emails_teacher_and_admin(): void {
+        set_config('notify_admin_copy', 1, 'local_labvirtual');
+
         ['teacher' => $teacher, 'labs' => $labs] = $this->create_batch_with_labs();
 
         $results = [];
@@ -123,6 +138,79 @@ final class notification_service_test extends advanced_testcase {
         $this->assertCount(2, $messages);
         $recipients = array_map(static fn($m) => $m->to, $messages);
         $this->assertContains($teacher->email, $recipients);
+        $this->assertContains(get_admin()->email, $recipients);
+    }
+
+    /**
+     * The administrator is not copied when notify_admin_copy is off (the default).
+     */
+    public function test_send_summary_admin_disabled_by_default(): void {
+        ['teacher' => $teacher, 'labs' => $labs] = $this->create_batch_with_labs(1);
+
+        $results = [];
+        foreach ($labs as $lab) {
+            $results[] = ['lab' => $lab, 'name' => 'Lab', 'action' => 'reset', 'ok' => true];
+        }
+
+        $sink = $this->redirectEmails();
+        (new notification_service())->send_summary($results);
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $recipients = array_map(static fn($m) => $m->to, $messages);
+        $this->assertContains($teacher->email, $recipients);
+        $this->assertNotContains(get_admin()->email, $recipients);
+    }
+
+    /**
+     * Course editors are warned about their own labs.
+     */
+    public function test_send_warnings_emails_editors(): void {
+        ['teacher' => $teacher, 'labs' => $labs] = $this->create_batch_with_labs(1);
+        $lab    = reset($labs);
+        $editor = $this->enrol_editor($lab->courseid);
+
+        $sink = $this->redirectEmails();
+        (new notification_service())->send_warnings(
+            $labs,
+            maintenance_task::ACTION_RESET,
+            new \DateTime('@' . (time() + 7 * DAYSECS))
+        );
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $recipients = array_map(static fn($m) => $m->to, $messages);
+        $this->assertContains($editor->email, $recipients, 'The course editor should be warned.');
+        $this->assertContains($teacher->email, $recipients);
+
+        // The editor email links directly to their course.
+        $bodies = implode("\n", array_map(static fn($m) => $m->body, $messages));
+        $this->assertStringContainsString('course/view.php', $bodies);
+    }
+
+    /**
+     * Course editors receive the post-action summary for their own labs.
+     */
+    public function test_send_summary_emails_editors(): void {
+        ['labs' => $labs] = $this->create_batch_with_labs(1);
+        $lab    = reset($labs);
+        $editor = $this->enrol_editor($lab->courseid);
+
+        $results = [[
+            'lab'     => $lab,
+            'name'    => 'Lab ' . $lab->courseid,
+            'action'  => 'reset',
+            'ok'      => true,
+            'editors' => [$editor],
+        ]];
+
+        $sink = $this->redirectEmails();
+        (new notification_service())->send_summary($results);
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $recipients = array_map(static fn($m) => $m->to, $messages);
+        $this->assertContains($editor->email, $recipients);
     }
 
     /**

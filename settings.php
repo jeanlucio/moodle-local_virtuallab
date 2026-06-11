@@ -74,6 +74,13 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_labvirtual/notify_admin_copy',
+        get_string('settings_notify_admin', 'local_labvirtual'),
+        get_string('settings_notify_admin_desc', 'local_labvirtual'),
+        0
+    ));
+
     $settings->add(new admin_setting_heading(
         'local_labvirtual/heading_manage',
         '',
