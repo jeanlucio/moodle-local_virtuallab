@@ -26,6 +26,13 @@ Feature: Lab Virtual student panel
     Then I should see "Lab EAD 01"
     And I should see "Participants"
 
+  Scenario: Student editing one lab cannot start editing another in the same batch
+    Given the user "student1" is already enrolled as editor in a lab of batch "UI 2026"
+    And I log in as "student1"
+    When I visit the student panel for batch "UI 2026"
+    Then I should see "Enrolled" in the "Lab EAD 01" "table_row"
+    And the "Editor" "button" should be disabled
+
   Scenario: Non-authenticated user cannot access the panel
     When I visit the student panel for batch "UI 2026"
     Then I should see "Log in"
