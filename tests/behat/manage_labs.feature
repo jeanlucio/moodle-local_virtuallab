@@ -15,8 +15,6 @@ Feature: Manage labs within a Lab Virtual batch
     When I visit the labs page for batch "T 2026"
     And I follow "Create labs"
     And I set the field "Number of labs" to "3"
-    And I set the field "Editor key" to "edkey1"
-    And I set the field "Visitor key" to "viskey1"
     And I press "Create labs"
     Then I should see "3 lab(s) created successfully"
     And I should see "Student panel URL"
