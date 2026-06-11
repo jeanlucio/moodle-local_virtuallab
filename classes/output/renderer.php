@@ -76,9 +76,6 @@ class renderer extends plugin_renderer_base {
      * @return string Rendered HTML.
      */
     public function render_labs_panel(\stdClass $batch, array $labs, int $batchid): string {
-        $firstlab = !empty($labs) ? $labs[array_key_first($labs)] : null;
-        $showkeys = $firstlab && !empty($firstlab['showkeys']);
-
         $labrows = [];
         foreach ($labs as $lab) {
             $lab['courseurl'] = (new \moodle_url('/course/view.php', ['id' => $lab['courseid']]))->out(false);
@@ -91,9 +88,6 @@ class renderer extends plugin_renderer_base {
             'batchid'         => $batchid,
             'sesskey'         => sesskey(),
             'viewurl'         => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
-            'showkeys'        => $showkeys,
-            'batchteacherkey' => $firstlab ? $firstlab['teacherkey'] : '',
-            'batchstudentkey' => $firstlab ? $firstlab['studentkey'] : '',
             'haslabs'         => !empty($labs),
             'labs'            => $labrows,
         ];

@@ -26,15 +26,10 @@ namespace local_labvirtual\local;
 
 /**
  * Fetches all panel data for a batch in a single JOIN query, aggregating in PHP.
- *
- * Reads enrolment keys directly from {enrol}.password — no copy in plugin tables.
  */
 class panel_repository {
     /** @var int Maximum editors per lab (from plugin config). */
     private int $maxteachers;
-
-    /** @var bool Whether to show keys in the panel. */
-    private bool $showkeys;
 
     /** @var int Role ID for editingteacher, cached to avoid repeated queries. */
     private int $teacherroleid;
@@ -45,10 +40,6 @@ class panel_repository {
     public function __construct() {
         global $DB;
         $this->maxteachers   = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
-        $this->showkeys      = (bool) get_config('local_labvirtual', 'show_keys_in_panel');
-        if ((string) get_config('local_labvirtual', 'show_keys_in_panel') === '') {
-            $this->showkeys = true;
-        }
         $this->teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
     }
 
@@ -70,8 +61,6 @@ class panel_repository {
                        lc.timecreated,
                        lc.lastreset,
                        c.fullname      AS coursename,
-                       enrt.password   AS teacherkey,
-                       enrs.password   AS studentkey,
                        u.id            AS editorid,
                        u.firstname,
                        u.lastname,
@@ -81,8 +70,6 @@ class panel_repository {
                        u.alternatename
                   FROM {local_labvirtual_courses} lc
                   JOIN {course} c    ON c.id    = lc.courseid
-                  JOIN {enrol} enrt  ON enrt.id = lc.teacher_enrolid
-                  JOIN {enrol} enrs  ON enrs.id = lc.student_enrolid
              LEFT JOIN {context} ctx ON ctx.instanceid   = lc.courseid
                                     AND ctx.contextlevel  = :contextlevel
              LEFT JOIN {role_assignments} ra
@@ -163,9 +150,6 @@ class panel_repository {
                     'coursename'              => format_string($row->coursename),
                     'teacher_enrolid'         => $row->teacher_enrolid,
                     'student_enrolid'         => $row->student_enrolid,
-                    'teacherkey'              => $this->showkeys ? s($row->teacherkey) : '',
-                    'studentkey'              => $this->showkeys ? s($row->studentkey) : '',
-                    'showkeys'                => $this->showkeys,
                     'user_enrolled_here'      => !empty($enrolledcourseids[(int) $row->courseid]),
                     'user_is_editor_anywhere' => $useriseditoranywhere,
                     'editors'                 => [],
@@ -209,10 +193,6 @@ class panel_repository {
                 && !$lab['user_is_editor_anywhere'];
             $lab['can_enrol_visitor'] = !$lab['user_enrolled_here'];
             $lab['statuslabel']       = $this->status_label($lab);
-
-            if ($lab['status_full']) {
-                $lab['teacherkey'] = '';
-            }
 
             $result[] = $lab;
         }

@@ -126,23 +126,6 @@ final class panel_status_test extends advanced_testcase {
     }
 
     /**
-     * A full lab hides the teacher key (it would be useless when full).
-     */
-    public function test_full_lab_hides_teacher_key(): void {
-        set_config('max_teachers_per_lab', 1, 'local_labvirtual');
-
-        ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs(1);
-        $this->enrol_as_editor($this->getDataGenerator()->create_user()->id, $courseids[0]);
-
-        $viewer = $this->getDataGenerator()->create_user();
-        $repo   = new panel_repository();
-        $labs   = $repo->get_panel_data($batchid, $viewer->id);
-
-        $this->assertTrue($labs[0]['status_full']);
-        $this->assertSame('', $labs[0]['teacherkey']);
-    }
-
-    /**
      * A full lab disables the editor enrol button but keeps the visitor button active.
      */
     public function test_full_lab_disables_editor_button_only(): void {

@@ -40,13 +40,6 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    $settings->add(new admin_setting_configcheckbox(
-        'local_labvirtual/show_keys_in_panel',
-        get_string('settings_show_keys', 'local_labvirtual'),
-        get_string('settings_show_keys_desc', 'local_labvirtual'),
-        1
-    ));
-
     $settings->add(new admin_setting_heading(
         'local_labvirtual/heading_lifecycle',
         get_string('settings_lifecycle', 'local_labvirtual'),

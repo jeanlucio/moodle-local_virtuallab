@@ -7,6 +7,7 @@
 - Lifecycle emails include a direct link: the batch panel for teachers and the management page for the administrator
 - Fixed capability language string keys (`labvirtual:view` / `labvirtual:manage`) so failed permission checks render the standard message instead of a fatal error
 - The student panel now sends guests to the login page (returning to the panel afterwards) instead of failing a capability check
+- Removed enrolment key display from the student panel: enrolment is automatic via the panel buttons, so the keys are no longer shown to anyone (they remain set on the enrol instances to prevent direct self-enrolment). The "Show enrolment keys in student panel" setting was removed.
 - New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
 
 ## 0.4.0-alpha (2026-06-09)

@@ -10,9 +10,6 @@
         "batchid": 1,
         "sesskey": "abc123",
         "viewurl": "/local/labvirtual/view.php?batchid=1",
-        "showkeys": true,
-        "batchteacherkey": "prof_ead261",
-        "batchstudentkey": "est_ead261",
         "haslabs": true,
         "labs": [
             {
@@ -42,13 +39,6 @@
             <i class="fa fa-user-tie me-1" aria-hidden="true"></i>
             {{teachername}}
         </p>
-        {{#showkeys}}
-        <p class="mb-0 small text-body-secondary">
-            {{#str}} batch_keys, local_labvirtual {{/str}}:
-            <span class="me-3">{{#str}} key_editor, local_labvirtual {{/str}}: <code>{{batchteacherkey}}</code></span>
-            <span>{{#str}} key_visitor, local_labvirtual {{/str}}: <code>{{batchstudentkey}}</code></span>
-        </p>
-        {{/showkeys}}
     </div>
 
     {{#haslabs}}
