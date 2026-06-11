@@ -27,12 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['access_as_editor'] = 'Acessar {$a} como editor';
 $string['access_as_visitor'] = 'Acessar {$a} como visitante';
+$string['access_via_teacher'] = 'O acesso a este laboratório é fornecido pelo(s) professor(es) responsável(is): {$a}. Entre em contato para ser inscrito.';
 $string['already_enrolled'] = 'Inscrito';
 $string['batch_category'] = 'Categoria de destino';
 $string['batch_created'] = 'Turma criada com sucesso.';
 $string['batch_deleted'] = 'Turma e todos os seus laboratórios excluídos com sucesso.';
 $string['batch_name'] = 'Nome da turma';
 $string['batch_nameprefix'] = 'Prefixo do nome dos laboratórios';
+$string['batch_override_default'] = 'Usar o padrão do site';
+$string['batch_overrides'] = 'Configurações próprias da turma (opcional)';
+$string['batch_overrides_help'] = 'Deixe um campo vazio para usar o padrão do site nesta turma.';
 $string['batch_teacher'] = 'Professor responsável';
 $string['batch_updated'] = 'Turma atualizada com sucesso';
 $string['bulk_action'] = 'Com selecionados';

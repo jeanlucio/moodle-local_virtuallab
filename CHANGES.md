@@ -13,6 +13,10 @@
 - Lifecycle warning and summary emails are now also sent to the editors of each affected course (one email per editor, listing their own labs). The administrator copy is now optional via the new "Send a copy to the administrator" setting (off by default).
 - Labs now enrol users through the course manual enrolment instance instead of two self-enrolment instances. The panel chooses the role (editor or visitor) at enrolment time, and the standard course "enrolment options" page no longer shows the confusing disabled key blocks. The single teacher_enrolid/student_enrolid columns become one enrolid (existing labs migrated). The self-enrolment observer was removed as it is no longer reachable.
 - New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
+- Delegated batch management: each batch lives in its own subcategory under a shared "Virtual labs" parent, and the responsible teachers receive a role there (manage the labs plus view the courses without enrolling). The management page is scoped by category — admins see every batch, a teacher only their own — and creating a batch stays admin-only.
+- Teachers can edit their batch: rename it, add or remove co-responsible teachers, set the lab name prefix (moved out of the admin creation form into the teacher's "Create labs" form) and override the lifecycle settings (editors per lab, months, action and warning days) per batch, falling back to the site defaults.
+- The "View course" link in the student panel is now shown only to managers (admin or the batch teachers); other users no longer see a dead-end link.
+- A logged-in visitor who opens a managed lab course without access now sees a notice naming the responsible teacher(s) to contact, instead of the bare enrolment page.
 
 ## 0.4.0-alpha (2026-06-09)
 

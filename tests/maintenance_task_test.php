@@ -118,6 +118,32 @@ final class maintenance_task_test extends advanced_testcase {
     }
 
     /**
+     * A per-batch override drives the action even when the global lifecycle is disabled.
+     */
+    public function test_execute_uses_per_batch_override(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 0, 'local_labvirtual');
+        set_config('lifecycle_action', 0, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 7);
+
+        $DB->set_field('local_labvirtual_batches', 'lifecyclemonths', 6, ['id' => $batchid]);
+        $DB->set_field(
+            'local_labvirtual_batches',
+            'lifecycleaction',
+            maintenance_task::ACTION_RESET,
+            ['id' => $batchid]
+        );
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertGreaterThan(0, (int) $lab->lastreset, 'The per-batch override should trigger the reset.');
+    }
+
+    /**
      * An overdue lab is reset (lastreset updated, course kept) when action = reset.
      */
     public function test_execute_resets_overdue_lab(): void {

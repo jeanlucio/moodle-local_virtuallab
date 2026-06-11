@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version definition.
+ * Hook callback registrations for local_labvirtual.
  *
  * @package    local_labvirtual
  * @copyright  2026 Jean Lúcio
@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_labvirtual';
-$plugin->version   = 2026061140;
-$plugin->requires  = 2024100700; // Moodle 4.5+.
-$plugin->supported = [405, 502];
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '0.5.0-alpha';
+$callbacks = [
+    [
+        'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
+        'callback' => [\local_labvirtual\hook_callbacks::class, 'before_standard_top_of_body_html'],
+    ],
+];

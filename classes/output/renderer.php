@@ -76,7 +76,13 @@ class renderer extends plugin_renderer_base {
      * @param int       $batchid      Batch ID (for form actions).
      * @return string Rendered HTML.
      */
-    public function render_labs_panel(\stdClass $batch, string $teachernames, array $labs, int $batchid): string {
+    public function render_labs_panel(
+        \stdClass $batch,
+        string $teachernames,
+        array $labs,
+        int $batchid,
+        bool $canmanage = false
+    ): string {
         $labrows = [];
         foreach ($labs as $lab) {
             $lab['courseurl'] = (new \moodle_url('/course/view.php', ['id' => $lab['courseid']]))->out(false);
@@ -87,6 +93,7 @@ class renderer extends plugin_renderer_base {
             'batchname'       => format_string($batch->name),
             'teachername'     => $teachernames,
             'batchid'         => $batchid,
+            'canmanage'       => $canmanage,
             'sesskey'         => sesskey(),
             'viewurl'         => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
             'haslabs'         => !empty($labs),

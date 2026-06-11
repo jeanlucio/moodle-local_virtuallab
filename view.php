@@ -25,6 +25,7 @@
 require(__DIR__ . '/../../config.php');
 
 use local_labvirtual\local\batch_manager;
+use local_labvirtual\local\batch_settings;
 use local_labvirtual\local\course_registry;
 use local_labvirtual\local\panel_repository;
 
@@ -72,7 +73,7 @@ if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $cours
     );
 
     if ($isteacher) {
-        $maxteachers   = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
+        $maxteachers   = batch_settings::effective($batch)->maxteachers;
         $coursecontext = context_course::instance($courseid);
         $editors       = get_enrolled_users($coursecontext, 'moodle/course:update');
 
@@ -129,8 +130,15 @@ $teachernames = implode(', ', array_map(fn($teacher) => fullname($teacher), $tea
 $repository = new panel_repository();
 $labs       = $repository->get_panel_data($batchid, $USER->id);
 
+// Only batch managers (admin or the responsible teachers) get the "view course" link;
+// they can open the lab courses without enrolling.
+$canmanage = has_capability(
+    'local/labvirtual:manage',
+    context_coursecat::instance($batch->categoryid)
+);
+
 $renderer = $PAGE->get_renderer('local_labvirtual');
 
 echo $OUTPUT->header();
-echo $renderer->render_labs_panel($batch, $teachernames, $labs, $batchid);
+echo $renderer->render_labs_panel($batch, $teachernames, $labs, $batchid, $canmanage);
 echo $OUTPUT->footer();

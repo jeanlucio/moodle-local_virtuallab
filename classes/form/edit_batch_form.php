@@ -71,6 +71,48 @@ class edit_batch_form extends \moodleform {
         $mform->setType('nameprefix', PARAM_TEXT);
         $mform->addRule('nameprefix', null, 'required', null, 'client');
 
+        $mform->addElement('header', 'overrides', get_string('batch_overrides', 'local_labvirtual'));
+        $mform->addElement(
+            'static',
+            'overridesnote',
+            '',
+            get_string('batch_overrides_help', 'local_labvirtual')
+        );
+
+        $mform->addElement('text', 'maxteachers', get_string('settings_max_teachers', 'local_labvirtual'), ['size' => 5]);
+        $mform->setType('maxteachers', PARAM_TEXT);
+
+        $mform->addElement(
+            'text',
+            'lifecyclemonths',
+            get_string('settings_lifecycle_months', 'local_labvirtual'),
+            ['size' => 5]
+        );
+        $mform->setType('lifecyclemonths', PARAM_TEXT);
+
+        $mform->addElement('select', 'lifecycleaction', get_string('settings_lifecycle_action', 'local_labvirtual'), [
+            ''  => get_string('batch_override_default', 'local_labvirtual'),
+            '0' => get_string('settings_lifecycle_action_none', 'local_labvirtual'),
+            '1' => get_string('settings_lifecycle_action_reset', 'local_labvirtual'),
+            '2' => get_string('settings_lifecycle_action_delete', 'local_labvirtual'),
+        ]);
+
+        $mform->addElement('text', 'warningdays', get_string('settings_warning_days', 'local_labvirtual'), ['size' => 5]);
+        $mform->setType('warningdays', PARAM_TEXT);
+
         $this->add_action_buttons(true, get_string('save_batch', 'local_labvirtual'));
+    }
+
+    #[\Override]
+    public function validation($data, $files): array {
+        $errors = parent::validation($data, $files);
+
+        foreach (['maxteachers', 'lifecyclemonths', 'warningdays'] as $field) {
+            if ($data[$field] !== '' && !ctype_digit((string) $data[$field])) {
+                $errors[$field] = get_string('error', 'moodle');
+            }
+        }
+
+        return $errors;
     }
 }

@@ -59,23 +59,37 @@ class batch_manager {
     }
 
     /**
-     * Updates a batch: name (renaming its subcategory), responsible teachers and lab prefix.
+     * Updates a batch: name (renaming its subcategory), teachers, prefix and setting overrides.
      *
      * @param int    $batchid    Batch ID.
      * @param string $name       New batch name.
      * @param int[]  $teacherids Responsible teacher user IDs.
      * @param string $nameprefix Lab name prefix.
+     * @param array  $settings   Override values keyed by maxteachers, lifecyclemonths,
+     *                           lifecycleaction and warningdays; empty or null means inherit.
      */
-    public function update_batch(int $batchid, string $name, array $teacherids, string $nameprefix): void {
+    public function update_batch(
+        int $batchid,
+        string $name,
+        array $teacherids,
+        string $nameprefix,
+        array $settings = []
+    ): void {
         global $DB;
 
         $batch = $this->get_batch($batchid);
 
-        $DB->update_record('local_labvirtual_batches', (object) [
+        $record = (object) [
             'id'         => $batchid,
             'name'       => $name,
             'nameprefix' => $nameprefix,
-        ]);
+        ];
+        foreach (['maxteachers', 'lifecyclemonths', 'lifecycleaction', 'warningdays'] as $key) {
+            $value = $settings[$key] ?? null;
+            $record->$key = ($value === null || $value === '') ? null : (int) $value;
+        }
+
+        $DB->update_record('local_labvirtual_batches', $record);
 
         if ($name !== $batch->name) {
             category_manager::rename_category((int) $batch->categoryid, $name);

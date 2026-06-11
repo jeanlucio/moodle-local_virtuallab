@@ -8,6 +8,7 @@
         "batchname": "Projeto de Interface 2026/1",
         "teachername": "Jean Lúcio",
         "batchid": 1,
+        "canmanage": true,
         "sesskey": "abc123",
         "viewurl": "/local/labvirtual/view.php?batchid=1",
         "haslabs": true,
@@ -47,7 +48,9 @@
                     <th scope="col">Ambiente</th>
                     <th scope="col">Status</th>
                     <th scope="col">{{#str}} currenteditors, local_labvirtual {{/str}}</th>
+                    {{#canmanage}}
                     <th scope="col">{{#str}} view_course, local_labvirtual {{/str}}</th>
+                    {{/canmanage}}
                     <th scope="col">{{#str}} enrol_join, local_labvirtual {{/str}}</th>
                 </tr>
             </thead>
@@ -68,6 +71,7 @@
                             <span class="text-body-secondary">—</span>
                         {{/editors}}
                     </td>
+                    {{#canmanage}}
                     <td>
                         <a href="{{courseurl}}"
                            class="btn btn-sm btn-outline-secondary"
@@ -76,6 +80,7 @@
                             {{#str}} view_course, local_labvirtual {{/str}}
                         </a>
                     </td>
+                    {{/canmanage}}
                     <td class="text-nowrap">
                         {{#user_enrolled_here}}
                         <span class="badge bg-secondary lv-badge-enrolled">

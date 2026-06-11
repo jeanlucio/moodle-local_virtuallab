@@ -117,7 +117,12 @@ if ($batchid) {
         if ($data = $form->get_data()) {
             require_sesskey();
             $teacherids = array_map('intval', (array) $data->teacherids);
-            $batchmgr->update_batch($batchid, $data->name, $teacherids, trim($data->nameprefix));
+            $batchmgr->update_batch($batchid, $data->name, $teacherids, trim($data->nameprefix), [
+                'maxteachers'     => $data->maxteachers,
+                'lifecyclemonths' => $data->lifecyclemonths,
+                'lifecycleaction' => $data->lifecycleaction,
+                'warningdays'     => $data->warningdays,
+            ]);
             redirect(
                 $level2url,
                 get_string('batch_updated', 'local_labvirtual'),
@@ -127,10 +132,14 @@ if ($batchid) {
         }
 
         $form->set_data([
-            'batchid'    => $batchid,
-            'name'       => $batch->name,
-            'teacherids' => array_keys($batchmgr->get_teachers($batchid)),
-            'nameprefix' => $batch->nameprefix,
+            'batchid'         => $batchid,
+            'name'            => $batch->name,
+            'teacherids'      => array_keys($batchmgr->get_teachers($batchid)),
+            'nameprefix'      => $batch->nameprefix,
+            'maxteachers'     => $batch->maxteachers,
+            'lifecyclemonths' => $batch->lifecyclemonths,
+            'lifecycleaction' => $batch->lifecycleaction === null ? '' : (string) $batch->lifecycleaction,
+            'warningdays'     => $batch->warningdays,
         ]);
 
         echo $OUTPUT->header();

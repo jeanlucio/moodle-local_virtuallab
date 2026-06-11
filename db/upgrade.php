@@ -201,5 +201,23 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061130, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061140) {
+        $table = new xmldb_table('local_labvirtual_batches');
+
+        $fields = [
+            new xmldb_field('maxteachers', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'timecreated'),
+            new xmldb_field('lifecyclemonths', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'maxteachers'),
+            new xmldb_field('lifecycleaction', XMLDB_TYPE_INTEGER, '4', null, null, null, null, 'lifecyclemonths'),
+            new xmldb_field('warningdays', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'lifecycleaction'),
+        ];
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026061140, 'local', 'labvirtual');
+    }
+
     return true;
 }

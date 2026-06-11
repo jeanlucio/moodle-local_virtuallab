@@ -27,12 +27,16 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['access_as_editor'] = 'Access {$a} as editor';
 $string['access_as_visitor'] = 'Access {$a} as visitor';
+$string['access_via_teacher'] = 'Access to this lab is provided by the responsible teacher(s): {$a}. Please contact them to be enrolled.';
 $string['already_enrolled'] = 'Enrolled';
 $string['batch_category'] = 'Destination category';
 $string['batch_created'] = 'Batch created successfully.';
 $string['batch_deleted'] = 'Batch and all its labs deleted successfully.';
 $string['batch_name'] = 'Batch name';
 $string['batch_nameprefix'] = 'Lab name prefix';
+$string['batch_override_default'] = 'Use site default';
+$string['batch_overrides'] = 'Per-batch overrides (optional)';
+$string['batch_overrides_help'] = 'Leave a field empty to use the site default for this batch.';
 $string['batch_teacher'] = 'Responsible teacher';
 $string['batch_updated'] = 'Batch updated successfully';
 $string['bulk_action'] = 'With selected';
