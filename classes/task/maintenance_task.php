@@ -25,6 +25,7 @@
 namespace local_labvirtual\task;
 
 use local_labvirtual\local\maintenance_service;
+use local_labvirtual\local\notification_service;
 
 /**
  * Resets or deletes labs whose last-reset (or creation) date exceeds
@@ -61,8 +62,9 @@ class maintenance_task extends \core\task\scheduled_task {
     public function execute(): void {
         global $DB;
 
-        $months = (int) get_config('local_labvirtual', 'lifecycle_months');
-        $action = (int) get_config('local_labvirtual', 'lifecycle_action');
+        $months      = (int) get_config('local_labvirtual', 'lifecycle_months');
+        $action      = (int) get_config('local_labvirtual', 'lifecycle_action');
+        $warningdays = (int) get_config('local_labvirtual', 'warning_days_before');
 
         if ($months === 0 || $action === 0) {
             mtrace('Lab Virtual maintenance: disabled (lifecycle_months or lifecycle_action is 0).');
@@ -70,6 +72,11 @@ class maintenance_task extends \core\task\scheduled_task {
         }
 
         $cutoff = mktime(0, 0, 0, (int)date('n') - $months, (int)date('j'), (int)date('Y'));
+
+        // Phase 0 — pre-action warnings.
+        if ($warningdays > 0) {
+            $this->send_warnings($cutoff, $months, $warningdays, $action);
+        }
 
         $labs = $DB->get_records_sql(
             "SELECT lc.*
@@ -87,13 +94,19 @@ class maintenance_task extends \core\task\scheduled_task {
         $label = $action === self::ACTION_RESET ? 'reset' : 'delete';
         mtrace('Lab Virtual maintenance: ' . count($labs) . " lab(s) due for {$label}.");
 
+        // Capture course names before deletion so the summary can list deleted labs.
+        $coursenames = $this->get_course_names($labs);
+
         $service = new maintenance_service();
+        $results = [];
         $success = 0;
         $errors  = 0;
 
         // Delete and reset are per-course Moodle API calls;
         // batch equivalents do not exist, so the loop is unavoidable.
         foreach ($labs as $lab) {
+            $name = $coursenames[$lab->courseid] ?? ('#' . $lab->courseid);
+            $ok   = true;
             try {
                 if ($action === self::ACTION_RESET) {
                     $service->reset_lab($lab->id, $lab->batchid);
@@ -106,9 +119,78 @@ class maintenance_task extends \core\task\scheduled_task {
             } catch (\Throwable $e) {
                 mtrace("  Error on lab {$lab->id}: " . $e->getMessage());
                 $errors++;
+                $ok = false;
             }
+            $results[] = [
+                'lab'    => $lab,
+                'name'   => $name,
+                'action' => $label,
+                'ok'     => $ok,
+            ];
+        }
+
+        // Phase 2 — post-action summary to teachers and admin.
+        if (!empty($results)) {
+            (new notification_service())->send_summary($results);
         }
 
         mtrace("Lab Virtual maintenance: done. {$success} succeeded, {$errors} failed.");
+    }
+
+    /**
+     * Phase 0: emails the responsible teacher about labs approaching the cutoff
+     * and marks them so the warning is not sent again in the same cycle.
+     *
+     * @param int $cutoff      Timestamp threshold for the action (labs older than this are due).
+     * @param int $months      Configured lifecycle length in months.
+     * @param int $warningdays Number of days before the action to warn.
+     * @param int $action      Lifecycle action setting (1 = reset, 2 = delete).
+     */
+    private function send_warnings(int $cutoff, int $months, int $warningdays, int $action): void {
+        global $DB;
+
+        // Labs whose reference date lands in [cutoff, cutoff + warningdays): due within the window, not yet overdue.
+        $warnend = mktime(0, 0, 0, (int)date('n') - $months, (int)date('j') + $warningdays, (int)date('Y'));
+
+        $warninglabs = $DB->get_records_sql(
+            "SELECT lc.*
+               FROM {local_labvirtual_courses} lc
+              WHERE lc.lastwarn = 0
+                AND ((lc.lastreset > 0 AND lc.lastreset >= :cutoff1 AND lc.lastreset < :warnend1)
+                  OR (lc.lastreset = 0 AND lc.timecreated >= :cutoff2 AND lc.timecreated < :warnend2))",
+            ['cutoff1' => $cutoff, 'warnend1' => $warnend, 'cutoff2' => $cutoff, 'warnend2' => $warnend]
+        );
+
+        if (empty($warninglabs)) {
+            return;
+        }
+
+        mtrace('Lab Virtual maintenance: ' . count($warninglabs) . ' lab(s) warned.');
+
+        // All warned labs are actioned within warningdays; show that deadline to the teacher.
+        $deadline = time() + $warningdays * DAYSECS;
+        (new notification_service())->send_warnings($warninglabs, $action, new \DateTime("@{$deadline}"));
+
+        [$insql, $params] = $DB->get_in_or_equal(array_keys($warninglabs), SQL_PARAMS_NAMED);
+        $DB->set_field_select('local_labvirtual_courses', 'lastwarn', time(), "id $insql", $params);
+    }
+
+    /**
+     * Returns a map of course ID to course full name for the given labs in one query.
+     *
+     * @param \stdClass[] $labs Lab rows with a courseid property.
+     * @return string[] Indexed by course ID.
+     */
+    private function get_course_names(array $labs): array {
+        global $DB;
+
+        $courseids = [];
+        foreach ($labs as $lab) {
+            $courseids[] = $lab->courseid;
+        }
+
+        [$insql, $params] = $DB->get_in_or_equal(array_unique($courseids), SQL_PARAMS_NAMED);
+
+        return $DB->get_records_select_menu('course', "id $insql", $params, '', 'id, fullname');
     }
 }

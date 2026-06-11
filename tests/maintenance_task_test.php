@@ -196,6 +196,54 @@ final class maintenance_task_test extends advanced_testcase {
     }
 
     /**
+     * A lab sitting in the warning window (due within warning_days_before) is warned
+     * but not actioned: lastwarn is set and the teacher receives an email.
+     */
+    public function test_execute_warns_lab_in_window(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+        set_config('warning_days_before', 7, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        // Backdating exactly 6 months places the reference date at the cutoff: warned, not yet overdue.
+        $this->backdate_labs($batchid, 6);
+
+        $sink = $this->redirectEmails();
+        $this->run_task();
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $this->assertGreaterThan(0, (int) $lab->lastwarn, 'lastwarn should have been set.');
+        $this->assertEquals(0, (int) $lab->lastreset, 'Lab in the warning window should not be reset.');
+        $this->assertGreaterThanOrEqual(1, count($messages), 'A warning email should have been sent.');
+    }
+
+    /**
+     * A lab already warned (lastwarn > 0) is not warned again in the same cycle.
+     */
+    public function test_execute_does_not_rewarn(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_labvirtual');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+        set_config('warning_days_before', 7, 'local_labvirtual');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 6);
+        $DB->set_field('local_labvirtual_courses', 'lastwarn', time() - DAYSECS, ['batchid' => $batchid]);
+
+        $sink = $this->redirectEmails();
+        $this->run_task();
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(0, $messages, 'No warning email should be sent to an already-warned lab.');
+    }
+
+    /**
      * All labs in a batch are processed when multiple labs are overdue.
      */
     public function test_execute_processes_all_overdue_labs(): void {

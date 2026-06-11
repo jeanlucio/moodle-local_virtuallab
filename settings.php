@@ -73,6 +73,14 @@ if ($hassiteconfig) {
         ]
     ));
 
+    $settings->add(new admin_setting_configtext(
+        'local_labvirtual/warning_days_before',
+        get_string('settings_warning_days', 'local_labvirtual'),
+        get_string('settings_warning_days_desc', 'local_labvirtual'),
+        7,
+        PARAM_INT
+    ));
+
     $settings->add(new admin_setting_heading(
         'local_labvirtual/heading_manage',
         '',

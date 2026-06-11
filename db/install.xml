@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/labvirtual/db" VERSION="20260523"
+<XMLDB PATH="local/labvirtual/db" VERSION="20260611"
     COMMENT="XMLDB file for local plugin labvirtual"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
@@ -29,6 +29,7 @@
         <FIELD NAME="student_enrolid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK enrol.id — enrol_self instance with student role"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of lab creation — base for lifecycle"/>
         <FIELD NAME="lastreset" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last successful reset (0 = never)"/>
+        <FIELD NAME="lastwarn" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last lifecycle warning email sent to the teacher (0 = never)"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

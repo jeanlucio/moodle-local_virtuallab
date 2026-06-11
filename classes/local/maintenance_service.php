@@ -58,7 +58,12 @@ class maintenance_service {
         $resetdata = $this->build_reset_data($lab->courseid);
         reset_course_userdata($resetdata);
 
-        $DB->set_field('local_labvirtual_courses', 'lastreset', time(), ['id' => $labid]);
+        // Clearing lastwarn starts a fresh lifecycle cycle so a new warning is sent next time.
+        $DB->update_record('local_labvirtual_courses', (object) [
+            'id'        => $labid,
+            'lastreset' => time(),
+            'lastwarn'  => 0,
+        ]);
 
         $event = course_reset::create([
             'objectid' => $lab->courseid,

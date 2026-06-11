@@ -1,6 +1,12 @@
 # Changelog — Lab Virtual
 
-## 4.0.0 (2026-06-09)
+## 0.5.0-alpha (2026-06-11)
+
+- Lifecycle warning emails: the responsible teacher is notified a configurable number of days before a lab is reset or deleted (new "Warning days before action" setting, default 7; 0 disables)
+- Post-action summary emails sent to each responsible teacher and to the site administrator after the maintenance task runs
+- New `lastwarn` field on managed labs tracks the warning sent per lifecycle cycle; it is cleared on reset so a fresh warning is issued next cycle
+
+## 0.4.0-alpha (2026-06-09)
 
 - Initial release
 - Batch creation: generates N lab courses with dual self-enrolment instances (editor + visitor key)
