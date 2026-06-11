@@ -119,6 +119,49 @@ final class batch_manager_test extends advanced_testcase {
     }
 
     /**
+     * update_batch changes the name (renaming the subcategory), prefix and teachers.
+     */
+    public function test_update_batch_updates_fields_and_category(): void {
+        global $DB;
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $mgr = new batch_manager();
+        $id  = $mgr->create_batch('Old name', [$user1->id], 'OldPrefix');
+
+        $mgr->update_batch($id, 'New name', [$user2->id], 'NewPrefix');
+
+        $batch = $mgr->get_batch($id);
+        $this->assertSame('New name', $batch->name);
+        $this->assertSame('NewPrefix', $batch->nameprefix);
+
+        $subcategory = $DB->get_record('course_categories', ['id' => $batch->categoryid], 'name', MUST_EXIST);
+        $this->assertSame('New name', $subcategory->name);
+
+        $teachers = $mgr->get_teachers($id);
+        $this->assertArrayHasKey($user2->id, $teachers);
+        $this->assertArrayNotHasKey($user1->id, $teachers);
+
+        $context = $mgr->get_batch_context($id);
+        $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user2->id));
+        $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user1->id));
+    }
+
+    /**
+     * set_prefix updates only the lab name prefix.
+     */
+    public function test_set_prefix_updates_only_the_prefix(): void {
+        $user = $this->getDataGenerator()->create_user();
+        $mgr  = new batch_manager();
+        $id   = $mgr->create_batch('Turma X', [$user->id], '');
+
+        $mgr->set_prefix($id, 'Lab Z');
+
+        $this->assertSame('Lab Z', $mgr->get_batch($id)->nameprefix);
+    }
+
+    /**
      * list_batches returns the joined teacher names, category name and correct lab count.
      */
     public function test_list_batches_returns_joined_data(): void {

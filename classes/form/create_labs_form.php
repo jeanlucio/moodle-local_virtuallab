@@ -41,6 +41,15 @@ class create_labs_form extends \moodleform {
 
         $mform->addElement(
             'text',
+            'nameprefix',
+            get_string('batch_nameprefix', 'local_labvirtual'),
+            ['size' => 40, 'maxlength' => 255]
+        );
+        $mform->setType('nameprefix', PARAM_TEXT);
+        $mform->addRule('nameprefix', null, 'required', null, 'client');
+
+        $mform->addElement(
+            'text',
             'labcount',
             get_string('lab_count', 'local_labvirtual'),
             ['size' => 5, 'maxlength' => 4]

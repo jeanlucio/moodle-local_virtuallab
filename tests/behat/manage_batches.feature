@@ -8,9 +8,6 @@ Feature: Manage Lab Virtual batches
     Given the following "users" exist:
       | username | firstname | lastname | email          |
       | teacher1 | Teacher   | One      | t1@example.com |
-    And the following "categories" exist:
-      | name     | idnumber |
-      | Labs Cat | labscat  |
     And I log in as "admin"
 
   @javascript
@@ -19,10 +16,19 @@ Feature: Manage Lab Virtual batches
     And I follow "New batch"
     And I set the field "Batch name" to "Interface 2026/1"
     And I set the field "Responsible teacher" to "Teacher One"
-    And I set the field "Lab name prefix" to "Lab EAD"
     And I press "New batch"
     Then I should see "Batch created successfully"
     And I should see "Interface 2026/1"
+
+  @javascript
+  Scenario: Manager edits a batch name
+    Given a lab virtual batch "UI 2026" exists with teacher "teacher1" and 0 labs
+    When I visit the labs page for batch "UI 2026"
+    And I follow "Edit batch"
+    And I set the field "Batch name" to "UI 2026 renamed"
+    And I press "Save batch"
+    Then I should see "Batch updated successfully"
+    And I should see "UI 2026 renamed"
 
   Scenario: Admin deletes a batch
     Given a lab virtual batch "Interface 2026/1" exists with teacher "teacher1" and 2 labs

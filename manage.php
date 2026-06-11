@@ -29,6 +29,7 @@ require(__DIR__ . '/../../config.php');
 
 use local_labvirtual\form\create_batch_form;
 use local_labvirtual\form\create_labs_form;
+use local_labvirtual\form\edit_batch_form;
 use local_labvirtual\local\batch_manager;
 use local_labvirtual\local\course_factory;
 use local_labvirtual\local\course_registry;
@@ -73,7 +74,7 @@ if ($batchid) {
     // Create labs.
     if ($action === 'createlabs') {
         $form = new create_labs_form($createurl->out(false));
-        $form->set_data(['batchid' => $batchid]);
+        $form->set_data(['batchid' => $batchid, 'nameprefix' => $batch->nameprefix]);
 
         if ($form->is_cancelled()) {
             redirect($level2url);
@@ -81,6 +82,7 @@ if ($batchid) {
 
         if ($data = $form->get_data()) {
             require_sesskey();
+            $batchmgr->set_prefix((int) $data->batchid, trim($data->nameprefix));
             $factory = new course_factory();
             $created = $factory->create_labs(
                 (int) $data->batchid,
@@ -93,6 +95,43 @@ if ($batchid) {
                 \core\output\notification::NOTIFY_SUCCESS
             );
         }
+
+        echo $OUTPUT->header();
+        $form->display();
+        echo $OUTPUT->footer();
+        exit;
+    }
+
+    // Edit batch.
+    if ($action === 'editbatch') {
+        $editurl = new moodle_url(
+            '/local/labvirtual/manage.php',
+            ['batchid' => $batchid, 'action' => 'editbatch']
+        );
+        $form = new edit_batch_form($editurl->out(false));
+
+        if ($form->is_cancelled()) {
+            redirect($level2url);
+        }
+
+        if ($data = $form->get_data()) {
+            require_sesskey();
+            $teacherids = array_map('intval', (array) $data->teacherids);
+            $batchmgr->update_batch($batchid, $data->name, $teacherids, trim($data->nameprefix));
+            redirect(
+                $level2url,
+                get_string('batch_updated', 'local_labvirtual'),
+                null,
+                \core\output\notification::NOTIFY_SUCCESS
+            );
+        }
+
+        $form->set_data([
+            'batchid'    => $batchid,
+            'name'       => $batch->name,
+            'teacherids' => array_keys($batchmgr->get_teachers($batchid)),
+            'nameprefix' => $batch->nameprefix,
+        ]);
 
         echo $OUTPUT->header();
         $form->display();
@@ -246,10 +285,15 @@ if ($batchid) {
         ['batchid' => $batchid]
     ))->out(false);
 
+    $editurl = (new moodle_url(
+        '/local/labvirtual/manage.php',
+        ['batchid' => $batchid, 'action' => 'editbatch']
+    ))->out(false);
+
     $renderer = $PAGE->get_renderer('local_labvirtual');
 
     echo $OUTPUT->header();
-    echo $renderer->render_labs_list($batch, $labs, $panelurl, $createurl->out(false));
+    echo $renderer->render_labs_list($batch, $labs, $panelurl, $createurl->out(false), $editurl);
     echo $OUTPUT->footer();
     exit;
 }
@@ -277,11 +321,7 @@ if ($action === 'createbatch') {
         $teacherids = array_map('intval', (array) $data->teacherids);
 
         $batchmgr = new batch_manager();
-        $batchmgr->create_batch(
-            $data->name,
-            $teacherids,
-            $data->nameprefix
-        );
+        $batchmgr->create_batch($data->name, $teacherids);
         redirect(
             $manageurl,
             get_string('batch_created', 'local_labvirtual'),

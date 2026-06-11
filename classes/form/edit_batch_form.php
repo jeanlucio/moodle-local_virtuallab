@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Form for creating a new Lab Virtual batch (turma).
+ * Form for editing an existing Lab Virtual batch (turma).
  *
  * @package    local_labvirtual
  * @copyright  2026 Jean Lúcio
@@ -29,12 +29,15 @@ defined('MOODLE_INTERNAL') || die();
 require_once($GLOBALS['CFG']->libdir . '/formslib.php');
 
 /**
- * Batch creation form.
+ * Batch editing form: name, responsible teachers and lab prefix.
  */
-class create_batch_form extends \moodleform {
+class edit_batch_form extends \moodleform {
     #[\Override]
     public function definition(): void {
         $mform = $this->_form;
+
+        $mform->addElement('hidden', 'batchid');
+        $mform->setType('batchid', PARAM_INT);
 
         $mform->addElement(
             'text',
@@ -59,6 +62,15 @@ class create_batch_form extends \moodleform {
         );
         $mform->addRule('teacherids', null, 'required', null, 'client');
 
-        $this->add_action_buttons(false, get_string('create_batch', 'local_labvirtual'));
+        $mform->addElement(
+            'text',
+            'nameprefix',
+            get_string('batch_nameprefix', 'local_labvirtual'),
+            ['size' => 40, 'maxlength' => 255]
+        );
+        $mform->setType('nameprefix', PARAM_TEXT);
+        $mform->addRule('nameprefix', null, 'required', null, 'client');
+
+        $this->add_action_buttons(true, get_string('save_batch', 'local_labvirtual'));
     }
 }

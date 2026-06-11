@@ -33,13 +33,13 @@ class batch_manager {
      *
      * @param string $name       Human-readable batch name.
      * @param int[]  $teacherids User IDs of the responsible teachers.
-     * @param string $nameprefix Prefix used to name labs (e.g. "Lab EAD"), may be empty.
+     * @param string $nameprefix Prefix used to name labs (e.g. "Lab EAD"); set later by the teacher.
      * @return int New batch ID.
      */
     public function create_batch(
         string $name,
         array $teacherids,
-        string $nameprefix
+        string $nameprefix = ''
     ): int {
         global $DB;
 
@@ -56,6 +56,44 @@ class batch_manager {
         $this->set_teachers($batchid, $teacherids);
 
         return $batchid;
+    }
+
+    /**
+     * Updates a batch: name (renaming its subcategory), responsible teachers and lab prefix.
+     *
+     * @param int    $batchid    Batch ID.
+     * @param string $name       New batch name.
+     * @param int[]  $teacherids Responsible teacher user IDs.
+     * @param string $nameprefix Lab name prefix.
+     */
+    public function update_batch(int $batchid, string $name, array $teacherids, string $nameprefix): void {
+        global $DB;
+
+        $batch = $this->get_batch($batchid);
+
+        $DB->update_record('local_labvirtual_batches', (object) [
+            'id'         => $batchid,
+            'name'       => $name,
+            'nameprefix' => $nameprefix,
+        ]);
+
+        if ($name !== $batch->name) {
+            category_manager::rename_category((int) $batch->categoryid, $name);
+        }
+
+        $this->set_teachers($batchid, $teacherids);
+    }
+
+    /**
+     * Sets the lab name prefix of a batch.
+     *
+     * @param int    $batchid    Batch ID.
+     * @param string $nameprefix Lab name prefix.
+     */
+    public function set_prefix(int $batchid, string $nameprefix): void {
+        global $DB;
+
+        $DB->set_field('local_labvirtual_batches', 'nameprefix', $nameprefix, ['id' => $batchid]);
     }
 
     /**

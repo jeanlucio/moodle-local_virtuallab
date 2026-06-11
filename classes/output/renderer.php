@@ -148,7 +148,8 @@ class renderer extends plugin_renderer_base {
         \stdClass $batch,
         array $labs,
         string $panelurl,
-        string $createurl
+        string $createurl,
+        string $editurl = ''
     ): string {
         $rows = [];
 
@@ -184,6 +185,7 @@ class renderer extends plugin_renderer_base {
             'haslabs'      => !empty($rows),
             'panelurl'     => $panelurl,
             'createurl'    => $createurl,
+            'editurl'      => $editurl,
             'sesskey'      => sesskey(),
             'strpanelhelp' => get_string('panel_url_help', 'local_labvirtual'),
         ];
