@@ -38,10 +38,11 @@ class role_provisioner {
     /**
      * Ensures the delegated role exists with the right capabilities and context levels.
      *
-     * The role mirrors the category Manager capabilities so a responsible teacher has full
-     * control over the courses in their own batch category (edit content, grades and
-     * enrolments), scoped to that subcategory. Idempotent: safe to call on install and on
-     * every upgrade. Stores the role ID in plugin config and returns it.
+     * The role mirrors the editingteacher capabilities so a responsible teacher can fully
+     * manage the content, grades and enrolments of their batch courses, plus course:view
+     * to enter without enrolling — but without the category-level visibility a Manager would
+     * bring (no global course list, no "manage courses" page). Idempotent: safe to call on
+     * install and on every upgrade. Stores the role ID in plugin config and returns it.
      *
      * @return int The delegated role ID.
      */
@@ -56,7 +57,7 @@ class role_provisioner {
                 get_string('role_batchmanager', 'local_labvirtual'),
                 self::ROLE_SHORTNAME,
                 get_string('role_batchmanager_desc', 'local_labvirtual'),
-                'manager'
+                'editingteacher'
             );
         }
 
@@ -64,11 +65,14 @@ class role_provisioner {
 
         $systemcontext = \context_system::instance();
 
-        // Copy the Manager role capabilities so the delegated role grants the same control,
-        // but only where it is assigned (the batch subcategory). One-off provisioning.
-        $managerid = (int) $DB->get_field('role', 'id', ['shortname' => 'manager']);
-        if ($managerid) {
-            foreach ($DB->get_records('role_capabilities', ['roleid' => $managerid]) as $capability) {
+        // Rebuild the capability set from scratch so re-provisioning cannot leave stale caps.
+        $DB->delete_records('role_capabilities', ['roleid' => $roleid]);
+
+        // Mirror the editingteacher capabilities (course content, grades, enrolments), applied
+        // only where the role is assigned (the batch subcategory). One-off provisioning.
+        $sourceid = (int) $DB->get_field('role', 'id', ['shortname' => 'editingteacher']);
+        if ($sourceid) {
+            foreach ($DB->get_records('role_capabilities', ['roleid' => $sourceid]) as $capability) {
                 assign_capability(
                     $capability->capability,
                     $capability->permission,
@@ -79,6 +83,9 @@ class role_provisioner {
             }
         }
 
+        // On top of editingteacher: enter the courses without enrolling, and manage the batch.
+        assign_capability('moodle/course:view', CAP_ALLOW, $roleid, $systemcontext->id, true);
+        assign_capability('moodle/course:viewhiddensections', CAP_ALLOW, $roleid, $systemcontext->id, true);
         assign_capability('local/labvirtual:manage', CAP_ALLOW, $roleid, $systemcontext->id, true);
 
         set_config('managerroleid', $roleid, 'local_labvirtual');

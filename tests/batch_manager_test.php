@@ -117,6 +117,10 @@ final class batch_manager_test extends advanced_testcase {
         $this->assertTrue(has_capability('moodle/grade:viewall', $context, $user1->id));
         $this->assertFalse(has_capability('moodle/course:update', $context, $user2->id));
 
+        // But no category-level powers: no global course list or course creation.
+        $this->assertFalse(has_capability('moodle/category:manage', $context, $user1->id));
+        $this->assertFalse(has_capability('moodle/course:create', $context, $user1->id));
+
         $mgr->set_teachers($id, [$user2->id]);
 
         $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user1->id));

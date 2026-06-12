@@ -226,5 +226,12 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061150, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061151) {
+        // Re-provision the role: editingteacher-based set (no category-level visibility).
+        \local_labvirtual\local\role_provisioner::ensure_role();
+
+        upgrade_plugin_savepoint(true, 2026061151, 'local', 'labvirtual');
+    }
+
     return true;
 }
