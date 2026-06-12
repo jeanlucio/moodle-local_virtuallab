@@ -74,6 +74,7 @@ class renderer extends plugin_renderer_base {
      * @param string    $teachernames Comma-separated names of the responsible teachers.
      * @param array     $labs         Enriched lab data from panel_repository.
      * @param int       $batchid      Batch ID (for form actions).
+     * @param bool      $canmanage    Whether the viewer may manage the batch (shows the view-course link).
      * @return string Rendered HTML.
      */
     public function render_labs_panel(
@@ -108,6 +109,7 @@ class renderer extends plugin_renderer_base {
      *
      * @param array  $batches      List of batch records from batch_manager::list_batches().
      * @param string $createurl    URL for the "New batch" action.
+     * @param bool   $cancreate    Whether to show the "New batch" button.
      * @return string Rendered HTML.
      */
     public function render_batches_list(array $batches, string $createurl, bool $cancreate = false): string {
@@ -149,6 +151,7 @@ class renderer extends plugin_renderer_base {
      * @param array     $labs      Lab records from course_registry::list_labs().
      * @param string    $panelurl  Absolute URL to the student panel for this batch.
      * @param string    $createurl URL for the "Create labs" action.
+     * @param string    $editurl   URL for the "Edit batch" action.
      * @return string Rendered HTML.
      */
     public function render_labs_list(
