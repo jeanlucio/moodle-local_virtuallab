@@ -146,7 +146,9 @@ Before acting, the task emails a **warning** the configured number of days in ad
 
 ### 🧪 Automated Tests
 
-Lab Virtual ships with a PHPUnit integration test suite. Every CI push runs against the full matrix (Moodle 4.5 → 5.2, PostgreSQL and MariaDB).
+Lab Virtual ships with PHPUnit (unit/integration) and Behat (acceptance) test suites. Every CI push runs both against the full matrix (Moodle 4.5 → 5.2, PostgreSQL and MariaDB).
+
+#### Unit & integration tests (PHPUnit)
 
 | Test file | Cases | What is covered |
 |-----------|------:|----------------|
@@ -163,6 +165,21 @@ Lab Virtual ships with a PHPUnit integration test suite. Every CI push runs agai
 
 ```bash
 vendor/bin/phpunit --testsuite local_labvirtual_testsuite
+```
+
+#### Acceptance tests (Behat)
+
+End-to-end browser tests covering the admin, teacher and student flows.
+
+| Feature | Scenarios | What is covered |
+|---------|----------:|----------------|
+| `manage_batches.feature` | 3 | Admin creates a batch; a manager edits a batch; admin deletes a batch |
+| `manage_labs.feature` | 2 | Creating labs and seeing the student panel URL; resetting a single lab |
+| `student_panel.feature` | 4 | Panel header and labs list; enrolling as editor and landing in the course; the one-editor-per-batch block; guests sent to login |
+| **Total** | **9** | |
+
+```bash
+vendor/bin/behat --tags @local_labvirtual
 ```
 
 ---
@@ -322,7 +339,9 @@ Antes de agir, a tarefa envia um **aviso** com a antecedência configurada; depo
 
 ### 🧪 Testes Automatizados
 
-O Lab Virtual inclui uma suíte de testes de integração PHPUnit. Todo push de CI executa a matriz completa (Moodle 4.5 → 5.2, PostgreSQL e MariaDB).
+O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat (aceitação). Todo push de CI executa ambas na matriz completa (Moodle 4.5 → 5.2, PostgreSQL e MariaDB).
+
+#### Testes unitários e de integração (PHPUnit)
 
 | Arquivo de teste | Casos | O que é coberto |
 |-----------------|------:|----------------|
@@ -339,6 +358,21 @@ O Lab Virtual inclui uma suíte de testes de integração PHPUnit. Todo push de 
 
 ```bash
 vendor/bin/phpunit --testsuite local_labvirtual_testsuite
+```
+
+#### Testes de aceitação (Behat)
+
+Testes de navegador ponta a ponta cobrindo os fluxos de admin, professor e estudante.
+
+| Feature | Cenários | O que é coberto |
+|---------|---------:|----------------|
+| `manage_batches.feature` | 3 | Admin cria turma; gestor edita turma; admin exclui turma |
+| `manage_labs.feature` | 2 | Criar labs e ver a URL do painel; resetar um lab |
+| `student_panel.feature` | 4 | Cabeçalho e lista de labs; inscrição como editor e entrada no curso; bloqueio de um editor por turma; visitante enviado ao login |
+| **Total** | **9** | |
+
+```bash
+vendor/bin/behat --tags @local_labvirtual
 ```
 
 ---
