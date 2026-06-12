@@ -9,7 +9,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Batch name (e.g. Projeto de Interface 2026/1)"/>
         <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle course_categories.id — the batch own subcategory"/>
-        <FIELD NAME="nameprefix" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="Lab name prefix (e.g. Lab EAD → Lab EAD 01)"/>
+        <FIELD NAME="nameprefix" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Lab name prefix (e.g. Lab EAD → Lab EAD 01)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of batch creation"/>
         <FIELD NAME="maxteachers" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for max editors per lab; NULL uses the global default"/>
         <FIELD NAME="lifecyclemonths" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for lifecycle months; NULL uses the global default"/>
