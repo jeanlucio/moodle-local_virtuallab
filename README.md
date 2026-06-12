@@ -21,7 +21,7 @@ Each batch lives in its own course subcategory, and its **responsible teachers m
 ### ✨ Features
 
 * 🗂 **Batch creation:** Create N lab courses in one step, each with a unique short name, inside the batch's own subcategory.
-* 🔓 **Key-free enrolment:** Students join straight from the panel — one click picks the role (editor or visitor) and enrols them through the course manual enrolment instance. No enrolment keys, and the standard "enrolment options" page no longer shows confusing key blocks.
+* 🔓 **Key-free enrolment:** Students join straight from the panel — one click picks the role (editor or visitor) and enrols them through the course manual enrolment instance. There are no enrolment keys to share or manage.
 * 👥 **Multiple responsible teachers:** A batch can have several responsible teachers; all of them manage the batch and receive its notifications.
 * 🎓 **Delegated management:** Responsible teachers get a scoped role on their batch subcategory, giving them full control of *their own* lab courses (edit content, grades and enrolments, enter without enrolling) — but no access to the rest of the platform.
 * 🖥 **Self-service student panel:** Authenticated students see every lab in the batch, its current status, and join with a single click.
@@ -31,7 +31,7 @@ Each batch lives in its own course subcategory, and its **responsible teachers m
 * ⚙️ **Per-batch settings:** Each batch can override the global defaults for editors-per-lab and the lifecycle policy (months, action, warning days); leaving a field empty inherits the site default.
 * 🔗 **Shareable panel URL:** Managers can copy and share a direct link to each batch's student panel.
 * ♻️ **Reset / 🗑 delete / ☑️ bulk:** Reset clears user data and enrolments while keeping the course shell; delete removes the course and registry row; bulk actions reset or delete several labs at once.
-* 🏭 **Delete batch:** Removes a whole batch, its labs and its (now empty) subcategory.
+* 🏭 **Delete batch:** Removes a whole batch, its labs and its subcategory.
 * ⏰ **Automatic lifecycle maintenance:** A nightly scheduled task resets or deletes overdue labs, applying each batch's own settings, with advance warning emails.
 * 📧 **Lifecycle notifications:** Warning and summary emails are sent to the responsible teachers and to each affected course's editors; the administrator copy is optional.
 * 🙋 **Helpful access notice:** A logged-in visitor who reaches a lab course without access sees a notice naming the responsible teacher(s) to contact.
@@ -170,7 +170,7 @@ vendor/bin/phpunit --testsuite local_labvirtual_testsuite
 ### 🔐 Security & Compliance
 
 * Two capabilities: `local/labvirtual:manage` (assignable at system for admins and at a course category for delegated teachers) and `local/labvirtual:view`.
-* The management page is scoped by category context — admins manage every batch, a delegated teacher only their own; creating a batch stays admin-only.
+* The management page is scoped by category context — admins manage every batch, a delegated teacher only their own; creating a batch is restricted to admins.
 * Every write action checks the capability in the correct context and verifies `require_sesskey()`.
 * All DB queries use named parameters — no SQL injection surface.
 * Cross-batch ownership check on every reset and delete: a lab can only be modified via the batch it was created in. Batch subcategory deletion is guarded so only an empty, plugin-owned subcategory is ever removed.
@@ -197,7 +197,7 @@ Cada turma vive na sua própria subcategoria de cursos, e seus **professores res
 ### ✨ Funcionalidades
 
 * 🗂 **Criação em lote:** Cria N cursos-lab em uma etapa, cada um com shortname único, dentro da subcategoria própria da turma.
-* 🔓 **Inscrição sem chaves:** O estudante entra direto pelo painel — um clique escolhe o papel (editor ou visitante) e o inscreve pela instância de inscrição manual do curso. Sem chaves, e a tela padrão de "opções de inscrição" não mostra mais blocos de chave confusos.
+* 🔓 **Inscrição sem chaves:** O estudante entra direto pelo painel — um clique escolhe o papel (editor ou visitante) e o inscreve pela instância de inscrição manual do curso. Não há chaves de inscrição para compartilhar ou gerenciar.
 * 👥 **Múltiplos professores responsáveis:** Uma turma pode ter vários responsáveis; todos gerenciam a turma e recebem as notificações.
 * 🎓 **Gestão delegada:** Os responsáveis recebem um papel escopado na subcategoria da turma, com controle total dos cursos-lab *da turma deles* (editar conteúdo, notas e inscrições, entrar sem se inscrever) — sem acesso ao resto da plataforma.
 * 🖥 **Painel self-service para estudantes:** Estudantes autenticados veem todos os labs da turma, o status atual e entram com um clique.
@@ -207,7 +207,7 @@ Cada turma vive na sua própria subcategoria de cursos, e seus **professores res
 * ⚙️ **Configurações por turma:** Cada turma pode sobrescrever os padrões globais de editores-por-lab e da política de ciclo de vida (meses, ação, dias de aviso); campo vazio herda o padrão do site.
 * 🔗 **URL do painel compartilhável:** Gestores copiam e compartilham o link direto do painel de cada turma.
 * ♻️ **Resetar / 🗑 excluir / ☑️ em lote:** Reset limpa dados e inscrições preservando o curso; exclusão remove curso e registro; ações em lote resetam ou excluem vários labs de uma vez.
-* 🏭 **Excluir turma:** Remove a turma inteira, seus labs e a subcategoria (já vazia).
+* 🏭 **Excluir turma:** Remove a turma inteira, seus labs e a subcategoria.
 * ⏰ **Manutenção automática do ciclo de vida:** Tarefa noturna reseta ou exclui labs vencidos, aplicando as configurações próprias de cada turma, com e-mails de aviso antecipado.
 * 📧 **Notificações de ciclo de vida:** E-mails de aviso e resumo para os professores responsáveis e para os editores de cada curso afetado; a cópia ao administrador é opcional.
 * 🙋 **Aviso de acesso:** Um visitante logado que chega a um curso-lab sem acesso vê um aviso com o nome do(s) professor(es) responsável(is) para contato.
@@ -346,7 +346,7 @@ vendor/bin/phpunit --testsuite local_labvirtual_testsuite
 ### 🔐 Segurança e Conformidade
 
 * Duas capabilities: `local/labvirtual:manage` (assinável no sistema para admins e numa categoria de curso para professores delegados) e `local/labvirtual:view`.
-* A página de gerenciamento é escopada por contexto de categoria — admins gerenciam todas as turmas, o professor delegado só as dele; criar turma continua exclusivo do admin.
+* A página de gerenciamento é escopada por contexto de categoria — admins gerenciam todas as turmas, o professor delegado só as dele; criar turma é restrito aos admins.
 * Cada ação de escrita verifica a capability no contexto correto e valida `require_sesskey()`.
 * Todas as queries usam parâmetros nomeados — sem superfície de SQL injection.
 * Verificação de propriedade cruzada em todo reset e exclusão: um lab só pode ser modificado pela turma em que foi criado. A exclusão da subcategoria é protegida para remover apenas uma subcategoria vazia e pertencente ao plugin.
