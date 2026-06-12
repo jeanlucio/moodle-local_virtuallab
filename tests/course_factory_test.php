@@ -116,4 +116,14 @@ final class course_factory_test extends advanced_testcase {
             );
         }
     }
+
+    /**
+     * create_labs refuses a count above the per-request maximum.
+     */
+    public function test_create_labs_rejects_excessive_count(): void {
+        ['batchid' => $batchid] = $this->create_batch();
+
+        $this->expectException(\moodle_exception::class);
+        (new course_factory())->create_labs($batchid, course_factory::MAX_LABS + 1);
+    }
 }

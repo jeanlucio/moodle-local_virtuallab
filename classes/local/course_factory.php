@@ -28,6 +28,9 @@ namespace local_labvirtual\local;
  * Creates lab courses in batch, each with two self-enrolment instances.
  */
 class course_factory {
+    /** @var int Maximum number of labs that can be created in a single request. */
+    public const MAX_LABS = 50;
+
     /**
      * Creates N lab courses for the given batch and registers them.
      *
@@ -45,6 +48,10 @@ class course_factory {
         int $labcount
     ): array {
         global $CFG, $DB;
+
+        if ($labcount < 1 || $labcount > self::MAX_LABS) {
+            throw new \moodle_exception('error_too_many_labs', 'local_labvirtual', '', self::MAX_LABS);
+        }
 
         require_once($CFG->dirroot . '/course/lib.php');
         require_once($CFG->libdir . '/enrollib.php');

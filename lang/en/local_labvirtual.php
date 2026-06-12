@@ -75,6 +75,7 @@ $string['error_course_not_managed'] = 'This course is not managed by Lab Virtual
 $string['error_enrol_mismatch'] = 'Enrollment instance does not match the requested lab.';
 $string['error_lab_full'] = 'This lab has reached the maximum number of editors.';
 $string['error_no_labs_selected'] = 'No labs selected. Please select at least one lab.';
+$string['error_too_many_labs'] = 'You can create at most {$a} labs at once.';
 $string['eventbatchdeleted'] = 'Batch deleted';
 $string['eventbatchdeleted_desc'] = 'The batch with id {$a->batchid} was deleted ({$a->labcount} lab(s) removed).';
 $string['eventcoursedeleted'] = 'Lab course deleted';

@@ -24,6 +24,8 @@
 
 namespace local_labvirtual\form;
 
+use local_labvirtual\local\course_factory;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($GLOBALS['CFG']->libdir . '/formslib.php');
@@ -66,8 +68,11 @@ class create_labs_form extends \moodleform {
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
 
-        if (isset($data['labcount']) && (int) $data['labcount'] < 1) {
+        $labcount = isset($data['labcount']) ? (int) $data['labcount'] : 0;
+        if ($labcount < 1) {
             $errors['labcount'] = get_string('error', 'moodle');
+        } else if ($labcount > course_factory::MAX_LABS) {
+            $errors['labcount'] = get_string('error_too_many_labs', 'local_labvirtual', course_factory::MAX_LABS);
         }
 
         return $errors;

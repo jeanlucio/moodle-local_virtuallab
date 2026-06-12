@@ -115,7 +115,7 @@ The **Manage Lab Virtual** button in the settings page links directly to the man
 #### Teacher workflow
 
 1. The responsible teacher opens the management page and sees **only their own batches**.
-2. **Create labs:** choose the lab name prefix (remembered for next time) and how many labs to create.
+2. **Create labs:** choose the lab name prefix (remembered for next time) and how many labs to create (up to 50 at a time).
 3. From the batch page they can add more labs, reset/delete labs (individually or in bulk), open any lab course to edit content and grades, copy the student panel URL, and **edit the batch** (name, co-responsible teachers, prefix, and per-batch lifecycle settings).
 
 #### Student workflow
@@ -155,13 +155,13 @@ Lab Virtual ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 | `batch_manager_test.php` | 7 | Batch create/get, auto subcategory, multiple teachers, delegated-role isolation, update batch, set prefix, listing |
 | `batch_settings_test.php` | 2 | Effective settings: global default vs per-batch override |
 | `category_manager_test.php` | 3 | Safe deletion guard: empty batch subcategory removed; non-child or non-empty category kept |
-| `course_factory_test.php` | 3 | Correct lab count; labs use the manual enrolment instance and no self instance; all IDs returned |
+| `course_factory_test.php` | 4 | Correct lab count; labs use the manual enrolment instance and no self instance; all IDs returned; excessive count rejected |
 | `course_registry_test.php` | 10 | Ownership checks, bulk lookup and enrol-for-batch validation |
 | `maintenance_service_test.php` | 5 | Reset/delete behaviour and wrong-batch guards; batch deletion |
 | `maintenance_task_test.php` | 10 | Disabled cases, reset/delete overdue labs, per-batch override, reference-date logic |
 | `notification_service_test.php` | 7 | Warning/summary to teachers and editors; admin copy gated by setting; course link |
 | `panel_status_test.php` | 6 | Available/in-use/full flags; enrolment and one-editor-per-batch rules |
-| **Total** | **53** | |
+| **Total** | **54** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_labvirtual_testsuite
@@ -308,7 +308,7 @@ O botão **Gerenciar Lab Virtual** na página de configurações leva direto ao 
 #### Fluxo do professor
 
 1. O professor responsável abre a página de gerenciamento e vê **apenas as turmas dele**.
-2. **Criar labs:** escolhe o prefixo do nome dos labs (lembrado para a próxima vez) e quantos labs criar.
+2. **Criar labs:** escolhe o prefixo do nome dos labs (lembrado para a próxima vez) e quantos labs criar (até 50 por vez).
 3. Na página da turma ele pode adicionar mais labs, resetar/excluir labs (individual ou em lote), abrir qualquer curso-lab para editar conteúdo e notas, copiar a URL do painel e **editar a turma** (nome, co-responsáveis, prefixo e configurações de ciclo de vida da turma).
 
 #### Fluxo do estudante
@@ -348,13 +348,13 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 | `batch_manager_test.php` | 7 | Criar/obter turma, subcategoria automática, múltiplos professores, isolamento do papel delegado, editar turma, definir prefixo, listagem |
 | `batch_settings_test.php` | 2 | Configuração efetiva: padrão global vs override da turma |
 | `category_manager_test.php` | 3 | Guard de exclusão segura: subcategoria vazia da turma é removida; categoria não-filha ou não-vazia é mantida |
-| `course_factory_test.php` | 3 | Quantidade correta de labs; labs usam a instância manual e nenhuma self; todos os IDs retornados |
+| `course_factory_test.php` | 4 | Quantidade correta de labs; labs usam a instância manual e nenhuma self; todos os IDs retornados; quantidade excessiva rejeitada |
 | `course_registry_test.php` | 10 | Verificações de propriedade, busca em lote e validação de inscrição por turma |
 | `maintenance_service_test.php` | 5 | Reset/exclusão e guards de turma errada; exclusão de turma |
 | `maintenance_task_test.php` | 10 | Casos desabilitados, reset/exclusão de labs vencidos, override por turma, lógica de data de referência |
 | `notification_service_test.php` | 7 | Aviso/resumo para professores e editores; cópia ao admin condicionada à config; link do curso |
 | `panel_status_test.php` | 6 | Flags disponível/em uso/cheio; regras de inscrição e de um editor por turma |
-| **Total** | **53** | |
+| **Total** | **54** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_labvirtual_testsuite

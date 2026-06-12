@@ -75,6 +75,7 @@ $string['error_course_not_managed'] = 'Este curso não é gerenciado pelo Lab Vi
 $string['error_enrol_mismatch'] = 'Instância de inscrição não corresponde ao laboratório solicitado.';
 $string['error_lab_full'] = 'Este laboratório atingiu o número máximo de editores.';
 $string['error_no_labs_selected'] = 'Nenhum laboratório selecionado. Selecione ao menos um laboratório.';
+$string['error_too_many_labs'] = 'Você pode criar no máximo {$a} laboratórios por vez.';
 $string['eventbatchdeleted'] = 'Turma excluída';
 $string['eventbatchdeleted_desc'] = 'A turma com id {$a->batchid} foi excluída ({$a->labcount} laboratório(s) removido(s)).';
 $string['eventcoursedeleted'] = 'Laboratório excluído';
