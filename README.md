@@ -49,7 +49,7 @@ Typical scenarios:
 * Technical and vocational training where learners need a personal sandbox
 * Any discipline where students require their own configurable Moodle space each semester
 
-Without this plugin, an admin must manually create dozens of courses, configure enrolments, and clean up at the end of every semester. Lab Virtual automates the entire cycle and lets each teacher run their own batch.
+Moodle core can already create many courses at once (the *Upload courses* admin tool, via CSV). Lab Virtual is not about bulk creation itself — it adds everything around the **recurring, self-service lifecycle** of disposable sandboxes: grouping labs into a batch, a panel for students to pick and join one, automatic reset or deletion at the end of the term, and **delegation** so each teacher runs their own batch without admin access. If you only need to create courses in bulk once, the core tool is enough; if you run this cycle every semester, Lab Virtual automates it end to end.
 
 ---
 
@@ -242,7 +242,7 @@ Cenários típicos:
 * Formação técnica e profissional em que os estudantes precisam de um sandbox pessoal
 * Qualquer disciplina em que os estudantes necessitam de um espaço Moodle configurável próprio a cada semestre
 
-Sem este plugin, um administrador precisa criar manualmente dezenas de cursos, configurar inscrições e fazer a limpeza ao final de cada semestre. O Lab Virtual automatiza todo esse ciclo e permite que cada professor cuide da própria turma.
+O core do Moodle já cria vários cursos de uma vez (a ferramenta *Enviar cursos*, via CSV). O Lab Virtual não é sobre a criação em lote em si — ele adiciona tudo em volta do **ciclo recorrente e self-service** de sandboxes descartáveis: agrupar labs numa turma, um painel para o estudante escolher e entrar, reset ou exclusão automáticos ao final do período, e **delegação** para cada professor cuidar da própria turma sem acesso de admin. Se você só precisa criar cursos em massa uma vez, a ferramenta do core basta; se esse ciclo se repete a cada semestre, o Lab Virtual o automatiza de ponta a ponta.
 
 ---
 
