@@ -17,6 +17,7 @@
 - Teachers can edit their batch: rename it, add or remove co-responsible teachers, set the lab name prefix (moved out of the admin creation form into the teacher's "Create labs" form) and override the lifecycle settings (editors per lab, months, action and warning days) per batch, falling back to the site defaults.
 - The "View course" link in the student panel is now shown only to managers (admin or the batch teachers); other users no longer see a dead-end link.
 - A logged-in visitor who opens a managed lab course without access now sees a notice naming the responsible teacher(s) to contact, instead of the bare enrolment page.
+- The responsible teacher role now grants full management of the batch courses (edit content, grades and enrolments), mirroring the category Manager capabilities scoped to their own subcategory, instead of read-only viewing.
 
 ## 0.4.0-alpha (2026-06-09)
 

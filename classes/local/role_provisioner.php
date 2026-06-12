@@ -35,19 +35,13 @@ class role_provisioner {
     /** @var string Shortname of the delegated role. */
     public const ROLE_SHORTNAME = 'labvirtualmanager';
 
-    /** @var string[] Capabilities granted to the delegated role. */
-    private const CAPABILITIES = [
-        'local/labvirtual:manage',
-        'moodle/course:view',
-        'moodle/course:viewhiddenactivities',
-        'moodle/course:viewhiddensections',
-    ];
-
     /**
      * Ensures the delegated role exists with the right capabilities and context levels.
      *
-     * Idempotent: safe to call on install and on every upgrade. Stores the role ID in
-     * plugin config and returns it.
+     * The role mirrors the category Manager capabilities so a responsible teacher has full
+     * control over the courses in their own batch category (edit content, grades and
+     * enrolments), scoped to that subcategory. Idempotent: safe to call on install and on
+     * every upgrade. Stores the role ID in plugin config and returns it.
      *
      * @return int The delegated role ID.
      */
@@ -61,16 +55,31 @@ class role_provisioner {
             $roleid = create_role(
                 get_string('role_batchmanager', 'local_labvirtual'),
                 self::ROLE_SHORTNAME,
-                get_string('role_batchmanager_desc', 'local_labvirtual')
+                get_string('role_batchmanager_desc', 'local_labvirtual'),
+                'manager'
             );
         }
 
         set_role_contextlevels($roleid, [CONTEXT_COURSECAT]);
 
         $systemcontext = \context_system::instance();
-        foreach (self::CAPABILITIES as $capability) {
-            assign_capability($capability, CAP_ALLOW, $roleid, $systemcontext->id, true);
+
+        // Copy the Manager role capabilities so the delegated role grants the same control,
+        // but only where it is assigned (the batch subcategory). One-off provisioning.
+        $managerid = (int) $DB->get_field('role', 'id', ['shortname' => 'manager']);
+        if ($managerid) {
+            foreach ($DB->get_records('role_capabilities', ['roleid' => $managerid]) as $capability) {
+                assign_capability(
+                    $capability->capability,
+                    $capability->permission,
+                    $roleid,
+                    $capability->contextid,
+                    true
+                );
+            }
         }
+
+        assign_capability('local/labvirtual:manage', CAP_ALLOW, $roleid, $systemcontext->id, true);
 
         set_config('managerroleid', $roleid, 'local_labvirtual');
 

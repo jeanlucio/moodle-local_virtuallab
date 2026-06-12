@@ -112,6 +112,11 @@ final class batch_manager_test extends advanced_testcase {
         $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user1->id));
         $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user2->id));
 
+        // Full control over the batch courses: edit content and view grades.
+        $this->assertTrue(has_capability('moodle/course:update', $context, $user1->id));
+        $this->assertTrue(has_capability('moodle/grade:viewall', $context, $user1->id));
+        $this->assertFalse(has_capability('moodle/course:update', $context, $user2->id));
+
         $mgr->set_teachers($id, [$user2->id]);
 
         $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user1->id));

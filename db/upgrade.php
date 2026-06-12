@@ -219,5 +219,12 @@ function xmldb_local_labvirtual_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061140, 'local', 'labvirtual');
     }
 
+    if ($oldversion < 2026061150) {
+        // Re-provision the role so responsible teachers gain full manager capabilities.
+        \local_labvirtual\local\role_provisioner::ensure_role();
+
+        upgrade_plugin_savepoint(true, 2026061150, 'local', 'labvirtual');
+    }
+
     return true;
 }
