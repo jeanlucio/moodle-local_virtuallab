@@ -1,11 +1,5 @@
 # Changelog — Virtual Lab
 
-## [v1.1.0] — 2026-06-16
-
-- Shared checklist task list per batch: when the Teacher Checklist block (`block_teacher_checklist`) is installed, the batch edit form gains a task list field; tasks entered there are pushed into the Teacher Checklist block of every lab created afterwards, and the block is added to each lab automatically
-- "Apply task list to existing labs" action propagates the current task list to labs that were already created
-- The whole feature degrades silently when the Teacher Checklist block is not installed: the field is hidden and lab creation is unaffected
-
 ## [v1.0.0] — 2026-06-16
 
 Initial public release.
@@ -15,6 +9,7 @@ Initial public release.
 - Student self-service panel: shows lab status (available / in use / full) and lets students enrol themselves as editor or visitor with one click; shareable URL per batch
 - One-editor-anywhere rule: a student cannot hold editor slots in more than one lab per batch simultaneously
 - Delegated teacher management: responsible teachers can rename their batch, manage co-teachers, set the lab prefix and override lifecycle settings, scoped to their own subcategory
+- Shared checklist task list per batch: when the Teacher Checklist block (`block_teacher_checklist`) is installed, the batch edit form gains a task list field; tasks entered there are pushed into the Teacher Checklist block of every lab created afterwards, and the block is added to each lab automatically. An "Apply task list to existing labs" action propagates the current task list to labs already created. The feature degrades silently when the block is not installed: the field is hidden and lab creation is unaffected
 - Lifecycle maintenance task: automatically resets or deletes overdue labs on a nightly schedule, with configurable thresholds per site and per batch
 - Warning emails: responsible teachers are notified a configurable number of days before a lifecycle action runs
 - Summary emails: after each maintenance run, each affected teacher receives a summary of what happened to their labs
