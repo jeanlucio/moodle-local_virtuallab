@@ -70,6 +70,20 @@ class edit_batch_form extends \moodleform {
         );
         $mform->setType('nameprefix', PARAM_TEXT);
 
+        $actionstrmap = [
+            0 => 'settings_lifecycle_action_none',
+            1 => 'settings_lifecycle_action_reset',
+            2 => 'settings_lifecycle_action_delete',
+        ];
+        $defaultmaxteachers = (int) (get_config('local_virtuallab', 'max_teachers_per_lab') ?: 3);
+        $defaultlifecyclemonths = (int) get_config('local_virtuallab', 'lifecycle_months');
+        $defaultlifecycleaction = (int) get_config('local_virtuallab', 'lifecycle_action');
+        $defaultwarningdays = (int) (get_config('local_virtuallab', 'warning_days_before') ?: 7);
+        $defaultactionlabel = get_string(
+            $actionstrmap[$defaultlifecycleaction] ?? 'settings_lifecycle_action_none',
+            'local_virtuallab'
+        );
+
         $mform->addElement('header', 'overrides', get_string('batch_overrides', 'local_virtuallab'));
         $mform->addElement(
             'static',
@@ -78,25 +92,60 @@ class edit_batch_form extends \moodleform {
             get_string('batch_overrides_help', 'local_virtuallab')
         );
 
-        $mform->addElement('text', 'maxteachers', get_string('settings_max_teachers', 'local_virtuallab'), ['size' => 5]);
+        $maxteachersgrp = [
+            $mform->createElement('text', 'maxteachers', '', ['size' => 5]),
+            $mform->createElement('static', '', '', \html_writer::span(
+                get_string('batch_override_placeholder', 'local_virtuallab', $defaultmaxteachers),
+                'text-muted small ms-2'
+            )),
+        ];
+        $mform->addGroup(
+            $maxteachersgrp,
+            'maxteachers_grp',
+            get_string('settings_max_teachers', 'local_virtuallab'),
+            '',
+            false
+        );
         $mform->setType('maxteachers', PARAM_TEXT);
 
-        $mform->addElement(
-            'text',
-            'lifecyclemonths',
+        $lifecyclemonthsgrp = [
+            $mform->createElement('text', 'lifecyclemonths', '', ['size' => 5]),
+            $mform->createElement('static', '', '', \html_writer::span(
+                get_string('batch_override_placeholder', 'local_virtuallab', $defaultlifecyclemonths)
+                . ' ' . get_string('batch_lifecycle_zero_hint', 'local_virtuallab'),
+                'text-muted small ms-2'
+            )),
+        ];
+        $mform->addGroup(
+            $lifecyclemonthsgrp,
+            'lifecyclemonths_grp',
             get_string('settings_lifecycle_months', 'local_virtuallab'),
-            ['size' => 5]
+            '',
+            false
         );
         $mform->setType('lifecyclemonths', PARAM_TEXT);
 
         $mform->addElement('select', 'lifecycleaction', get_string('settings_lifecycle_action', 'local_virtuallab'), [
-            ''  => get_string('batch_override_default', 'local_virtuallab'),
+            ''  => get_string('batch_override_default_hint', 'local_virtuallab', $defaultactionlabel),
             '0' => get_string('settings_lifecycle_action_none', 'local_virtuallab'),
             '1' => get_string('settings_lifecycle_action_reset', 'local_virtuallab'),
             '2' => get_string('settings_lifecycle_action_delete', 'local_virtuallab'),
         ]);
 
-        $mform->addElement('text', 'warningdays', get_string('settings_warning_days', 'local_virtuallab'), ['size' => 5]);
+        $warningdaysgrp = [
+            $mform->createElement('text', 'warningdays', '', ['size' => 5]),
+            $mform->createElement('static', '', '', \html_writer::span(
+                get_string('batch_override_placeholder', 'local_virtuallab', $defaultwarningdays),
+                'text-muted small ms-2'
+            )),
+        ];
+        $mform->addGroup(
+            $warningdaysgrp,
+            'warningdays_grp',
+            get_string('settings_warning_days', 'local_virtuallab'),
+            '',
+            false
+        );
         $mform->setType('warningdays', PARAM_TEXT);
 
         $this->add_action_buttons(true, get_string('save_batch', 'local_virtuallab'));
@@ -106,9 +155,14 @@ class edit_batch_form extends \moodleform {
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
 
-        foreach (['maxteachers', 'lifecyclemonths', 'warningdays'] as $field) {
+        $fieldgroups = [
+            'maxteachers'     => 'maxteachers_grp',
+            'lifecyclemonths' => 'lifecyclemonths_grp',
+            'warningdays'     => 'warningdays_grp',
+        ];
+        foreach ($fieldgroups as $field => $groupname) {
             if ($data[$field] !== '' && !ctype_digit((string) $data[$field])) {
-                $errors[$field] = get_string('error', 'moodle');
+                $errors[$groupname] = get_string('error', 'moodle');
             }
         }
 
