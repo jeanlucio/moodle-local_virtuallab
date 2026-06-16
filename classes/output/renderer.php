@@ -169,6 +169,12 @@ class renderer extends plugin_renderer_base {
         string $editurl = '',
         string $syncurl = ''
     ): string {
+        $qrsvg = '';
+        if ($panelurl !== '') {
+            $qrcode = new \core_qrcode($panelurl);
+            $qrsvg = 'data:image/svg+xml;base64,' . base64_encode($qrcode->getBarcodeSVGcode(4, 4));
+        }
+
         $rows = [];
 
         foreach ($labs as $lab) {
@@ -202,6 +208,8 @@ class renderer extends plugin_renderer_base {
             'labs'         => $rows,
             'haslabs'      => !empty($rows),
             'panelurl'     => $panelurl,
+            'qrsvg'        => $qrsvg,
+            'qralt'        => get_string('panel_url_qrcode', 'local_virtuallab'),
             'createurl'    => $createurl,
             'editurl'      => $editurl,
             'syncurl'      => $syncurl,

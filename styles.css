@@ -63,3 +63,8 @@
 .path-local-virtuallab .local-virtuallab-bulk-select {
     width: auto;
 }
+
+.path-local-virtuallab .local-virtuallab-manage-labs .local-virtuallab-qrcode-img {
+    width: 160px;
+    height: 160px;
+}

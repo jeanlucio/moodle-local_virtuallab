@@ -24,6 +24,8 @@
         ],
         "haslabs": true,
         "panelurl": "https://moodle.example.com/local/virtuallab/view.php?batchid=1",
+        "qrsvg": "data:image/svg+xml;base64,PHN2Zy8+",
+        "qralt": "QR code do painel de estudantes",
         "createurl": "/local/virtuallab/manage.php?batchid=1&action=createlabs",
         "editurl": "/local/virtuallab/manage.php?batchid=1&action=editbatch",
         "syncurl": "/local/virtuallab/manage.php?batchid=1&action=syncchecklist&sesskey=abc123",
@@ -72,6 +74,28 @@
                     {{#str}} copy_panel_link, local_virtuallab {{/str}}
                 </button>
             </div>
+            {{#qrsvg}}
+            <div class="mt-2 text-end">
+                <button type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        data-bs-toggle="collapse"
+                        data-toggle="collapse"
+                        data-bs-target="#local-virtuallab-qrcode-{{batchid}}"
+                        data-target="#local-virtuallab-qrcode-{{batchid}}"
+                        aria-expanded="false"
+                        aria-controls="local-virtuallab-qrcode-{{batchid}}">
+                    <i class="fa fa-qrcode me-1" aria-hidden="true"></i>
+                    {{#str}} show_qrcode, local_virtuallab {{/str}}
+                </button>
+            </div>
+            <div class="collapse" id="local-virtuallab-qrcode-{{batchid}}">
+                <div class="text-center mt-3">
+                    <img src="{{qrsvg}}"
+                         alt="{{qralt}}"
+                         class="local-virtuallab-qrcode-img">
+                </div>
+            </div>
+            {{/qrsvg}}
         </div>
     </div>
 
