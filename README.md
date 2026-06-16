@@ -28,6 +28,7 @@ Each batch lives in its own course subcategory, and its **responsible teachers m
 * 🔒 **One-editor-anywhere rule:** A student who is already an editor in one lab cannot take the editor slot in another lab in the same batch — they can still join as visitor.
 * ✏️ **Edit batch:** Rename a batch, add or remove co-responsible teachers, change the lab name prefix, and override lifecycle settings per batch.
 * ⚙️ **Per-batch settings:** Each batch can override the global defaults for editors-per-lab and the lifecycle policy (months, action, warning days); leaving a field empty inherits the site default.
+* 📋 **Shared checklist task list (optional):** When the [Teacher Checklist](https://github.com/jeanlucio/moodle-block_teacher_checklist) block is installed, a task list field appears in the batch edit form; tasks entered there are automatically provisioned into the Teacher Checklist block of every new lab and the block is added to each lab automatically. An **Apply to existing labs** button retroactively syncs the task list to labs already created. The feature degrades silently when the block is absent.
 * 🔗 **Shareable panel URL:** Managers can copy and share a direct link to each batch's student panel.
 * ♻️ **Reset / 🗑 delete / ☑️ bulk:** Reset clears user data and enrolments while keeping the course shell; delete removes the course and registry row; bulk actions reset or delete several labs at once.
 * 🏭 **Delete batch:** Removes a whole batch, its labs and its subcategory.
@@ -157,6 +158,7 @@ Virtual Lab ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 | `batch_manager_test.php` | 12 | Batch create/get, auto subcategory, multiple teachers, delegated-role isolation, update batch, set prefix, listing; batch assignment notifications sent only to new teachers; suspended users excluded; re-saving same list sends no message |
 | `batch_settings_test.php` | 2 | Effective settings: global default vs per-batch override |
 | `category_manager_test.php` | 3 | Safe deletion guard: empty batch subcategory removed; non-child or non-empty category kept |
+| `checklist_integration_test.php` | 7 | `is_available()` with block present; `provision_course()` seeds items, is idempotent, adds block, does not duplicate block; `sync_batch()` provisions all labs and handles empty task list gracefully |
 | `course_factory_test.php` | 4 | Correct lab count; labs use the manual enrolment instance and no self instance; all IDs returned; excessive count rejected |
 | `course_registry_test.php` | 10 | Ownership checks, bulk lookup and enrol-for-batch validation |
 | `hook_callbacks_test.php` | 5 | Primary navigation node visible to admins and batch teachers; invisible to regular users, guests and logged-out requests |
@@ -164,7 +166,8 @@ Virtual Lab ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 | `maintenance_task_test.php` | 10 | Disabled cases, reset/delete overdue labs, per-batch override, reference-date logic |
 | `notification_service_test.php` | 7 | Warning/summary to teachers and editors; admin copy gated by setting; course link |
 | `panel_status_test.php` | 6 | Available/in-use/full flags; enrolment and one-editor-per-batch rules |
-| **Total** | **64** | |
+| `task_manager_test.php` | 8 | `set_tasks_from_text()` parsing (LF, CRLF, blank lines, trim); `set_tasks()` replace semantics; `get_tasks()` sortorder; `get_tasks_text()` round-trip; empty list edge cases |
+| **Total** | **79** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
@@ -225,6 +228,7 @@ Cada turma vive na sua própria subcategoria de cursos, e seus **professores res
 * 🔒 **Regra de um editor por turma:** Quem já é editor em um lab não assume a vaga de editor em outro lab da mesma turma — mas ainda entra como visitante.
 * ✏️ **Editar turma:** Renomear, adicionar/remover co-responsáveis, mudar o prefixo dos labs e sobrescrever as configurações de ciclo de vida por turma.
 * ⚙️ **Configurações por turma:** Cada turma pode sobrescrever os padrões globais de editores-por-lab e da política de ciclo de vida (meses, ação, dias de aviso); campo vazio herda o padrão do site.
+* 📋 **Lista de tarefas compartilhada da turma (opcional):** Quando o bloco [Teacher Checklist](https://github.com/jeanlucio/moodle-block_teacher_checklist) está instalado, o formulário de edição da turma ganha um campo de lista de tarefas; as tarefas são automaticamente provisionadas no bloco Teacher Checklist de cada novo lab criado, e o bloco é adicionado ao lab automaticamente. O botão **Aplicar a labs existentes** sincroniza retroativamente a lista para labs já criados. A funcionalidade é transparente quando o bloco não está instalado.
 * 🔗 **URL do painel compartilhável:** Gestores copiam e compartilham o link direto do painel de cada turma.
 * ♻️ **Resetar / 🗑 excluir / ☑️ em lote:** Reset limpa dados e inscrições preservando o curso; exclusão remove curso e registro; ações em lote resetam ou excluem vários labs de uma vez.
 * 🏭 **Excluir turma:** Remove a turma inteira, seus labs e a subcategoria.
@@ -354,6 +358,7 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 | `batch_manager_test.php` | 12 | Criar/obter turma, subcategoria automática, múltiplos professores, isolamento do papel delegado, editar turma, definir prefixo, listagem; notificações enviadas apenas a professores novos; usuários suspensos excluídos; re-salvar a mesma lista não envia mensagem |
 | `batch_settings_test.php` | 2 | Configuração efetiva: padrão global vs override da turma |
 | `category_manager_test.php` | 3 | Guard de exclusão segura: subcategoria vazia da turma é removida; categoria não-filha ou não-vazia é mantida |
+| `checklist_integration_test.php` | 7 | `is_available()` com bloco presente; `provision_course()` semeia itens, é idempotente, adiciona bloco, não duplica bloco; `sync_batch()` provisiona todos os labs e lida com lista vazia sem erros |
 | `course_factory_test.php` | 4 | Quantidade correta de labs; labs usam a instância manual e nenhuma self; todos os IDs retornados; quantidade excessiva rejeitada |
 | `course_registry_test.php` | 10 | Verificações de propriedade, busca em lote e validação de inscrição por turma |
 | `hook_callbacks_test.php` | 5 | Nó de navegação primária visível para admins e professores de turma; invisível para usuários comuns, visitantes e sessões deslogadas |
@@ -361,7 +366,8 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 | `maintenance_task_test.php` | 10 | Casos desabilitados, reset/exclusão de labs vencidos, override por turma, lógica de data de referência |
 | `notification_service_test.php` | 7 | Aviso/resumo para professores e editores; cópia ao admin condicionada à config; link do curso |
 | `panel_status_test.php` | 6 | Flags disponível/em uso/cheio; regras de inscrição e de um editor por turma |
-| **Total** | **64** | |
+| `task_manager_test.php` | 8 | Parsing de `set_tasks_from_text()` (LF, CRLF, linhas em branco, trim); semântica de substituição de `set_tasks()`; sortorder de `get_tasks()`; round-trip de `get_tasks_text()`; casos limite de lista vazia |
+| **Total** | **79** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
