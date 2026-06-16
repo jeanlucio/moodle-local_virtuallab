@@ -95,7 +95,11 @@ final class notification_service_test extends advanced_testcase {
 
         $this->assertCount(1, $messages, 'One grouped warning email per teacher is expected.');
         $this->assertEquals($teacher->email, $messages[0]->to);
-        $this->assertStringContainsString('Lab Virtual', $messages[0]->subject);
+        $expectedsubject = get_string('email_warning_subject', 'local_virtuallab', (object) [
+            'action' => get_string('email_action_delete', 'local_virtuallab'),
+            'days'   => 7,
+        ]);
+        $this->assertEquals($expectedsubject, $messages[0]->subject);
     }
 
     /**
