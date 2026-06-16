@@ -28,5 +28,5 @@ $plugin->component = 'local_virtuallab';
 $plugin->version   = 2026061600;
 $plugin->requires  = 2024100700; // Moodle 4.5+.
 $plugin->supported = [405, 502];
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '0.5.0-alpha';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = 'v1.0.0';
