@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Hook callback registrations for local_virtuallab.
+ * Message providers for local_virtuallab.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
@@ -24,13 +24,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$callbacks = [
-    [
-        'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
-        'callback' => 'local_virtuallab\hook_callbacks::before_standard_top_of_body_html',
-    ],
-    [
-        'hook'     => \core\hook\navigation\primary_extend::class,
-        'callback' => 'local_virtuallab\hook_callbacks::primary_extend',
+$messageproviders = [
+    'batch_assigned' => [
+        'capability' => 'local/virtuallab:manage',
+        'defaults'   => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
     ],
 ];

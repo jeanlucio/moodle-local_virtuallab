@@ -136,7 +136,7 @@ class batch_manager {
     }
 
     /**
-     * Replaces the set of responsible teachers for a batch.
+     * Replaces the set of responsible teachers for a batch and notifies newly-added ones.
      *
      * @param int   $batchid    Batch ID.
      * @param int[] $teacherids User IDs to set as responsible teachers.
@@ -145,6 +145,11 @@ class batch_manager {
         global $DB;
 
         $teacherids = array_values(array_unique(array_filter(array_map('intval', $teacherids))));
+
+        $existingids = array_map('intval', array_values(
+            $DB->get_fieldset_select('local_virtuallab_batch_teachers', 'userid', 'batchid = :batchid', ['batchid' => $batchid])
+        ));
+        $newteacherids = array_values(array_diff($teacherids, $existingids));
 
         $DB->delete_records('local_virtuallab_batch_teachers', ['batchid' => $batchid]);
 
@@ -158,6 +163,53 @@ class batch_manager {
         }
 
         $this->sync_teacher_roles($batchid, $teacherids);
+
+        if ($newteacherids) {
+            $this->notify_new_teachers($batchid, $newteacherids);
+        }
+    }
+
+    /**
+     * Sends a Moodle message to each newly-assigned teacher with a direct link to manage.php.
+     *
+     * @param int   $batchid       Batch ID they were just assigned to.
+     * @param int[] $newteacherids User IDs of the teachers newly added in this operation.
+     */
+    private function notify_new_teachers(int $batchid, array $newteacherids): void {
+        global $DB;
+
+        [$insql, $params] = $DB->get_in_or_equal($newteacherids, SQL_PARAMS_NAMED);
+        $users = $DB->get_records_select('user', "id $insql AND deleted = 0 AND suspended = 0", $params);
+
+        if (empty($users)) {
+            return;
+        }
+
+        $batch    = $this->get_batch($batchid);
+        $url      = new \moodle_url('/local/virtuallab/manage.php');
+        $from     = \core_user::get_noreply_user();
+        $subject  = get_string('message_batch_assigned_subject', 'local_virtuallab', format_string($batch->name));
+        $bodyp1   = get_string('message_batch_assigned_body', 'local_virtuallab', format_string($batch->name));
+        $bodyp2   = \html_writer::link($url, get_string('manage_batches', 'local_virtuallab'));
+        $bodyhtml = \html_writer::tag('p', $bodyp1) . \html_writer::tag('p', $bodyp2);
+        $bodytext = html_to_text($bodyhtml);
+
+        foreach ($users as $user) {
+            $message = new \core\message\message();
+            $message->component = 'local_virtuallab';
+            $message->name = 'batch_assigned';
+            $message->userfrom = $from;
+            $message->userto = $user;
+            $message->subject = $subject;
+            $message->fullmessage = $bodytext;
+            $message->fullmessageformat = FORMAT_PLAIN;
+            $message->fullmessagehtml = $bodyhtml;
+            $message->smallmessage = get_string('message_batch_assigned_small', 'local_virtuallab');
+            $message->notification = 1;
+            $message->contexturl = $url->out(false);
+            $message->contexturlname = get_string('manage_batches', 'local_virtuallab');
+            message_send($message);
+        }
     }
 
     /**

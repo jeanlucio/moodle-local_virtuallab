@@ -197,4 +197,96 @@ final class batch_manager_test extends advanced_testcase {
         $this->expectException(\dml_exception::class);
         $mgr->get_batch(99999);
     }
+
+    /**
+     * Creating a batch sends a batch_assigned notification to each responsible teacher.
+     */
+    public function test_create_batch_notifies_each_teacher(): void {
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $sink = $this->redirectMessages();
+        (new batch_manager())->create_batch('Turma Notif', [$user1->id, $user2->id], 'Lab');
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(2, $messages);
+        foreach ($messages as $message) {
+            $this->assertSame('local_virtuallab', $message->component);
+            $this->assertSame('batch_assigned', $message->eventtype);
+            $this->assertEquals(1, $message->notification);
+        }
+
+        $recipients = array_map(static fn($message) => (int) $message->useridto, $messages);
+        $this->assertContains((int) $user1->id, $recipients);
+        $this->assertContains((int) $user2->id, $recipients);
+    }
+
+    /**
+     * Updating a batch notifies only the newly-added teachers, never the existing ones.
+     */
+    public function test_update_batch_notifies_only_new_teachers(): void {
+        $existing = $this->getDataGenerator()->create_user();
+        $added    = $this->getDataGenerator()->create_user();
+
+        $mgr     = new batch_manager();
+        $batchid = $mgr->create_batch('Turma', [$existing->id], 'Lab');
+
+        $sink = $this->redirectMessages();
+        $mgr->update_batch($batchid, 'Turma', [$existing->id, $added->id], 'Lab');
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(1, $messages);
+        $this->assertEquals((int) $added->id, (int) $messages[0]->useridto);
+    }
+
+    /**
+     * Re-saving the same set of teachers sends no notification.
+     */
+    public function test_set_teachers_without_new_sends_no_message(): void {
+        $user    = $this->getDataGenerator()->create_user();
+        $mgr     = new batch_manager();
+        $batchid = $mgr->create_batch('Turma', [$user->id], 'Lab');
+
+        $sink = $this->redirectMessages();
+        $mgr->set_teachers($batchid, [$user->id]);
+        $count = $sink->count();
+        $sink->close();
+
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * Removing a teacher notifies nobody: the removed user is not a new assignment.
+     */
+    public function test_removing_teacher_notifies_nobody(): void {
+        $user1   = $this->getDataGenerator()->create_user();
+        $user2   = $this->getDataGenerator()->create_user();
+        $mgr     = new batch_manager();
+        $batchid = $mgr->create_batch('Turma', [$user1->id, $user2->id], 'Lab');
+
+        $sink = $this->redirectMessages();
+        $mgr->set_teachers($batchid, [$user1->id]);
+        $count = $sink->count();
+        $sink->close();
+
+        $this->assertEquals(0, $count);
+    }
+
+    /**
+     * A suspended new teacher does not receive the assignment notification.
+     */
+    public function test_suspended_teacher_is_not_notified(): void {
+        $active    = $this->getDataGenerator()->create_user();
+        $suspended = $this->getDataGenerator()->create_user(['suspended' => 1]);
+
+        $sink = $this->redirectMessages();
+        (new batch_manager())->create_batch('Turma', [$active->id, $suspended->id], 'Lab');
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertCount(1, $messages);
+        $this->assertEquals((int) $active->id, (int) $messages[0]->useridto);
+    }
 }

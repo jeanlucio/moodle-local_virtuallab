@@ -24,6 +24,7 @@
 
 namespace local_virtuallab;
 
+use core\hook\navigation\primary_extend;
 use core\hook\output\before_standard_top_of_body_html_generation;
 use local_virtuallab\local\batch_manager;
 use local_virtuallab\local\course_registry;
@@ -32,6 +33,41 @@ use local_virtuallab\local\course_registry;
  * Hook callbacks.
  */
 class hook_callbacks {
+    /**
+     * Adds a "Manage Virtual Lab" entry to the primary navigation for users who can
+     * manage at least one batch (site managers and responsible teachers).
+     *
+     * The flat navigation that older Moodle used to surface local plugin links was
+     * removed from the Boost drawer in Moodle 5.x, so the primary navigation hook is
+     * the supported cross-version (4.5 and 5.x) entry point.
+     *
+     * @param primary_extend $hook The primary navigation hook.
+     */
+    public static function primary_extend(primary_extend $hook): void {
+        global $DB, $USER;
+
+        if (!isloggedin() || isguestuser()) {
+            return;
+        }
+
+        $systemcontext = \context_system::instance();
+
+        $hasaccess = has_capability('local/virtuallab:manage', $systemcontext)
+            || $DB->record_exists('local_virtuallab_batch_teachers', ['userid' => $USER->id]);
+
+        if (!$hasaccess) {
+            return;
+        }
+
+        $hook->get_primaryview()->add(
+            get_string('manage_batches', 'local_virtuallab'),
+            new \moodle_url('/local/virtuallab/manage.php'),
+            \navigation_node::TYPE_CUSTOM,
+            null,
+            'local_virtuallab_manage'
+        );
+    }
+
     /**
      * Tells a non-enrolled visitor of a managed lab course who to contact for access.
      *
