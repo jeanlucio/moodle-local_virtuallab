@@ -70,6 +70,18 @@ class edit_batch_form extends \moodleform {
         );
         $mform->setType('nameprefix', PARAM_TEXT);
 
+        // The shared task list only makes sense when the teacher checklist block is installed.
+        if (\local_virtuallab\local\checklist_integration::is_available()) {
+            $mform->addElement(
+                'textarea',
+                'checklisttasks',
+                get_string('batch_checklist_tasks', 'local_virtuallab'),
+                ['rows' => 6, 'cols' => 60]
+            );
+            $mform->setType('checklisttasks', PARAM_TEXT);
+            $mform->addHelpButton('checklisttasks', 'batch_checklist_tasks', 'local_virtuallab');
+        }
+
         $actionstrmap = [
             0 => 'settings_lifecycle_action_none',
             1 => 'settings_lifecycle_action_reset',

@@ -34,6 +34,22 @@
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="local_virtuallab_batch_tasks" COMMENT="Shared checklist tasks pushed into each lab of a batch">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="batchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK local_virtuallab_batches.id"/>
+        <FIELD NAME="title" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Task title shown in the teacher checklist block"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Display order"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_batch" TYPE="foreign" FIELDS="batchid" REFTABLE="local_virtuallab_batches" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="batchid-sortorder" UNIQUE="false" FIELDS="batchid, sortorder"/>
+      </INDEXES>
+    </TABLE>
     <TABLE NAME="local_virtuallab_courses" COMMENT="Lab Virtual individual labs (sandbox courses)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

@@ -61,6 +61,13 @@ class course_factory {
         $manualplugin  = enrol_get_plugin('manual');
         $existingcount = $DB->count_records('local_virtuallab_courses', ['batchid' => $batchid]);
 
+        // Resolve the shared checklist task list once; provisioning is skipped when the
+        // companion plugin is absent or the batch has no tasks configured.
+        $checklist     = new checklist_integration();
+        $checklisttasks = checklist_integration::is_available()
+            ? (new task_manager())->get_tasks($batchid)
+            : [];
+
         $createdcourseids = [];
 
         // Bulk-load existing shortnames matching this batch prefix to avoid N+1 queries in the loop.
@@ -126,6 +133,10 @@ class course_factory {
 
             $DB->insert_record('local_virtuallab_courses', $record);
             $createdcourseids[] = $course->id;
+
+            if ($checklisttasks) {
+                $checklist->provision_course((int) $course->id, $checklisttasks);
+            }
         }
 
         return $createdcourseids;

@@ -1,5 +1,11 @@
 # Changelog — Virtual Lab
 
+## [v1.1.0] — 2026-06-16
+
+- Shared checklist task list per batch: when the Teacher Checklist block (`block_teacher_checklist`) is installed, the batch edit form gains a task list field; tasks entered there are pushed into the Teacher Checklist block of every lab created afterwards, and the block is added to each lab automatically
+- "Apply task list to existing labs" action propagates the current task list to labs that were already created
+- The whole feature degrades silently when the Teacher Checklist block is not installed: the field is hidden and lab creation is unaffected
+
 ## [v1.0.0] — 2026-06-16
 
 Initial public release.

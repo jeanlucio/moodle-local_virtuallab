@@ -131,6 +131,10 @@ if ($batchid) {
                 'lifecycleaction' => $data->lifecycleaction,
                 'warningdays'     => $data->warningdays,
             ]);
+            if (isset($data->checklisttasks)) {
+                (new \local_virtuallab\local\task_manager())
+                    ->set_tasks_from_text($batchid, $data->checklisttasks);
+            }
             redirect(
                 $level2url,
                 get_string('batch_updated', 'local_virtuallab'),
@@ -144,6 +148,7 @@ if ($batchid) {
             'name'            => $batch->name,
             'teacherids'      => array_keys($teachers),
             'nameprefix'      => $batch->nameprefix,
+            'checklisttasks'  => (new \local_virtuallab\local\task_manager())->get_tasks_text($batchid),
             'maxteachers'     => $batch->maxteachers,
             'lifecyclemonths' => $batch->lifecyclemonths,
             'lifecycleaction' => $batch->lifecycleaction === null ? '' : (string) $batch->lifecycleaction,
@@ -219,6 +224,18 @@ if ($batchid) {
         redirect(
             $level2url,
             get_string('lab_deleted', 'local_virtuallab'),
+            null,
+            \core\output\notification::NOTIFY_SUCCESS
+        );
+    }
+
+    // Apply the batch task list to every existing lab.
+    if ($action === 'syncchecklist') {
+        require_sesskey();
+        $synced = (new \local_virtuallab\local\checklist_integration())->sync_batch($batchid);
+        redirect(
+            $level2url,
+            get_string('checklist_synced', 'local_virtuallab', $synced),
             null,
             \core\output\notification::NOTIFY_SUCCESS
         );
@@ -307,10 +324,23 @@ if ($batchid) {
         ['batchid' => $batchid, 'action' => 'editbatch']
     ))->out(false);
 
+    // Offer the retroactive sync only when the checklist plugin is present and the batch
+    // actually has tasks to push into the already-created labs.
+    $syncurl = '';
+    $hassynctasks = \local_virtuallab\local\checklist_integration::is_available()
+        && (new \local_virtuallab\local\task_manager())->get_tasks($batchid);
+    if ($hassynctasks) {
+        $syncurl = (new moodle_url('/local/virtuallab/manage.php', [
+            'batchid' => $batchid,
+            'action'  => 'syncchecklist',
+            'sesskey' => sesskey(),
+        ]))->out(false);
+    }
+
     $renderer = $PAGE->get_renderer('local_virtuallab');
 
     echo $OUTPUT->header();
-    echo $renderer->render_labs_list($batch, $labs, $panelurl, $createurl->out(false), $editurl);
+    echo $renderer->render_labs_list($batch, $labs, $panelurl, $createurl->out(false), $editurl, $syncurl);
     echo $OUTPUT->footer();
     exit;
 }

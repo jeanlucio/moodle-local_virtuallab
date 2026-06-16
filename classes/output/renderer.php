@@ -158,6 +158,7 @@ class renderer extends plugin_renderer_base {
      * @param string    $panelurl  Absolute URL to the student panel for this batch.
      * @param string    $createurl URL for the "Create labs" action.
      * @param string    $editurl   URL for the "Edit batch" action.
+     * @param string    $syncurl   URL for the "Apply task list to existing labs" action (empty hides it).
      * @return string Rendered HTML.
      */
     public function render_labs_list(
@@ -165,7 +166,8 @@ class renderer extends plugin_renderer_base {
         array $labs,
         string $panelurl,
         string $createurl,
-        string $editurl = ''
+        string $editurl = '',
+        string $syncurl = ''
     ): string {
         $rows = [];
 
@@ -202,6 +204,7 @@ class renderer extends plugin_renderer_base {
             'panelurl'     => $panelurl,
             'createurl'    => $createurl,
             'editurl'      => $editurl,
+            'syncurl'      => $syncurl,
             'sesskey'      => sesskey(),
             'strpanelhelp' => get_string('panel_url_help', 'local_virtuallab'),
         ];

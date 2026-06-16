@@ -26,12 +26,19 @@
         "panelurl": "https://moodle.example.com/local/virtuallab/view.php?batchid=1",
         "createurl": "/local/virtuallab/manage.php?batchid=1&action=createlabs",
         "editurl": "/local/virtuallab/manage.php?batchid=1&action=editbatch",
+        "syncurl": "/local/virtuallab/manage.php?batchid=1&action=syncchecklist&sesskey=abc123",
         "sesskey": "abc123",
         "strpanelhelp": "Share this URL with students..."
     }
 }}
 <div class="local-virtuallab-manage-labs">
     <div class="mb-3 d-flex justify-content-end">
+        {{#syncurl}}
+        <a href="{{syncurl}}" class="btn btn-outline-secondary me-2">
+            <i class="fa fa-list-check me-1" aria-hidden="true"></i>
+            {{#str}} apply_checklist_existing, local_virtuallab {{/str}}
+        </a>
+        {{/syncurl}}
         {{#editurl}}
         <a href="{{editurl}}" class="btn btn-outline-secondary">
             <i class="fa fa-pen me-1" aria-hidden="true"></i>
