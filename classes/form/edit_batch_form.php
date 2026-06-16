@@ -17,12 +17,12 @@
 /**
  * Form for editing an existing Lab Virtual batch (turma).
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\form;
+namespace local_virtuallab\form;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -42,7 +42,7 @@ class edit_batch_form extends \moodleform {
         $mform->addElement(
             'text',
             'name',
-            get_string('batch_name', 'local_labvirtual'),
+            get_string('batch_name', 'local_virtuallab'),
             ['size' => 60, 'maxlength' => 255]
         );
         $mform->setType('name', PARAM_TEXT);
@@ -56,7 +56,7 @@ class edit_batch_form extends \moodleform {
         $mform->addElement(
             'autocomplete',
             'teacherids',
-            get_string('batch_teacher', 'local_labvirtual'),
+            get_string('batch_teacher', 'local_virtuallab'),
             [],
             $options
         );
@@ -65,42 +65,42 @@ class edit_batch_form extends \moodleform {
         $mform->addElement(
             'text',
             'nameprefix',
-            get_string('batch_nameprefix', 'local_labvirtual'),
+            get_string('batch_nameprefix', 'local_virtuallab'),
             ['size' => 40, 'maxlength' => 255]
         );
         $mform->setType('nameprefix', PARAM_TEXT);
         $mform->addRule('nameprefix', null, 'required', null, 'client');
 
-        $mform->addElement('header', 'overrides', get_string('batch_overrides', 'local_labvirtual'));
+        $mform->addElement('header', 'overrides', get_string('batch_overrides', 'local_virtuallab'));
         $mform->addElement(
             'static',
             'overridesnote',
             '',
-            get_string('batch_overrides_help', 'local_labvirtual')
+            get_string('batch_overrides_help', 'local_virtuallab')
         );
 
-        $mform->addElement('text', 'maxteachers', get_string('settings_max_teachers', 'local_labvirtual'), ['size' => 5]);
+        $mform->addElement('text', 'maxteachers', get_string('settings_max_teachers', 'local_virtuallab'), ['size' => 5]);
         $mform->setType('maxteachers', PARAM_TEXT);
 
         $mform->addElement(
             'text',
             'lifecyclemonths',
-            get_string('settings_lifecycle_months', 'local_labvirtual'),
+            get_string('settings_lifecycle_months', 'local_virtuallab'),
             ['size' => 5]
         );
         $mform->setType('lifecyclemonths', PARAM_TEXT);
 
-        $mform->addElement('select', 'lifecycleaction', get_string('settings_lifecycle_action', 'local_labvirtual'), [
-            ''  => get_string('batch_override_default', 'local_labvirtual'),
-            '0' => get_string('settings_lifecycle_action_none', 'local_labvirtual'),
-            '1' => get_string('settings_lifecycle_action_reset', 'local_labvirtual'),
-            '2' => get_string('settings_lifecycle_action_delete', 'local_labvirtual'),
+        $mform->addElement('select', 'lifecycleaction', get_string('settings_lifecycle_action', 'local_virtuallab'), [
+            ''  => get_string('batch_override_default', 'local_virtuallab'),
+            '0' => get_string('settings_lifecycle_action_none', 'local_virtuallab'),
+            '1' => get_string('settings_lifecycle_action_reset', 'local_virtuallab'),
+            '2' => get_string('settings_lifecycle_action_delete', 'local_virtuallab'),
         ]);
 
-        $mform->addElement('text', 'warningdays', get_string('settings_warning_days', 'local_labvirtual'), ['size' => 5]);
+        $mform->addElement('text', 'warningdays', get_string('settings_warning_days', 'local_virtuallab'), ['size' => 5]);
         $mform->setType('warningdays', PARAM_TEXT);
 
-        $this->add_action_buttons(true, get_string('save_batch', 'local_labvirtual'));
+        $this->add_action_buttons(true, get_string('save_batch', 'local_virtuallab'));
     }
 
     #[\Override]

@@ -17,20 +17,20 @@
 /**
  * PHPUnit tests for category_manager.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\category_manager;
+use local_virtuallab\local\category_manager;
 
 /**
  * Tests the batch category structure and its safe deletion guard.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing

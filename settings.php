@@ -17,7 +17,7 @@
 /**
  * Plugin administration settings.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,70 +26,70 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category(
-        'local_labvirtual_category',
-        get_string('pluginname', 'local_labvirtual')
+        'local_virtuallab_category',
+        get_string('pluginname', 'local_virtuallab')
     ));
 
     $settings = new admin_settingpage(
-        'local_labvirtual',
+        'local_virtuallab',
         get_string('settings', 'moodle')
     );
 
     $settings->add(new admin_setting_configtext(
-        'local_labvirtual/max_teachers_per_lab',
-        get_string('settings_max_teachers', 'local_labvirtual'),
-        get_string('settings_max_teachers_desc', 'local_labvirtual'),
+        'local_virtuallab/max_teachers_per_lab',
+        get_string('settings_max_teachers', 'local_virtuallab'),
+        get_string('settings_max_teachers_desc', 'local_virtuallab'),
         3,
         PARAM_INT
     ));
 
     $settings->add(new admin_setting_heading(
-        'local_labvirtual/heading_lifecycle',
-        get_string('settings_lifecycle', 'local_labvirtual'),
+        'local_virtuallab/heading_lifecycle',
+        get_string('settings_lifecycle', 'local_virtuallab'),
         ''
     ));
 
     $settings->add(new admin_setting_configtext(
-        'local_labvirtual/lifecycle_months',
-        get_string('settings_lifecycle_months', 'local_labvirtual'),
-        get_string('settings_lifecycle_months_desc', 'local_labvirtual'),
+        'local_virtuallab/lifecycle_months',
+        get_string('settings_lifecycle_months', 'local_virtuallab'),
+        get_string('settings_lifecycle_months_desc', 'local_virtuallab'),
         0,
         PARAM_INT
     ));
 
     $settings->add(new admin_setting_configselect(
-        'local_labvirtual/lifecycle_action',
-        get_string('settings_lifecycle_action', 'local_labvirtual'),
-        get_string('settings_lifecycle_action_desc', 'local_labvirtual'),
+        'local_virtuallab/lifecycle_action',
+        get_string('settings_lifecycle_action', 'local_virtuallab'),
+        get_string('settings_lifecycle_action_desc', 'local_virtuallab'),
         0,
         [
-            0 => get_string('settings_lifecycle_action_none', 'local_labvirtual'),
-            1 => get_string('settings_lifecycle_action_reset', 'local_labvirtual'),
-            2 => get_string('settings_lifecycle_action_delete', 'local_labvirtual'),
+            0 => get_string('settings_lifecycle_action_none', 'local_virtuallab'),
+            1 => get_string('settings_lifecycle_action_reset', 'local_virtuallab'),
+            2 => get_string('settings_lifecycle_action_delete', 'local_virtuallab'),
         ]
     ));
 
     $settings->add(new admin_setting_configtext(
-        'local_labvirtual/warning_days_before',
-        get_string('settings_warning_days', 'local_labvirtual'),
-        get_string('settings_warning_days_desc', 'local_labvirtual'),
+        'local_virtuallab/warning_days_before',
+        get_string('settings_warning_days', 'local_virtuallab'),
+        get_string('settings_warning_days_desc', 'local_virtuallab'),
         7,
         PARAM_INT
     ));
 
     $settings->add(new admin_setting_configcheckbox(
-        'local_labvirtual/notify_admin_copy',
-        get_string('settings_notify_admin', 'local_labvirtual'),
-        get_string('settings_notify_admin_desc', 'local_labvirtual'),
+        'local_virtuallab/notify_admin_copy',
+        get_string('settings_notify_admin', 'local_virtuallab'),
+        get_string('settings_notify_admin_desc', 'local_virtuallab'),
         0
     ));
 
-    $ADMIN->add('local_labvirtual_category', $settings);
+    $ADMIN->add('local_virtuallab_category', $settings);
 
-    $ADMIN->add('local_labvirtual_category', new admin_externalpage(
-        'local_labvirtual_manage',
-        get_string('manage_batches', 'local_labvirtual'),
-        new moodle_url('/local/labvirtual/manage.php'),
+    $ADMIN->add('local_virtuallab_category', new admin_externalpage(
+        'local_virtuallab_manage',
+        get_string('manage_batches', 'local_virtuallab'),
+        new moodle_url('/local/virtuallab/manage.php'),
         'moodle/site:config'
     ));
 }

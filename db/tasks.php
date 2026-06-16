@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Scheduled task definitions for local_labvirtual.
+ * Scheduled task definitions for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        'classname' => \local_labvirtual\task\maintenance_task::class,
+        'classname' => \local_virtuallab\task\maintenance_task::class,
         'blocking'  => 0,
         'minute'    => '0',
         'hour'      => '2',

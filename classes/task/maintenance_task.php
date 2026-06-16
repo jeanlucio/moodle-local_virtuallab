@@ -17,16 +17,16 @@
 /**
  * Scheduled task: automatic lifecycle management of lab courses.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\task;
+namespace local_virtuallab\task;
 
-use local_labvirtual\local\batch_settings;
-use local_labvirtual\local\maintenance_service;
-use local_labvirtual\local\notification_service;
+use local_virtuallab\local\batch_settings;
+use local_virtuallab\local\maintenance_service;
+use local_virtuallab\local\notification_service;
 
 /**
  * Resets or deletes labs whose last-reset (or creation) date exceeds
@@ -48,7 +48,7 @@ class maintenance_task extends \core\task\scheduled_task {
      * @return string
      */
     public function get_name(): string {
-        return get_string('task_maintenance', 'local_labvirtual');
+        return get_string('task_maintenance', 'local_virtuallab');
     }
 
     /**
@@ -63,8 +63,8 @@ class maintenance_task extends \core\task\scheduled_task {
     public function execute(): void {
         global $DB;
 
-        $batches = $DB->get_records('local_labvirtual_batches');
-        $alllabs = $batches ? $DB->get_records('local_labvirtual_courses') : [];
+        $batches = $DB->get_records('local_virtuallab_batches');
+        $alllabs = $batches ? $DB->get_records('local_virtuallab_courses') : [];
 
         if (empty($alllabs)) {
             mtrace('Lab Virtual maintenance: no labs to process.');
@@ -144,7 +144,7 @@ class maintenance_task extends \core\task\scheduled_task {
 
         if ($warnedids) {
             [$insql, $params] = $DB->get_in_or_equal($warnedids, SQL_PARAMS_NAMED);
-            $DB->set_field_select('local_labvirtual_courses', 'lastwarn', time(), "id $insql", $params);
+            $DB->set_field_select('local_virtuallab_courses', 'lastwarn', time(), "id $insql", $params);
         }
 
         if ($results) {

@@ -17,12 +17,12 @@
 /**
  * Manages the course category structure used by Lab Virtual batches.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 use core_course_category;
 
@@ -45,18 +45,18 @@ class category_manager {
     public static function get_parent_category(): int {
         global $DB;
 
-        $catid = (int) get_config('local_labvirtual', self::PARENT_CONFIG);
+        $catid = (int) get_config('local_virtuallab', self::PARENT_CONFIG);
         if ($catid && $DB->record_exists('course_categories', ['id' => $catid])) {
             return $catid;
         }
 
         $category = core_course_category::create((object) [
-            'name'        => get_string('parentcategory', 'local_labvirtual'),
+            'name'        => get_string('parentcategory', 'local_virtuallab'),
             'parent'      => 0,
             'description' => '',
         ]);
 
-        set_config(self::PARENT_CONFIG, $category->id, 'local_labvirtual');
+        set_config(self::PARENT_CONFIG, $category->id, 'local_virtuallab');
 
         return (int) $category->id;
     }
@@ -102,7 +102,7 @@ class category_manager {
     public static function delete_category(int $categoryid): void {
         global $DB;
 
-        $parentid = (int) get_config('local_labvirtual', self::PARENT_CONFIG);
+        $parentid = (int) get_config('local_virtuallab', self::PARENT_CONFIG);
         $category = $DB->get_record('course_categories', ['id' => $categoryid]);
 
         if (!$category || !$parentid || (int) $category->parent !== $parentid) {

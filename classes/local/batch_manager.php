@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Batch (turma) manager — CRUD operations for local_labvirtual_batches.
+ * Batch (turma) manager — CRUD operations for local_virtuallab_batches.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 /**
  * Handles creation and retrieval of Lab Virtual batches.
@@ -52,7 +52,7 @@ class batch_manager {
             'timecreated' => time(),
         ];
 
-        $batchid = $DB->insert_record('local_labvirtual_batches', $record);
+        $batchid = $DB->insert_record('local_virtuallab_batches', $record);
         $this->set_teachers($batchid, $teacherids);
 
         return $batchid;
@@ -89,7 +89,7 @@ class batch_manager {
             $record->$key = ($value === null || $value === '') ? null : (int) $value;
         }
 
-        $DB->update_record('local_labvirtual_batches', $record);
+        $DB->update_record('local_virtuallab_batches', $record);
 
         if ($name !== $batch->name) {
             category_manager::rename_category((int) $batch->categoryid, $name);
@@ -107,7 +107,7 @@ class batch_manager {
     public function set_prefix(int $batchid, string $nameprefix): void {
         global $DB;
 
-        $DB->set_field('local_labvirtual_batches', 'nameprefix', $nameprefix, ['id' => $batchid]);
+        $DB->set_field('local_virtuallab_batches', 'nameprefix', $nameprefix, ['id' => $batchid]);
     }
 
     /**
@@ -132,7 +132,7 @@ class batch_manager {
     public function get_batch(int $id): \stdClass {
         global $DB;
 
-        return $DB->get_record('local_labvirtual_batches', ['id' => $id], '*', MUST_EXIST);
+        return $DB->get_record('local_virtuallab_batches', ['id' => $id], '*', MUST_EXIST);
     }
 
     /**
@@ -146,7 +146,7 @@ class batch_manager {
 
         $teacherids = array_values(array_unique(array_filter(array_map('intval', $teacherids))));
 
-        $DB->delete_records('local_labvirtual_batch_teachers', ['batchid' => $batchid]);
+        $DB->delete_records('local_virtuallab_batch_teachers', ['batchid' => $batchid]);
 
         $rows = [];
         foreach ($teacherids as $userid) {
@@ -154,7 +154,7 @@ class batch_manager {
         }
 
         if ($rows) {
-            $DB->insert_records('local_labvirtual_batch_teachers', $rows);
+            $DB->insert_records('local_virtuallab_batch_teachers', $rows);
         }
 
         $this->sync_teacher_roles($batchid, $teacherids);
@@ -172,7 +172,7 @@ class batch_manager {
 
         require_once($CFG->dirroot . '/lib/accesslib.php');
 
-        $categoryid = (int) $DB->get_field('local_labvirtual_batches', 'categoryid', ['id' => $batchid]);
+        $categoryid = (int) $DB->get_field('local_virtuallab_batches', 'categoryid', ['id' => $batchid]);
         $context    = $categoryid ? \context_coursecat::instance($categoryid, IGNORE_MISSING) : false;
         if (!$context) {
             return;
@@ -183,12 +183,12 @@ class batch_manager {
         role_unassign_all([
             'roleid'    => $roleid,
             'contextid' => $context->id,
-            'component' => 'local_labvirtual',
+            'component' => 'local_virtuallab',
             'itemid'    => $batchid,
         ]);
 
         foreach ($teacherids as $userid) {
-            role_assign($roleid, $userid, $context->id, 'local_labvirtual', $batchid);
+            role_assign($roleid, $userid, $context->id, 'local_virtuallab', $batchid);
         }
     }
 
@@ -202,7 +202,7 @@ class batch_manager {
         global $DB;
 
         $sql = "SELECT u.*
-                  FROM {local_labvirtual_batch_teachers} bt
+                  FROM {local_virtuallab_batch_teachers} bt
                   JOIN {user} u ON u.id = bt.userid
                  WHERE bt.batchid = :batchid
                    AND u.deleted = 0
@@ -227,9 +227,9 @@ class batch_manager {
                        b.timecreated,
                        cat.name AS categoryname,
                        COUNT(lc.id) AS labcount
-                  FROM {local_labvirtual_batches} b
+                  FROM {local_virtuallab_batches} b
                   JOIN {course_categories} cat ON cat.id = b.categoryid
-             LEFT JOIN {local_labvirtual_courses} lc ON lc.batchid = b.id
+             LEFT JOIN {local_virtuallab_courses} lc ON lc.batchid = b.id
               GROUP BY b.id,
                        b.name,
                        b.categoryid,
@@ -256,14 +256,14 @@ class batch_manager {
      * @return \stdClass[] Filtered batches.
      */
     private function filter_manageable(array $batches): array {
-        if (has_capability('local/labvirtual:manage', \context_system::instance())) {
+        if (has_capability('local/virtuallab:manage', \context_system::instance())) {
             return $batches;
         }
 
         return array_filter($batches, static function (\stdClass $batch): bool {
             $context = \context_coursecat::instance($batch->categoryid, IGNORE_MISSING);
 
-            return $context && has_capability('local/labvirtual:manage', $context);
+            return $context && has_capability('local/virtuallab:manage', $context);
         });
     }
 
@@ -285,7 +285,7 @@ class batch_manager {
                        u.lastnamephonetic,
                        u.middlename,
                        u.alternatename
-                  FROM {local_labvirtual_batch_teachers} bt
+                  FROM {local_virtuallab_batch_teachers} bt
                   JOIN {user} u ON u.id = bt.userid
                  WHERE bt.batchid $insql
                    AND u.deleted = 0

@@ -1,7 +1,7 @@
-# Moodle Local Lab Virtual
+# Moodle Local Virtual Lab
 
-[![Moodle Plugin CI](https://github.com/jeanlucio/moodle-local_labvirtual/actions/workflows/ci.yml/badge.svg)](https://github.com/jeanlucio/moodle-local_labvirtual/actions/workflows/ci.yml)
-[![MDL Shield](https://img.shields.io/endpoint?url=https%3A%2F%2Fmdlshield.com%2Fapi%2Fbadge%2Flocal_labvirtual)](https://mdlshield.com/plugins/local_labvirtual)
+[![Moodle Plugin CI](https://github.com/jeanlucio/moodle-local_virtuallab/actions/workflows/ci.yml/badge.svg)](https://github.com/jeanlucio/moodle-local_virtuallab/actions/workflows/ci.yml)
+[![MDL Shield](https://img.shields.io/endpoint?url=https%3A%2F%2Fmdlshield.com%2Fapi%2Fbadge%2Flocal_virtuallab)](https://mdlshield.com/plugins/local_virtuallab)
 ![Moodle](https://img.shields.io/badge/Moodle-4.5%2B-orange?style=flat-square&logo=moodle&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Alpha-yellow?style=flat-square)
@@ -12,7 +12,7 @@
 
 ## English
 
-**Lab Virtual** (`local_labvirtual`) is a Moodle local plugin for **batch creation and lifecycle management of sandbox lab courses**, organised into **batches** (one per class or discipline), with a **self-service student panel** so students can pick and join their workspace without any admin intervention each semester.
+**Virtual Lab** (`local_virtuallab`) is a Moodle local plugin for **batch creation and lifecycle management of sandbox lab courses**, organised into **batches** (one per class or discipline), with a **self-service student panel** so students can pick and join their workspace without any admin intervention each semester.
 
 Each batch lives in its own course subcategory, and its **responsible teachers manage only their own batch** — creating, editing, resetting and deleting their labs, and entering the courses without being enrolled — while the administrator oversees everything. All write operations are scoped to courses registered in the plugin's own tables, so it never touches courses that belong to other teachers or disciplines.
 
@@ -41,7 +41,7 @@ Each batch lives in its own course subcategory, and its **responsible teachers m
 
 ### 🎓 Educational Purpose
 
-Lab Virtual is designed for courses where each student or group needs an **isolated Moodle course** to build prototypes, pages, or deliverables without interfering with the official class or with other students' work.
+Virtual Lab is designed for courses where each student or group needs an **isolated Moodle course** to build prototypes, pages, or deliverables without interfering with the official class or with other students' work.
 
 Typical scenarios:
 
@@ -49,7 +49,7 @@ Typical scenarios:
 * Technical and vocational training where learners need a personal sandbox
 * Any discipline where students require their own configurable Moodle space each semester
 
-Moodle core can already create many courses at once (the *Upload courses* admin tool, via CSV). Lab Virtual is not about bulk creation itself — it adds everything around the **recurring, self-service lifecycle** of disposable sandboxes: grouping labs into a batch, a panel for students to pick and join one, automatic reset or deletion at the end of the term, and **delegation** so each teacher runs their own batch without admin access. If you only need to create courses in bulk once, the core tool is enough; if you run this cycle every semester, Lab Virtual automates it end to end.
+Moodle core can already create many courses at once (the *Upload courses* admin tool, via CSV). Virtual Lab is not about bulk creation itself — it adds everything around the **recurring, self-service lifecycle** of disposable sandboxes: grouping labs into a batch, a panel for students to pick and join one, automatic reset or deletion at the end of the term, and **delegation** so each teacher runs their own batch without admin access. If you only need to create courses in bulk once, the core tool is enough; if you run this cycle every semester, Virtual Lab automates it end to end.
 
 ---
 
@@ -68,11 +68,11 @@ Tested against: Moodle 4.5, 5.0, 5.1, 5.2 × PostgreSQL and MariaDB.
 
 1. Download the `.zip` file or clone this repository.
 2. Extract the folder into your Moodle `local/` directory.
-3. Rename the folder to `labvirtual` (if necessary).
-   Final path: `your-moodle/local/labvirtual/`
+3. Rename the folder to `virtuallab` (if necessary).
+   Final path: `your-moodle/local/virtuallab/`
 4. Visit **Site administration → Notifications** to complete the installation.
 
-On install, the plugin provisions a shared **"Virtual labs"** course category and a delegated **"Lab Virtual batch manager"** role; the per-batch subcategory is created the first time you create a batch.
+On install, the plugin provisions a shared **"Virtual labs"** course category and a delegated **"Virtual Lab batch manager"** role; the per-batch subcategory is created the first time you create a batch.
 
 ---
 
@@ -80,7 +80,7 @@ On install, the plugin provisions a shared **"Virtual labs"** course category an
 
 | Who | Scope | Can do |
 |-----|-------|--------|
-| **Administrator** (system `local/labvirtual:manage`) | All batches | Create batches, assign responsible teachers, manage every batch and lab, change global settings. |
+| **Administrator** (system `local/virtuallab:manage`) | All batches | Create batches, assign responsible teachers, manage every batch and lab, change global settings. |
 | **Responsible teacher** (delegated role on the batch subcategory) | Their own batch only | Create / reset / delete labs, edit the batch, edit course content, grades and enrolments, open the lab courses without enrolling. |
 | **Student** | The student panel | Browse the batch labs and join one as editor or visitor. |
 
@@ -90,7 +90,7 @@ The delegated role mirrors the *editingteacher* capabilities (plus "view course 
 
 ### ⚙️ Settings
 
-Navigate to **Site administration → Plugins → Local plugins → Lab Virtual**. These are **global defaults**; the first four can be overridden per batch from the *Edit batch* form.
+Navigate to **Site administration → Plugins → Local plugins → Virtual Lab**. These are **global defaults**; the first four can be overridden per batch from the *Edit batch* form.
 
 | Setting | Description | Default |
 |---------|-------------|---------|
@@ -100,7 +100,7 @@ Navigate to **Site administration → Plugins → Local plugins → Lab Virtual*
 | **Warning days before action** | Days before the action when a warning email is sent. Set to `0` to disable warnings. | `7` |
 | **Send a copy to the administrator** | When enabled, the admin also receives a consolidated copy of the lifecycle warning and summary emails. | Off |
 
-The **Manage Lab Virtual** button in the settings page links directly to the management panel.
+The **Manage Virtual Lab** button in the settings page links directly to the management panel.
 
 ---
 
@@ -108,7 +108,7 @@ The **Manage Lab Virtual** button in the settings page links directly to the man
 
 #### Admin workflow
 
-1. Go to **Site administration → Plugins → Local plugins → Lab Virtual → Manage Lab Virtual**.
+1. Go to **Site administration → Plugins → Local plugins → Virtual Lab → Manage Virtual Lab**.
 2. Click **New batch** and fill in just the **batch name** and one or more **responsible teachers**. The batch gets its own subcategory automatically.
 3. Open the batch to manage it, or hand it over to the responsible teacher.
 
@@ -146,7 +146,7 @@ Before acting, the task emails a **warning** the configured number of days in ad
 
 ### 🧪 Automated Tests
 
-Lab Virtual ships with PHPUnit (unit/integration) and Behat (acceptance) test suites. Every CI push runs both against the full matrix (Moodle 4.5 → 5.2, PostgreSQL and MariaDB).
+Virtual Lab ships with PHPUnit (unit/integration) and Behat (acceptance) test suites. Every CI push runs both against the full matrix (Moodle 4.5 → 5.2, PostgreSQL and MariaDB).
 
 #### Unit & integration tests (PHPUnit)
 
@@ -164,7 +164,7 @@ Lab Virtual ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 | **Total** | **54** | |
 
 ```bash
-vendor/bin/phpunit --testsuite local_labvirtual_testsuite
+vendor/bin/phpunit --testsuite local_virtuallab_testsuite
 ```
 
 #### Acceptance tests (Behat)
@@ -179,14 +179,14 @@ End-to-end browser tests covering the admin, teacher and student flows.
 | **Total** | **9** | |
 
 ```bash
-vendor/bin/behat --tags @local_labvirtual
+vendor/bin/behat --tags @local_virtuallab
 ```
 
 ---
 
 ### 🔐 Security & Compliance
 
-* Two capabilities: `local/labvirtual:manage` (assignable at system for admins and at a course category for delegated teachers) and `local/labvirtual:view`.
+* Two capabilities: `local/virtuallab:manage` (assignable at system for admins and at a course category for delegated teachers) and `local/virtuallab:view`.
 * The management page is scoped by category context — admins manage every batch, a delegated teacher only their own; creating a batch is restricted to admins.
 * Every write action checks the capability in the correct context and verifies `require_sesskey()`.
 * All DB queries use named parameters — no SQL injection surface.
@@ -205,7 +205,7 @@ This project is licensed under the **GNU General Public License v3 (GPLv3)**.
 
 ## Português
 
-O **Lab Virtual** (`local_labvirtual`) é um plugin local Moodle para **criação e manutenção em lote de cursos-laboratório** (sandboxes isolados), organizados por **turmas**, com **painel self-service** para estudantes escolherem e acessarem seus ambientes sem intervenção do administrador a cada semestre.
+O **Lab Virtual** (`local_virtuallab`) é um plugin local Moodle para **criação e manutenção em lote de cursos-laboratório** (sandboxes isolados), organizados por **turmas**, com **painel self-service** para estudantes escolherem e acessarem seus ambientes sem intervenção do administrador a cada semestre.
 
 Cada turma vive na sua própria subcategoria de cursos, e seus **professores responsáveis gerenciam apenas a turma deles** — criando, editando, resetando e excluindo seus labs, e entrando nos cursos sem se inscrever — enquanto o administrador supervisiona tudo. Todas as operações de escrita são restritas aos cursos registrados nas tabelas do plugin, então ele nunca toca em cursos de outras disciplinas ou professores.
 
@@ -261,8 +261,8 @@ Testado contra: Moodle 4.5, 5.0, 5.1, 5.2 × PostgreSQL e MariaDB.
 
 1. Baixe o arquivo `.zip` ou clone este repositório.
 2. Extraia na pasta `local/` do seu Moodle.
-3. Renomeie para `labvirtual` (se necessário).
-   Caminho final: `seu-moodle/local/labvirtual/`
+3. Renomeie para `virtuallab` (se necessário).
+   Caminho final: `seu-moodle/local/virtuallab/`
 4. Acesse **Administração do site → Notificações** para concluir a instalação.
 
 Na instalação, o plugin provisiona uma categoria de cursos compartilhada **"Laboratórios Virtuais"** e um papel delegado **"Gestor de turma do Laboratório Virtual"**; a subcategoria de cada turma é criada na primeira vez que você cria uma turma.
@@ -273,7 +273,7 @@ Na instalação, o plugin provisiona uma categoria de cursos compartilhada **"La
 
 | Quem | Escopo | Pode fazer |
 |------|--------|-----------|
-| **Administrador** (`local/labvirtual:manage` no sistema) | Todas as turmas | Criar turmas, indicar responsáveis, gerenciar qualquer turma e lab, alterar configurações globais. |
+| **Administrador** (`local/virtuallab:manage` no sistema) | Todas as turmas | Criar turmas, indicar responsáveis, gerenciar qualquer turma e lab, alterar configurações globais. |
 | **Professor responsável** (papel delegado na subcategoria da turma) | Apenas a turma dele | Criar / resetar / excluir labs, editar a turma, editar conteúdo, notas e inscrições, abrir os cursos sem se inscrever. |
 | **Estudante** | O painel do estudante | Navegar pelos labs da turma e entrar como editor ou visitante. |
 
@@ -357,7 +357,7 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 | **Total** | **54** | |
 
 ```bash
-vendor/bin/phpunit --testsuite local_labvirtual_testsuite
+vendor/bin/phpunit --testsuite local_virtuallab_testsuite
 ```
 
 #### Testes de aceitação (Behat)
@@ -372,14 +372,14 @@ Testes de navegador ponta a ponta cobrindo os fluxos de admin, professor e estud
 | **Total** | **9** | |
 
 ```bash
-vendor/bin/behat --tags @local_labvirtual
+vendor/bin/behat --tags @local_virtuallab
 ```
 
 ---
 
 ### 🔐 Segurança e Conformidade
 
-* Duas capabilities: `local/labvirtual:manage` (assinável no sistema para admins e numa categoria de curso para professores delegados) e `local/labvirtual:view`.
+* Duas capabilities: `local/virtuallab:manage` (assinável no sistema para admins e numa categoria de curso para professores delegados) e `local/virtuallab:view`.
 * A página de gerenciamento é escopada por contexto de categoria — admins gerenciam todas as turmas, o professor delegado só as dele; criar turma é restrito aos admins.
 * Cada ação de escrita verifica a capability no contexto correto e valida `require_sesskey()`.
 * Todas as queries usam parâmetros nomeados — sem superfície de SQL injection.

@@ -20,20 +20,20 @@
  * Level 1 (no batchid): list of batches + create/delete batch.
  * Level 2 (batchid set): labs of a batch + create/reset/delete labs + bulk actions.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
 
-use local_labvirtual\form\create_batch_form;
-use local_labvirtual\form\create_labs_form;
-use local_labvirtual\form\edit_batch_form;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
-use local_labvirtual\local\course_registry;
-use local_labvirtual\local\maintenance_service;
+use local_virtuallab\form\create_batch_form;
+use local_virtuallab\form\create_labs_form;
+use local_virtuallab\form\edit_batch_form;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
+use local_virtuallab\local\course_registry;
+use local_virtuallab\local\maintenance_service;
 
 $batchid    = optional_param('batchid', 0, PARAM_INT);
 $action     = optional_param('action', '', PARAM_ALPHAEXT);
@@ -47,28 +47,28 @@ $systemcontext = context_system::instance();
 
 // System-level managers (admins) manage every batch; delegated teachers manage only the
 // batches whose subcategory grants them :manage. Per-action checks enforce this below.
-$canmanageall = has_capability('local/labvirtual:manage', $systemcontext);
+$canmanageall = has_capability('local/virtuallab:manage', $systemcontext);
 
 $PAGE->set_context($systemcontext);
 $PAGE->set_pagelayout('admin');
 
-$manageurl = new moodle_url('/local/labvirtual/manage.php');
+$manageurl = new moodle_url('/local/virtuallab/manage.php');
 
 // Level 2: labs within a batch.
 if ($batchid) {
     $batchmgr  = new batch_manager();
     $batch     = $batchmgr->get_batch($batchid);
-    require_capability('local/labvirtual:manage', context_coursecat::instance($batch->categoryid));
-    $level2url = new moodle_url('/local/labvirtual/manage.php', ['batchid' => $batchid]);
+    require_capability('local/virtuallab:manage', context_coursecat::instance($batch->categoryid));
+    $level2url = new moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]);
     $createurl = new moodle_url(
-        '/local/labvirtual/manage.php',
+        '/local/virtuallab/manage.php',
         ['batchid' => $batchid, 'action' => 'createlabs']
     );
 
     $PAGE->set_url($level2url);
-    $PAGE->set_title(get_string('manage_labs', 'local_labvirtual', format_string($batch->name)));
-    $PAGE->set_heading(get_string('manage_labs', 'local_labvirtual', format_string($batch->name)));
-    $PAGE->navbar->add(get_string('manage_batches', 'local_labvirtual'), $manageurl);
+    $PAGE->set_title(get_string('manage_labs', 'local_virtuallab', format_string($batch->name)));
+    $PAGE->set_heading(get_string('manage_labs', 'local_virtuallab', format_string($batch->name)));
+    $PAGE->navbar->add(get_string('manage_batches', 'local_virtuallab'), $manageurl);
     $PAGE->navbar->add(format_string($batch->name));
 
     // Create labs.
@@ -90,7 +90,7 @@ if ($batchid) {
             );
             redirect(
                 $level2url,
-                get_string('labs_created', 'local_labvirtual', count($created)),
+                get_string('labs_created', 'local_virtuallab', count($created)),
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
@@ -105,7 +105,7 @@ if ($batchid) {
     // Edit batch.
     if ($action === 'editbatch') {
         $editurl = new moodle_url(
-            '/local/labvirtual/manage.php',
+            '/local/virtuallab/manage.php',
             ['batchid' => $batchid, 'action' => 'editbatch']
         );
         $form = new edit_batch_form($editurl->out(false));
@@ -125,7 +125,7 @@ if ($batchid) {
             ]);
             redirect(
                 $level2url,
-                get_string('batch_updated', 'local_labvirtual'),
+                get_string('batch_updated', 'local_virtuallab'),
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
@@ -154,7 +154,7 @@ if ($batchid) {
         $lab      = $registry->get_lab_for_batch($labid, $batchid);
 
         if (!$confirm) {
-            $confirmurl = new moodle_url('/local/labvirtual/manage.php', [
+            $confirmurl = new moodle_url('/local/virtuallab/manage.php', [
                 'batchid' => $batchid,
                 'action'  => 'resetlab',
                 'labid'   => $labid,
@@ -163,7 +163,7 @@ if ($batchid) {
             ]);
             echo $OUTPUT->header();
             echo $OUTPUT->confirm(
-                get_string('confirm_reset_lab', 'local_labvirtual', format_string($lab->coursename)),
+                get_string('confirm_reset_lab', 'local_virtuallab', format_string($lab->coursename)),
                 $confirmurl,
                 $level2url
             );
@@ -176,7 +176,7 @@ if ($batchid) {
         $service->reset_lab($labid, $batchid);
         redirect(
             $level2url,
-            get_string('lab_reset', 'local_labvirtual'),
+            get_string('lab_reset', 'local_virtuallab'),
             null,
             \core\output\notification::NOTIFY_SUCCESS
         );
@@ -188,7 +188,7 @@ if ($batchid) {
         $lab      = $registry->get_lab_for_batch($labid, $batchid);
 
         if (!$confirm) {
-            $confirmurl = new moodle_url('/local/labvirtual/manage.php', [
+            $confirmurl = new moodle_url('/local/virtuallab/manage.php', [
                 'batchid' => $batchid,
                 'action'  => 'deletelab',
                 'labid'   => $labid,
@@ -197,7 +197,7 @@ if ($batchid) {
             ]);
             echo $OUTPUT->header();
             echo $OUTPUT->confirm(
-                get_string('confirm_delete_lab', 'local_labvirtual', format_string($lab->coursename)),
+                get_string('confirm_delete_lab', 'local_virtuallab', format_string($lab->coursename)),
                 $confirmurl,
                 $level2url
             );
@@ -210,7 +210,7 @@ if ($batchid) {
         $service->delete_lab($labid, $batchid);
         redirect(
             $level2url,
-            get_string('lab_deleted', 'local_labvirtual'),
+            get_string('lab_deleted', 'local_virtuallab'),
             null,
             \core\output\notification::NOTIFY_SUCCESS
         );
@@ -224,7 +224,7 @@ if ($batchid) {
         if (empty($labids)) {
             redirect(
                 $level2url,
-                get_string('error_no_labs_selected', 'local_labvirtual'),
+                get_string('error_no_labs_selected', 'local_virtuallab'),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
@@ -235,16 +235,16 @@ if ($batchid) {
         $validlabs = $registry->get_labs_for_batch_bulk($labids, $batchid);
 
         if (count($validlabs) !== count($labids)) {
-            throw new \moodle_exception('error_course_not_managed', 'local_labvirtual');
+            throw new \moodle_exception('error_course_not_managed', 'local_virtuallab');
         }
 
         if (!$confirm) {
             $count         = count($validlabs);
             $confirmstring = $bulkaction === 'reset'
-                ? get_string('confirm_bulk_reset', 'local_labvirtual', $count)
-                : get_string('confirm_bulk_delete', 'local_labvirtual', $count);
+                ? get_string('confirm_bulk_reset', 'local_virtuallab', $count)
+                : get_string('confirm_bulk_delete', 'local_virtuallab', $count);
 
-            $renderer = $PAGE->get_renderer('local_labvirtual');
+            $renderer = $PAGE->get_renderer('local_virtuallab');
 
             echo $OUTPUT->header();
             echo $renderer->render_bulk_confirm(
@@ -267,7 +267,7 @@ if ($batchid) {
             }
             redirect(
                 $level2url,
-                get_string('labs_bulk_reset', 'local_labvirtual', count($labids)),
+                get_string('labs_bulk_reset', 'local_virtuallab', count($labids)),
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
@@ -279,7 +279,7 @@ if ($batchid) {
             }
             redirect(
                 $level2url,
-                get_string('labs_bulk_deleted', 'local_labvirtual', count($labids)),
+                get_string('labs_bulk_deleted', 'local_virtuallab', count($labids)),
                 null,
                 \core\output\notification::NOTIFY_SUCCESS
             );
@@ -290,16 +290,16 @@ if ($batchid) {
     $registry = new course_registry();
     $labs     = $registry->list_labs($batchid);
     $panelurl = (new moodle_url(
-        '/local/labvirtual/view.php',
+        '/local/virtuallab/view.php',
         ['batchid' => $batchid]
     ))->out(false);
 
     $editurl = (new moodle_url(
-        '/local/labvirtual/manage.php',
+        '/local/virtuallab/manage.php',
         ['batchid' => $batchid, 'action' => 'editbatch']
     ))->out(false);
 
-    $renderer = $PAGE->get_renderer('local_labvirtual');
+    $renderer = $PAGE->get_renderer('local_virtuallab');
 
     echo $OUTPUT->header();
     echo $renderer->render_labs_list($batch, $labs, $panelurl, $createurl->out(false), $editurl);
@@ -310,14 +310,14 @@ if ($batchid) {
 // Level 1: list of batches.
 
 $PAGE->set_url($manageurl);
-$PAGE->set_title(get_string('manage_batches', 'local_labvirtual'));
-$PAGE->set_heading(get_string('manage_batches', 'local_labvirtual'));
+$PAGE->set_title(get_string('manage_batches', 'local_virtuallab'));
+$PAGE->set_heading(get_string('manage_batches', 'local_virtuallab'));
 
-$createurl = new moodle_url('/local/labvirtual/manage.php', ['action' => 'createbatch']);
+$createurl = new moodle_url('/local/virtuallab/manage.php', ['action' => 'createbatch']);
 
 // Create batch (system-level managers only).
 if ($action === 'createbatch') {
-    require_capability('local/labvirtual:manage', $systemcontext);
+    require_capability('local/virtuallab:manage', $systemcontext);
 
     $form = new create_batch_form($createurl->out(false));
 
@@ -333,7 +333,7 @@ if ($action === 'createbatch') {
         $batchmgr->create_batch($data->name, $teacherids);
         redirect(
             $manageurl,
-            get_string('batch_created', 'local_labvirtual'),
+            get_string('batch_created', 'local_virtuallab'),
             null,
             \core\output\notification::NOTIFY_SUCCESS
         );
@@ -354,10 +354,10 @@ if ($action === 'deletebatch') {
 
     $batchmgr    = new batch_manager();
     $targetbatch = $batchmgr->get_batch($targetbatchid);
-    require_capability('local/labvirtual:manage', context_coursecat::instance($targetbatch->categoryid));
+    require_capability('local/virtuallab:manage', context_coursecat::instance($targetbatch->categoryid));
 
     if (!$confirm) {
-        $confirmurl = new moodle_url('/local/labvirtual/manage.php', [
+        $confirmurl = new moodle_url('/local/virtuallab/manage.php', [
             'action'        => 'deletebatch',
             'targetbatchid' => $targetbatchid,
             'confirm'       => 1,
@@ -365,7 +365,7 @@ if ($action === 'deletebatch') {
         ]);
         echo $OUTPUT->header();
         echo $OUTPUT->confirm(
-            get_string('confirm_delete_batch', 'local_labvirtual', format_string($targetbatch->name)),
+            get_string('confirm_delete_batch', 'local_virtuallab', format_string($targetbatch->name)),
             $confirmurl,
             $manageurl
         );
@@ -378,7 +378,7 @@ if ($action === 'deletebatch') {
     $service->delete_batch($targetbatchid);
     redirect(
         $manageurl,
-        get_string('batch_deleted', 'local_labvirtual'),
+        get_string('batch_deleted', 'local_virtuallab'),
         null,
         \core\output\notification::NOTIFY_SUCCESS
     );
@@ -390,10 +390,10 @@ $batches  = $batchmgr->list_batches();
 
 // A delegated teacher who manages no batch has no business on this page.
 if (!$canmanageall && empty($batches)) {
-    throw new required_capability_exception($systemcontext, 'local/labvirtual:manage', 'nopermissions', '');
+    throw new required_capability_exception($systemcontext, 'local/virtuallab:manage', 'nopermissions', '');
 }
 
-$renderer = $PAGE->get_renderer('local_labvirtual');
+$renderer = $PAGE->get_renderer('local_virtuallab');
 
 echo $OUTPUT->header();
 echo $renderer->render_batches_list($batches, $createurl->out(false), $canmanageall);

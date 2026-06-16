@@ -17,22 +17,22 @@
 /**
  * PHPUnit tests for maintenance_service.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
-use local_labvirtual\local\maintenance_service;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
+use local_virtuallab\local\maintenance_service;
 
 /**
  * Tests for reset and delete operations, including cross-batch ownership checks.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -68,13 +68,13 @@ final class maintenance_service_test extends advanced_testcase {
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertEquals(0, (int) $lab->lastreset);
 
         $service = new maintenance_service();
         $service->reset_lab((int) $lab->id, $batchid);
 
-        $updated = $DB->get_record('local_labvirtual_courses', ['id' => $lab->id]);
+        $updated = $DB->get_record('local_virtuallab_courses', ['id' => $lab->id]);
         $this->assertGreaterThan(0, (int) $updated->lastreset);
         $this->assertTrue($DB->record_exists('course', ['id' => $lab->courseid]));
     }
@@ -86,7 +86,7 @@ final class maintenance_service_test extends advanced_testcase {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
 
         $service = new maintenance_service();
         $this->expectException(\dml_missing_record_exception::class);
@@ -100,13 +100,13 @@ final class maintenance_service_test extends advanced_testcase {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab      = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab      = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $courseid = (int) $lab->courseid;
 
         $service = new maintenance_service();
         $service->delete_lab((int) $lab->id, $batchid);
 
-        $this->assertFalse($DB->record_exists('local_labvirtual_courses', ['id' => $lab->id]));
+        $this->assertFalse($DB->record_exists('local_virtuallab_courses', ['id' => $lab->id]));
         $this->assertFalse($DB->record_exists('course', ['id' => $courseid]));
     }
 
@@ -117,7 +117,7 @@ final class maintenance_service_test extends advanced_testcase {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
 
         $service = new maintenance_service();
         $this->expectException(\dml_missing_record_exception::class);
@@ -135,8 +135,8 @@ final class maintenance_service_test extends advanced_testcase {
         $service = new maintenance_service();
         $service->delete_batch($batchid);
 
-        $this->assertFalse($DB->record_exists('local_labvirtual_batches', ['id' => $batchid]));
-        $this->assertEquals(0, $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]));
+        $this->assertFalse($DB->record_exists('local_virtuallab_batches', ['id' => $batchid]));
+        $this->assertEquals(0, $DB->count_records('local_virtuallab_courses', ['batchid' => $batchid]));
 
         foreach ($courseids as $courseid) {
             $this->assertFalse($DB->record_exists('course', ['id' => $courseid]));

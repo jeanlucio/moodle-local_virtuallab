@@ -17,45 +17,45 @@
 /**
  * Styles for Lab Virtual.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-.path-local-labvirtual .local-labvirtual-panel .page-header {
+.path-local-virtuallab .local-virtuallab-panel .page-header {
     border-bottom: 2px solid var(--primary, #0d6efd);
     padding-bottom: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
-.path-local-labvirtual .local-labvirtual-panel table code {
+.path-local-virtuallab .local-virtuallab-panel table code {
     background-color: var(--bs-secondary-bg, #f8f9fa);
     padding: 0.1rem 0.4rem;
     border-radius: 0.25rem;
     font-size: 0.875em;
 }
 
-.path-local-labvirtual .local-labvirtual-manage-labs .input-group .form-control[readonly] {
+.path-local-virtuallab .local-virtuallab-manage-labs .input-group .form-control[readonly] {
     background-color: var(--bs-secondary-bg, #f8f9fa);
     cursor: text;
 }
 
-.path-local-labvirtual .local-labvirtual-manage-labs .card-header {
+.path-local-virtuallab .local-virtuallab-manage-labs .card-header {
     font-weight: 600;
 }
 
-.path-local-labvirtual .badge.lv-badge-enrolled {
+.path-local-virtuallab .badge.lv-badge-enrolled {
     color: var(--bs-dark, #000);
 }
 
-.path-local-labvirtual .local-labvirtual-select-col {
+.path-local-virtuallab .local-virtuallab-select-col {
     width: 2.5rem;
 }
 
-.path-local-labvirtual .local-labvirtual-bulk-actions {
+.path-local-virtuallab .local-virtuallab-bulk-actions {
     gap: 0.5rem;
 }
 
-.path-local-labvirtual .local-labvirtual-bulk-select {
+.path-local-virtuallab .local-virtuallab-bulk-select {
     width: auto;
 }

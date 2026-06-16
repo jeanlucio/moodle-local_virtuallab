@@ -17,14 +17,14 @@
 /**
  * Form for creating labs within an existing batch.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\form;
+namespace local_virtuallab\form;
 
-use local_labvirtual\local\course_factory;
+use local_virtuallab\local\course_factory;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,7 +44,7 @@ class create_labs_form extends \moodleform {
         $mform->addElement(
             'text',
             'nameprefix',
-            get_string('batch_nameprefix', 'local_labvirtual'),
+            get_string('batch_nameprefix', 'local_virtuallab'),
             ['size' => 40, 'maxlength' => 255]
         );
         $mform->setType('nameprefix', PARAM_TEXT);
@@ -53,7 +53,7 @@ class create_labs_form extends \moodleform {
         $mform->addElement(
             'text',
             'labcount',
-            get_string('lab_count', 'local_labvirtual'),
+            get_string('lab_count', 'local_virtuallab'),
             ['size' => 5, 'maxlength' => 4]
         );
         $mform->setType('labcount', PARAM_INT);
@@ -61,7 +61,7 @@ class create_labs_form extends \moodleform {
         $mform->addRule('labcount', null, 'numeric', null, 'client');
         $mform->setDefault('labcount', 5);
 
-        $this->add_action_buttons(true, get_string('create_labs', 'local_labvirtual'));
+        $this->add_action_buttons(true, get_string('create_labs', 'local_virtuallab'));
     }
 
     #[\Override]
@@ -72,7 +72,7 @@ class create_labs_form extends \moodleform {
         if ($labcount < 1) {
             $errors['labcount'] = get_string('error', 'moodle');
         } else if ($labcount > course_factory::MAX_LABS) {
-            $errors['labcount'] = get_string('error_too_many_labs', 'local_labvirtual', course_factory::MAX_LABS);
+            $errors['labcount'] = get_string('error_too_many_labs', 'local_virtuallab', course_factory::MAX_LABS);
         }
 
         return $errors;

@@ -17,20 +17,20 @@
 /**
  * PHPUnit tests for batch_manager.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
+use local_virtuallab\local\batch_manager;
 
 /**
  * Tests for batch creation, retrieval and listing.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -109,8 +109,8 @@ final class batch_manager_test extends advanced_testcase {
         $id      = $mgr->create_batch('Turma Papel', [$user1->id], 'Lab');
         $context = $mgr->get_batch_context($id);
 
-        $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user1->id));
-        $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user2->id));
+        $this->assertTrue(has_capability('local/virtuallab:manage', $context, $user1->id));
+        $this->assertFalse(has_capability('local/virtuallab:manage', $context, $user2->id));
 
         // Full control over the batch courses: edit content and view grades.
         $this->assertTrue(has_capability('moodle/course:update', $context, $user1->id));
@@ -123,8 +123,8 @@ final class batch_manager_test extends advanced_testcase {
 
         $mgr->set_teachers($id, [$user2->id]);
 
-        $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user1->id));
-        $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user2->id));
+        $this->assertFalse(has_capability('local/virtuallab:manage', $context, $user1->id));
+        $this->assertTrue(has_capability('local/virtuallab:manage', $context, $user2->id));
     }
 
     /**
@@ -153,8 +153,8 @@ final class batch_manager_test extends advanced_testcase {
         $this->assertArrayNotHasKey($user1->id, $teachers);
 
         $context = $mgr->get_batch_context($id);
-        $this->assertTrue(has_capability('local/labvirtual:manage', $context, $user2->id));
-        $this->assertFalse(has_capability('local/labvirtual:manage', $context, $user1->id));
+        $this->assertTrue(has_capability('local/virtuallab:manage', $context, $user2->id));
+        $this->assertFalse(has_capability('local/virtuallab:manage', $context, $user1->id));
     }
 
     /**

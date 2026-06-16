@@ -17,22 +17,22 @@
 /**
  * PHPUnit tests for course_registry.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
-use local_labvirtual\local\course_registry;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
+use local_virtuallab\local\course_registry;
 
 /**
  * Tests for course registry: ownership checks, bulk lookup and enrol validation.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -85,7 +85,7 @@ final class course_registry_test extends advanced_testcase {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
 
         $registry = new course_registry();
         $result   = $registry->get_lab_for_batch((int) $lab->id, $batchid);
@@ -102,7 +102,7 @@ final class course_registry_test extends advanced_testcase {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
 
         $registry = new course_registry();
         $this->expectException(\moodle_exception::class);
@@ -128,7 +128,7 @@ final class course_registry_test extends advanced_testcase {
         ['batchid' => $batch2] = $this->create_batch_with_labs(1);
 
         $allids = array_column(
-            $DB->get_records('local_labvirtual_courses', [], 'id ASC', 'id'),
+            $DB->get_records('local_virtuallab_courses', [], 'id ASC', 'id'),
             null,
             'id'
         );
@@ -163,7 +163,7 @@ final class course_registry_test extends advanced_testcase {
         global $DB;
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(1);
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
 
         $registry = new course_registry();
         $result   = $registry->get_lab_for_enrol((int) $lab->courseid, $batchid);
@@ -180,7 +180,7 @@ final class course_registry_test extends advanced_testcase {
 
         ['batchid' => $batch1] = $this->create_batch_with_labs(1);
         ['batchid' => $batch2] = $this->create_batch_with_labs(1);
-        $lab2 = $DB->get_record('local_labvirtual_courses', ['batchid' => $batch2]);
+        $lab2 = $DB->get_record('local_virtuallab_courses', ['batchid' => $batch2]);
 
         $registry = new course_registry();
         $this->expectException(\moodle_exception::class);

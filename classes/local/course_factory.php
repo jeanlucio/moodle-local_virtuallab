@@ -17,12 +17,12 @@
 /**
  * Course factory — creates lab courses enrolled through a manual instance.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 /**
  * Creates lab courses in batch, each with two self-enrolment instances.
@@ -50,16 +50,16 @@ class course_factory {
         global $CFG, $DB;
 
         if ($labcount < 1 || $labcount > self::MAX_LABS) {
-            throw new \moodle_exception('error_too_many_labs', 'local_labvirtual', '', self::MAX_LABS);
+            throw new \moodle_exception('error_too_many_labs', 'local_virtuallab', '', self::MAX_LABS);
         }
 
         require_once($CFG->dirroot . '/course/lib.php');
         require_once($CFG->libdir . '/enrollib.php');
 
-        $batch         = $DB->get_record('local_labvirtual_batches', ['id' => $batchid], '*', MUST_EXIST);
+        $batch         = $DB->get_record('local_virtuallab_batches', ['id' => $batchid], '*', MUST_EXIST);
         $selfplugin    = enrol_get_plugin('self');
         $manualplugin  = enrol_get_plugin('manual');
-        $existingcount = $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]);
+        $existingcount = $DB->count_records('local_virtuallab_courses', ['batchid' => $batchid]);
 
         $createdcourseids = [];
 
@@ -123,7 +123,7 @@ class course_factory {
                 'lastreset'   => 0,
             ];
 
-            $DB->insert_record('local_labvirtual_courses', $record);
+            $DB->insert_record('local_virtuallab_courses', $record);
             $createdcourseids[] = $course->id;
         }
 

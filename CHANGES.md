@@ -1,11 +1,11 @@
-# Changelog — Lab Virtual
+# Changelog — Virtual Lab
 
 ## 0.5.0-alpha (2026-06-11)
 
 - Lifecycle warning emails: the responsible teacher is notified a configurable number of days before a lab is reset or deleted (new "Warning days before action" setting, default 7; 0 disables)
 - Post-action summary emails sent to each responsible teacher and to the site administrator after the maintenance task runs
 - Lifecycle emails include a direct link: the batch panel for teachers and the management page for the administrator
-- Fixed capability language string keys (`labvirtual:view` / `labvirtual:manage`) so failed permission checks render the standard message instead of a fatal error
+- Fixed capability language string keys (`virtuallab:view` / `virtuallab:manage`) so failed permission checks render the standard message instead of a fatal error
 - The student panel now sends guests to the login page (returning to the panel afterwards) instead of failing a capability check
 - Removed enrolment key display from the student panel: enrolment is automatic via the panel buttons, so the keys are no longer shown to anyone (they remain set on the enrol instances to prevent direct self-enrolment). The "Show enrolment keys in student panel" setting was removed.
 - Removed enrolment keys entirely: lab courses are now created with self-enrolment disabled (newenrols = 0) and no enrolment key, so the "Create labs" form no longer asks for editor/visitor keys. The panel enrols users programmatically. An upgrade step normalises existing labs.

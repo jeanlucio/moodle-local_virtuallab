@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Output renderer for local_labvirtual.
+ * Output renderer for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\output;
+namespace local_virtuallab\output;
 
 use plugin_renderer_base;
 
@@ -64,7 +64,7 @@ class renderer extends plugin_renderer_base {
             'labids'        => $labrows,
         ];
 
-        return $this->render_from_template('local_labvirtual/manage_bulk_confirm', $context);
+        return $this->render_from_template('local_virtuallab/manage_bulk_confirm', $context);
     }
 
     /**
@@ -96,12 +96,12 @@ class renderer extends plugin_renderer_base {
             'batchid'         => $batchid,
             'canmanage'       => $canmanage,
             'sesskey'         => sesskey(),
-            'viewurl'         => (new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]))->out(false),
+            'viewurl'         => (new \moodle_url('/local/virtuallab/view.php', ['batchid' => $batchid]))->out(false),
             'haslabs'         => !empty($labs),
             'labs'            => $labrows,
         ];
 
-        return $this->render_from_template('local_labvirtual/labs_panel', $context);
+        return $this->render_from_template('local_virtuallab/labs_panel', $context);
     }
 
     /**
@@ -123,14 +123,14 @@ class renderer extends plugin_renderer_base {
                 'categoryname' => format_string($batch->categoryname),
                 'labcount'     => (int) $batch->labcount,
                 'manageurl'    => (new \moodle_url(
-                    '/local/labvirtual/manage.php',
+                    '/local/virtuallab/manage.php',
                     ['batchid' => $batch->id]
                 ))->out(false),
-                'deleteurl'    => (new \moodle_url('/local/labvirtual/manage.php', [
+                'deleteurl'    => (new \moodle_url('/local/virtuallab/manage.php', [
                     'action'        => 'deletebatch',
                     'targetbatchid' => $batch->id,
                 ]))->out(false),
-                'deletelabel'  => get_string('delete_batch_label', 'local_labvirtual', format_string($batch->name)),
+                'deletelabel'  => get_string('delete_batch_label', 'local_virtuallab', format_string($batch->name)),
             ];
         }
 
@@ -141,7 +141,7 @@ class renderer extends plugin_renderer_base {
             'createurl'  => $createurl,
         ];
 
-        return $this->render_from_template('local_labvirtual/manage_batches', $context);
+        return $this->render_from_template('local_virtuallab/manage_batches', $context);
     }
 
     /**
@@ -172,34 +172,34 @@ class renderer extends plugin_renderer_base {
                 'lastreset'   => $lab->lastreset > 0
                     ? userdate($lab->lastreset, get_string('strftimedatetime', 'langconfig'))
                     : '—',
-                'reseturl'    => (new \moodle_url('/local/labvirtual/manage.php', [
+                'reseturl'    => (new \moodle_url('/local/virtuallab/manage.php', [
                     'batchid' => $batch->id,
                     'action'  => 'resetlab',
                     'labid'   => $lab->id,
                 ]))->out(false),
-                'deleteurl'   => (new \moodle_url('/local/labvirtual/manage.php', [
+                'deleteurl'   => (new \moodle_url('/local/virtuallab/manage.php', [
                     'batchid' => $batch->id,
                     'action'  => 'deletelab',
                     'labid'   => $lab->id,
                 ]))->out(false),
-                'resetlabel'  => get_string('reset_lab_label', 'local_labvirtual', format_string($lab->coursename)),
-                'deletelabel' => get_string('delete_lab_label', 'local_labvirtual', format_string($lab->coursename)),
+                'resetlabel'  => get_string('reset_lab_label', 'local_virtuallab', format_string($lab->coursename)),
+                'deletelabel' => get_string('delete_lab_label', 'local_virtuallab', format_string($lab->coursename)),
             ];
         }
 
         $context = [
             'batchname'    => format_string($batch->name),
             'batchid'      => $batch->id,
-            'manageurl'    => (new \moodle_url('/local/labvirtual/manage.php'))->out(false),
+            'manageurl'    => (new \moodle_url('/local/virtuallab/manage.php'))->out(false),
             'labs'         => $rows,
             'haslabs'      => !empty($rows),
             'panelurl'     => $panelurl,
             'createurl'    => $createurl,
             'editurl'      => $editurl,
             'sesskey'      => sesskey(),
-            'strpanelhelp' => get_string('panel_url_help', 'local_labvirtual'),
+            'strpanelhelp' => get_string('panel_url_help', 'local_virtuallab'),
         ];
 
-        return $this->render_from_template('local_labvirtual/manage_labs', $context);
+        return $this->render_from_template('local_virtuallab/manage_labs', $context);
     }
 }

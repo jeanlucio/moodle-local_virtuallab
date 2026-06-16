@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Step definitions for local_labvirtual acceptance tests.
+ * Step definitions for local_virtuallab acceptance tests.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @category   test
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,18 +27,18 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
 
 /**
  * Custom steps to set up Lab Virtual data without going through the admin forms.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @category   test
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class behat_local_labvirtual extends behat_base {
+class behat_local_virtuallab extends behat_base {
     /**
      * Maps batch names created during a scenario to their database IDs.
      *
@@ -88,7 +88,7 @@ class behat_local_labvirtual extends behat_base {
         $user    = $DB->get_record('user', ['username' => $username], '*', MUST_EXIST);
         $batchid = $this->get_batchid($name);
 
-        $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid], 'id ASC', '*', 0, 1);
+        $labs = $DB->get_records('local_virtuallab_courses', ['batchid' => $batchid], 'id ASC', '*', 0, 1);
         $lab  = reset($labs);
 
         if (!$lab) {
@@ -107,7 +107,7 @@ class behat_local_labvirtual extends behat_base {
      * @When I visit the lab virtual management page
      */
     public function i_visit_the_lab_virtual_management_page(): void {
-        $this->execute('behat_general::i_visit', ['/local/labvirtual/manage.php']);
+        $this->execute('behat_general::i_visit', ['/local/virtuallab/manage.php']);
     }
 
     /**
@@ -117,7 +117,7 @@ class behat_local_labvirtual extends behat_base {
      * @param string $name Batch name created earlier in the scenario.
      */
     public function i_visit_the_labs_page_for_batch(string $name): void {
-        $url = new moodle_url('/local/labvirtual/manage.php', ['batchid' => $this->get_batchid($name)]);
+        $url = new moodle_url('/local/virtuallab/manage.php', ['batchid' => $this->get_batchid($name)]);
         $this->execute('behat_general::i_visit', [$url->out_as_local_url(false)]);
     }
 
@@ -128,7 +128,7 @@ class behat_local_labvirtual extends behat_base {
      * @param string $name Batch name created earlier in the scenario.
      */
     public function i_visit_the_student_panel_for_batch(string $name): void {
-        $url = new moodle_url('/local/labvirtual/view.php', ['batchid' => $this->get_batchid($name)]);
+        $url = new moodle_url('/local/virtuallab/view.php', ['batchid' => $this->get_batchid($name)]);
         $this->execute('behat_general::i_visit', [$url->out_as_local_url(false)]);
     }
 

@@ -17,20 +17,20 @@
 /**
  * PHPUnit tests for batch_settings.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_settings;
+use local_virtuallab\local\batch_settings;
 
 /**
  * Tests resolution of effective per-batch settings.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -46,10 +46,10 @@ final class batch_settings_test extends advanced_testcase {
      * NULL overrides fall back to the global defaults.
      */
     public function test_effective_uses_global_default_when_null(): void {
-        set_config('max_teachers_per_lab', 4, 'local_labvirtual');
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', 1, 'local_labvirtual');
-        set_config('warning_days_before', 7, 'local_labvirtual');
+        set_config('max_teachers_per_lab', 4, 'local_virtuallab');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', 1, 'local_virtuallab');
+        set_config('warning_days_before', 7, 'local_virtuallab');
 
         $batch = (object) [
             'maxteachers'     => null,
@@ -70,8 +70,8 @@ final class batch_settings_test extends advanced_testcase {
      * Set overrides win over the global defaults, including an explicit zero.
      */
     public function test_effective_uses_override_when_set(): void {
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('warning_days_before', 7, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('warning_days_before', 7, 'local_virtuallab');
 
         $batch = (object) [
             'maxteachers'     => 1,

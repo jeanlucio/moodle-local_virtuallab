@@ -1,4 +1,4 @@
-@local @local_labvirtual
+@local @local_virtuallab
 Feature: Manage Lab Virtual batches
   In order to organise lab sandboxes per class
   As an administrator

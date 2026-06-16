@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Hook callback registrations for local_labvirtual.
+ * Hook callback registrations for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $callbacks = [
     [
         'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
-        'callback' => 'local_labvirtual\hook_callbacks::before_standard_top_of_body_html',
+        'callback' => 'local_virtuallab\hook_callbacks::before_standard_top_of_body_html',
     ],
 ];

@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Course registry — CRUD for local_labvirtual_courses.
+ * Course registry — CRUD for local_virtuallab_courses.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 /**
  * Reads and validates lab course registrations.
@@ -37,13 +37,13 @@ class course_registry {
     public function is_managed(int $courseid): bool {
         global $DB;
 
-        return $DB->record_exists('local_labvirtual_courses', ['courseid' => $courseid]);
+        return $DB->record_exists('local_virtuallab_courses', ['courseid' => $courseid]);
     }
 
     /**
      * Returns the lab record for the given lab row ID, validating it belongs to the given batch.
      *
-     * @param int $labid   Row ID in local_labvirtual_courses (PK).
+     * @param int $labid   Row ID in local_virtuallab_courses (PK).
      * @param int $batchid Expected batch ID (ownership check).
      * @return \stdClass Lab record with coursename populated.
      * @throws \moodle_exception If the lab does not exist or belongs to a different batch.
@@ -52,7 +52,7 @@ class course_registry {
         global $DB;
 
         $sql = "SELECT lc.*, c.fullname AS coursename, c.shortname
-                  FROM {local_labvirtual_courses} lc
+                  FROM {local_virtuallab_courses} lc
                   JOIN {course} c ON c.id = lc.courseid
                  WHERE lc.id      = :id
                    AND lc.batchid = :batchid";
@@ -60,7 +60,7 @@ class course_registry {
         $record = $DB->get_record_sql($sql, ['id' => $labid, 'batchid' => $batchid]);
 
         if (!$record) {
-            throw new \moodle_exception('error_course_not_managed', 'local_labvirtual');
+            throw new \moodle_exception('error_course_not_managed', 'local_virtuallab');
         }
 
         return $record;
@@ -76,7 +76,7 @@ class course_registry {
         global $DB;
 
         $sql = "SELECT lc.*, c.fullname AS coursename, c.shortname
-                  FROM {local_labvirtual_courses} lc
+                  FROM {local_virtuallab_courses} lc
                   JOIN {course} c ON c.id = lc.courseid
                  WHERE lc.batchid = :batchid
               ORDER BY lc.id ASC";
@@ -90,7 +90,7 @@ class course_registry {
      * Fetches all matching rows in one query. Used by bulk operations to pre-validate
      * ownership and avoid per-lab round-trips.
      *
-     * @param int[] $labids  Array of local_labvirtual_courses row IDs to fetch.
+     * @param int[] $labids  Array of local_virtuallab_courses row IDs to fetch.
      * @param int   $batchid Batch all labs must belong to.
      * @return \stdClass[] Indexed by lab ID. Only rows matching both labids and batchid are returned.
      */
@@ -105,7 +105,7 @@ class course_registry {
         $params['batchid'] = $batchid;
 
         $sql = "SELECT lc.*, c.fullname AS coursename, c.shortname
-                  FROM {local_labvirtual_courses} lc
+                  FROM {local_virtuallab_courses} lc
                   JOIN {course} c ON c.id = lc.courseid
                  WHERE lc.id $insql
                    AND lc.batchid = :batchid
@@ -128,13 +128,13 @@ class course_registry {
     public function get_lab_for_enrol(int $courseid, int $batchid): \stdClass {
         global $DB;
 
-        $record = $DB->get_record('local_labvirtual_courses', [
+        $record = $DB->get_record('local_virtuallab_courses', [
             'courseid' => $courseid,
             'batchid'  => $batchid,
         ]);
 
         if (!$record) {
-            throw new \moodle_exception('error_enrol_mismatch', 'local_labvirtual');
+            throw new \moodle_exception('error_enrol_mismatch', 'local_virtuallab');
         }
 
         return $record;

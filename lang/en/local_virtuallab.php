@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * English language strings for local_labvirtual.
+ * English language strings for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -58,20 +58,20 @@ $string['delete_lab_label'] = 'Delete lab: {$a}';
 $string['edit_batch'] = 'Edit batch';
 $string['email_action_delete'] = 'deleted';
 $string['email_action_reset'] = 'reset';
-$string['email_manage_link'] = 'Open Lab Virtual management';
+$string['email_manage_link'] = 'Open Virtual Lab management';
 $string['email_panel_link'] = 'Open the lab panel';
 $string['email_summary_body'] = 'The automatic lifecycle maintenance has just run. The labs below were processed:';
 $string['email_summary_editor_body'] = 'The automatic lifecycle maintenance has just run. The lab(s) you were editing were processed:';
 $string['email_summary_failed'] = 'failed';
 $string['email_summary_ok'] = 'done';
-$string['email_summary_subject'] = 'Lab Virtual — maintenance summary';
+$string['email_summary_subject'] = 'Virtual Lab — maintenance summary';
 $string['email_warning_body'] = 'The labs below will be {$a->action} by {$a->date} under the automatic lifecycle policy. Access or reset them before that date if you still need their content.';
 $string['email_warning_editor_body'] = 'The lab(s) you are editing below will be {$a->action} by {$a->date}. Please save anything you need before that date.';
-$string['email_warning_subject'] = 'Lab Virtual — your labs will be {$a->action} in {$a->days} day(s)';
+$string['email_warning_subject'] = 'Virtual Lab — your labs will be {$a->action} in {$a->days} day(s)';
 $string['enrol_join'] = 'Enrol and join';
 $string['error_already_editor_in_batch'] = 'You are already enrolled as an editor in another lab in this batch.';
 $string['error_batch_not_found'] = 'Batch not found or does not belong to this site.';
-$string['error_course_not_managed'] = 'This course is not managed by Lab Virtual.';
+$string['error_course_not_managed'] = 'This course is not managed by Virtual Lab.';
 $string['error_enrol_mismatch'] = 'Enrollment instance does not match the requested lab.';
 $string['error_lab_full'] = 'This lab has reached the maximum number of editors.';
 $string['error_no_labs_selected'] = 'No labs selected. Please select at least one lab.';
@@ -91,10 +91,10 @@ $string['lab_reset'] = 'Lab reset successfully.';
 $string['labs_bulk_deleted'] = '{$a} lab(s) deleted successfully.';
 $string['labs_bulk_reset'] = '{$a} lab(s) reset successfully.';
 $string['labs_created'] = '{$a} lab(s) created successfully.';
-$string['labvirtual:manage'] = 'Manage Lab Virtual (create batches and labs, reset, delete)';
-$string['labvirtual:view'] = 'View Lab Virtual student panel';
+$string['virtuallab:manage'] = 'Manage Virtual Lab (create batches and labs, reset, delete)';
+$string['virtuallab:view'] = 'View Virtual Lab student panel';
 $string['lastreset'] = 'Last reset';
-$string['manage_batches'] = 'Manage Lab Virtual';
+$string['manage_batches'] = 'Manage Virtual Lab';
 $string['manage_labs'] = 'Manage labs — {$a}';
 $string['nobatches'] = 'No batches found. Click the button below to add a new batch.';
 $string['nolabs'] = 'No labs in this batch yet.';
@@ -102,12 +102,12 @@ $string['panel_url'] = 'Student panel URL';
 $string['panel_url_copied'] = 'URL copied to clipboard.';
 $string['panel_url_help'] = 'Share this URL with students so they can access and choose their lab sandbox.';
 $string['parentcategory'] = 'Virtual labs';
-$string['pluginname'] = 'Lab Virtual';
-$string['privacy:metadata'] = 'The Lab Virtual plugin does not store any personal data directly. Course and enrolment records are managed by Moodle core.';
+$string['pluginname'] = 'Virtual Lab';
+$string['privacy:metadata'] = 'The Virtual Lab plugin does not store any personal data directly. Course and enrolment records are managed by Moodle core.';
 $string['reset_lab'] = 'Reset';
 $string['reset_lab_label'] = 'Reset lab: {$a}';
-$string['role_batchmanager'] = 'Lab Virtual batch manager';
-$string['role_batchmanager_desc'] = 'Gives a responsible teacher full management of the courses in their own batch category (edit content, grades and enrolments, without enrolling) plus the Lab Virtual batch tools.';
+$string['role_batchmanager'] = 'Virtual Lab batch manager';
+$string['role_batchmanager_desc'] = 'Gives a responsible teacher full management of the courses in their own batch category (edit content, grades and enrolments, without enrolling) plus the Virtual Lab batch tools.';
 $string['save_batch'] = 'Save batch';
 $string['settings_lifecycle'] = 'Lifecycle';
 $string['settings_lifecycle_action'] = 'Automatic action';
@@ -123,7 +123,7 @@ $string['settings_notify_admin'] = 'Send a copy to the administrator';
 $string['settings_notify_admin_desc'] = 'When enabled, the site administrator also receives a consolidated copy of the lifecycle warning and summary emails.';
 $string['settings_warning_days'] = 'Warning days before action';
 $string['settings_warning_days_desc'] = 'Number of days before the lifecycle action when a warning email is sent to the responsible teacher. Set to 0 to disable warning emails.';
-$string['task_maintenance'] = 'Lab Virtual — lifecycle maintenance';
+$string['task_maintenance'] = 'Virtual Lab — lifecycle maintenance';
 $string['view_course'] = 'View course';
 $string['view_course_label'] = 'View course: {$a}';
 $string['view_panel'] = 'Student panel';

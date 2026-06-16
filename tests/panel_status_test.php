@@ -17,22 +17,22 @@
 /**
  * PHPUnit tests for panel status computation in panel_repository.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
-use local_labvirtual\local\panel_repository;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
+use local_virtuallab\local\panel_repository;
 
 /**
  * Tests for lab status flags, key visibility, and enrol button logic in the student panel.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -107,7 +107,7 @@ final class panel_status_test extends advanced_testcase {
      * A lab that reaches max_teachers_per_lab editors has status_full = true.
      */
     public function test_status_full_at_max_teachers(): void {
-        set_config('max_teachers_per_lab', 2, 'local_labvirtual');
+        set_config('max_teachers_per_lab', 2, 'local_virtuallab');
 
         ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs(1);
 
@@ -128,7 +128,7 @@ final class panel_status_test extends advanced_testcase {
      * A full lab disables the editor enrol button but keeps the visitor button active.
      */
     public function test_full_lab_disables_editor_button_only(): void {
-        set_config('max_teachers_per_lab', 1, 'local_labvirtual');
+        set_config('max_teachers_per_lab', 1, 'local_virtuallab');
 
         ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs(1);
         $this->enrol_as_editor($this->getDataGenerator()->create_user()->id, $courseids[0]);

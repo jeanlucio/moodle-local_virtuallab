@@ -17,16 +17,16 @@
 /**
  * Maintenance service — reset and delete operations for Lab Virtual labs and batches.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
-use local_labvirtual\event\batch_deleted;
-use local_labvirtual\event\course_deleted;
-use local_labvirtual\event\course_reset;
+use local_virtuallab\event\batch_deleted;
+use local_virtuallab\event\course_deleted;
+use local_virtuallab\event\course_reset;
 
 /**
  * Provides reset and delete operations for managed lab courses and batches.
@@ -39,7 +39,7 @@ class maintenance_service {
      * Resets a single lab course: clears all user data and activities,
      * unenrols all users, and updates lastreset timestamp.
      *
-     * @param int $labid   Row ID in local_labvirtual_courses.
+     * @param int $labid   Row ID in local_virtuallab_courses.
      * @param int $batchid Batch the lab must belong to (ownership check).
      * @throws \moodle_exception If lab does not exist or belongs to a different batch.
      */
@@ -49,7 +49,7 @@ class maintenance_service {
         require_once($CFG->dirroot . '/course/lib.php');
 
         $lab = $DB->get_record_sql(
-            "SELECT lc.* FROM {local_labvirtual_courses} lc
+            "SELECT lc.* FROM {local_virtuallab_courses} lc
               WHERE lc.id = :id AND lc.batchid = :batchid",
             ['id' => $labid, 'batchid' => $batchid],
             MUST_EXIST
@@ -59,7 +59,7 @@ class maintenance_service {
         reset_course_userdata($resetdata);
 
         // Clearing lastwarn starts a fresh lifecycle cycle so a new warning is sent next time.
-        $DB->update_record('local_labvirtual_courses', (object) [
+        $DB->update_record('local_virtuallab_courses', (object) [
             'id'        => $labid,
             'lastreset' => time(),
             'lastwarn'  => 0,
@@ -77,7 +77,7 @@ class maintenance_service {
      * Deletes a single lab course: removes enrol instances, deletes the Moodle
      * course and removes the plugin registry row.
      *
-     * @param int $labid   Row ID in local_labvirtual_courses.
+     * @param int $labid   Row ID in local_virtuallab_courses.
      * @param int $batchid Batch the lab must belong to (ownership check).
      * @throws \moodle_exception If lab does not exist or belongs to a different batch.
      */
@@ -85,7 +85,7 @@ class maintenance_service {
         global $DB;
 
         $lab = $DB->get_record_sql(
-            "SELECT lc.* FROM {local_labvirtual_courses} lc
+            "SELECT lc.* FROM {local_virtuallab_courses} lc
               WHERE lc.id = :id AND lc.batchid = :batchid",
             ['id' => $labid, 'batchid' => $batchid],
             MUST_EXIST
@@ -104,9 +104,9 @@ class maintenance_service {
     public function delete_batch(int $batchid): void {
         global $DB;
 
-        $batch = $DB->get_record('local_labvirtual_batches', ['id' => $batchid], 'id, categoryid', MUST_EXIST);
+        $batch = $DB->get_record('local_virtuallab_batches', ['id' => $batchid], 'id, categoryid', MUST_EXIST);
 
-        $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
+        $labs = $DB->get_records('local_virtuallab_courses', ['batchid' => $batchid]);
 
         if ($labs) {
             // Deleting the course also removes its enrolment instances; the loop is
@@ -125,10 +125,10 @@ class maintenance_service {
                 $event->trigger();
             }
 
-            $DB->delete_records('local_labvirtual_courses', ['batchid' => $batchid]);
+            $DB->delete_records('local_virtuallab_courses', ['batchid' => $batchid]);
         }
 
-        $DB->delete_records('local_labvirtual_batches', ['id' => $batchid]);
+        $DB->delete_records('local_virtuallab_batches', ['id' => $batchid]);
 
         // Remove the now-empty batch subcategory (its context and role assignments go with it).
         category_manager::delete_category((int) $batch->categoryid);
@@ -146,7 +146,7 @@ class maintenance_service {
      * Used by delete_batch to avoid redundant lookups when iterating over labs
      * already validated to belong to the batch.
      *
-     * @param \stdClass $lab Row from local_labvirtual_courses.
+     * @param \stdClass $lab Row from local_virtuallab_courses.
      */
     private function do_delete_lab(\stdClass $lab): void {
         global $DB;
@@ -160,7 +160,7 @@ class maintenance_service {
         ]);
 
         delete_course($lab->courseid, false);
-        $DB->delete_records('local_labvirtual_courses', ['id' => $lab->id]);
+        $DB->delete_records('local_virtuallab_courses', ['id' => $lab->id]);
 
         $event->trigger();
     }

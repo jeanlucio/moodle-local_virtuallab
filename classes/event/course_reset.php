@@ -17,12 +17,12 @@
 /**
  * Event fired when a Lab Virtual lab course is reset.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\event;
+namespace local_virtuallab\event;
 
 /**
  * Triggered after a lab course is successfully reset via maintenance_service.
@@ -37,12 +37,12 @@ class course_reset extends \core\event\base {
 
     #[\Override]
     public static function get_name(): string {
-        return get_string('eventcoursereset', 'local_labvirtual');
+        return get_string('eventcoursereset', 'local_virtuallab');
     }
 
     #[\Override]
     public function get_description(): string {
-        return get_string('eventcoursereset_desc', 'local_labvirtual', (object) [
+        return get_string('eventcoursereset_desc', 'local_virtuallab', (object) [
             'courseid' => $this->objectid,
             'batchid'  => $this->other['batchid'],
         ]);

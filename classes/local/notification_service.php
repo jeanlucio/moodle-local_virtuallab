@@ -17,14 +17,14 @@
 /**
  * Notification service — lifecycle warning and summary emails.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
-use local_labvirtual\task\maintenance_task;
+use local_virtuallab\task\maintenance_task;
 
 /**
  * Sends lifecycle-related emails: pre-action warnings and post-action summaries.
@@ -41,7 +41,7 @@ class notification_service {
      * email listing their own labs, and the admin optionally gets a consolidated copy.
      * The caller is responsible for updating the lastwarn timestamp on the warned labs.
      *
-     * @param \stdClass[] $labs       Lab rows (from local_labvirtual_courses) due for a warning.
+     * @param \stdClass[] $labs       Lab rows (from local_virtuallab_courses) due for a warning.
      * @param int         $action     Lifecycle action setting (1 = reset, 2 = delete).
      * @param \DateTime   $cutoffdate Date when the action will be performed.
      */
@@ -67,12 +67,12 @@ class notification_service {
                 continue;
             }
 
-            $subject = get_string('email_warning_subject', 'local_labvirtual', (object) [
+            $subject = get_string('email_warning_subject', 'local_virtuallab', (object) [
                 'action' => $actionlabel,
                 'days'   => $days,
             ]);
 
-            $intro = get_string('email_warning_body', 'local_labvirtual', (object) [
+            $intro = get_string('email_warning_body', 'local_virtuallab', (object) [
                 'action' => $actionlabel,
                 'date'   => $datestr,
             ]);
@@ -85,7 +85,7 @@ class notification_service {
             $html = \html_writer::tag('p', s($intro));
             $html .= $this->render_list($items);
             $html .= $this->link_paragraph(
-                new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]),
+                new \moodle_url('/local/virtuallab/view.php', ['batchid' => $batchid]),
                 'email_panel_link'
             );
 
@@ -100,11 +100,11 @@ class notification_service {
 
         if ($this->notify_admin()) {
             $this->send_admin_copy(
-                get_string('email_warning_subject', 'local_labvirtual', (object) [
+                get_string('email_warning_subject', 'local_virtuallab', (object) [
                     'action' => $actionlabel,
                     'days'   => $days,
                 ]),
-                get_string('email_warning_body', 'local_labvirtual', (object) [
+                get_string('email_warning_body', 'local_virtuallab', (object) [
                     'action' => $actionlabel,
                     'date'   => $datestr,
                 ]),
@@ -140,11 +140,11 @@ class notification_service {
             return;
         }
 
-        $subject = get_string('email_warning_subject', 'local_labvirtual', (object) [
+        $subject = get_string('email_warning_subject', 'local_virtuallab', (object) [
             'action' => $actionlabel,
             'days'   => $days,
         ]);
-        $intro = get_string('email_warning_editor_body', 'local_labvirtual', (object) [
+        $intro = get_string('email_warning_editor_body', 'local_virtuallab', (object) [
             'action' => $actionlabel,
             'date'   => $datestr,
         ]);
@@ -180,8 +180,8 @@ class notification_service {
 
         $teachers = $this->get_teachers_by_batch(array_keys($bybatch));
         $from     = \core_user::get_noreply_user();
-        $subject  = get_string('email_summary_subject', 'local_labvirtual');
-        $intro    = get_string('email_summary_body', 'local_labvirtual');
+        $subject  = get_string('email_summary_subject', 'local_virtuallab');
+        $intro    = get_string('email_summary_body', 'local_virtuallab');
 
         foreach ($bybatch as $batchid => $batchresults) {
             if (empty($teachers[$batchid])) {
@@ -191,7 +191,7 @@ class notification_service {
             $html = \html_writer::tag('p', s($intro));
             $html .= $this->render_list($this->summary_lines($batchresults));
             $html .= $this->link_paragraph(
-                new \moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]),
+                new \moodle_url('/local/virtuallab/view.php', ['batchid' => $batchid]),
                 'email_panel_link'
             );
             $text = html_to_text($html);
@@ -231,7 +231,7 @@ class notification_service {
             return;
         }
 
-        $intro = get_string('email_summary_editor_body', 'local_labvirtual');
+        $intro = get_string('email_summary_editor_body', 'local_virtuallab');
 
         foreach ($byeditor as $entry) {
             $html = \html_writer::tag('p', s($intro)) . $this->render_list($this->summary_lines($entry['results']));
@@ -256,7 +256,7 @@ class notification_service {
         [$insql, $params] = $DB->get_in_or_equal($batchids, SQL_PARAMS_NAMED);
 
         $sql = "SELECT bt.id AS rowid, bt.batchid, u.*
-                  FROM {local_labvirtual_batch_teachers} bt
+                  FROM {local_virtuallab_batch_teachers} bt
                   JOIN {user} u ON u.id = bt.userid
                  WHERE bt.batchid $insql
                    AND u.deleted = 0
@@ -357,7 +357,7 @@ class notification_service {
      * @return bool
      */
     private function notify_admin(): bool {
-        return (bool) get_config('local_labvirtual', 'notify_admin_copy');
+        return (bool) get_config('local_virtuallab', 'notify_admin_copy');
     }
 
     /**
@@ -376,7 +376,7 @@ class notification_service {
 
         $html = \html_writer::tag('p', s($intro))
             . $this->render_list($items)
-            . $this->link_paragraph(new \moodle_url('/local/labvirtual/manage.php'), 'email_manage_link');
+            . $this->link_paragraph(new \moodle_url('/local/virtuallab/manage.php'), 'email_manage_link');
         $text = html_to_text($html);
 
         email_to_user($admin, $from, $subject, $text, $html);
@@ -391,7 +391,7 @@ class notification_service {
     private function action_label(int $action): string {
         $key = $action === maintenance_task::ACTION_DELETE ? 'email_action_delete' : 'email_action_reset';
 
-        return get_string($key, 'local_labvirtual');
+        return get_string($key, 'local_virtuallab');
     }
 
     /**
@@ -404,11 +404,11 @@ class notification_service {
         $lines = [];
         foreach ($results as $result) {
             $verb   = $result['action'] === 'delete'
-                ? get_string('email_action_delete', 'local_labvirtual')
-                : get_string('email_action_reset', 'local_labvirtual');
+                ? get_string('email_action_delete', 'local_virtuallab')
+                : get_string('email_action_reset', 'local_virtuallab');
             $status = $result['ok']
-                ? get_string('email_summary_ok', 'local_labvirtual')
-                : get_string('email_summary_failed', 'local_labvirtual');
+                ? get_string('email_summary_ok', 'local_virtuallab')
+                : get_string('email_summary_failed', 'local_virtuallab');
             $lines[] = "{$result['name']} — {$verb}: {$status}";
         }
 
@@ -423,7 +423,7 @@ class notification_service {
      * @return string HTML markup.
      */
     private function link_paragraph(\moodle_url $url, string $stringkey): string {
-        return \html_writer::tag('p', \html_writer::link($url, get_string($stringkey, 'local_labvirtual')));
+        return \html_writer::tag('p', \html_writer::link($url, get_string($stringkey, 'local_virtuallab')));
     }
 
     /**

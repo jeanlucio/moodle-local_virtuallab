@@ -17,12 +17,12 @@
 /**
  * Privacy provider — null implementation.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\privacy;
+namespace local_virtuallab\privacy;
 
 use core_privacy\local\metadata\null_provider;
 

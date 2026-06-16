@@ -17,21 +17,21 @@
 /**
  * Student self-service panel — choose and access a lab sandbox.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
 
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\batch_settings;
-use local_labvirtual\local\course_registry;
-use local_labvirtual\local\panel_repository;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\batch_settings;
+use local_virtuallab\local\course_registry;
+use local_virtuallab\local\panel_repository;
 
 $batchid = required_param('batchid', PARAM_INT);
 
-$viewurl = new moodle_url('/local/labvirtual/view.php', ['batchid' => $batchid]);
+$viewurl = new moodle_url('/local/virtuallab/view.php', ['batchid' => $batchid]);
 
 require_login();
 
@@ -42,7 +42,7 @@ if (isguestuser()) {
 }
 
 $context = context_system::instance();
-require_capability('local/labvirtual:view', $context);
+require_capability('local/virtuallab:view', $context);
 
 $batchmgr = new batch_manager();
 $batch    = $batchmgr->get_batch($batchid);
@@ -80,14 +80,14 @@ if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $cours
         if (count($editors) >= $maxteachers) {
             redirect(
                 $viewurl,
-                get_string('error_lab_full', 'local_labvirtual'),
+                get_string('error_lab_full', 'local_virtuallab'),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
         }
 
         $editorsql = "SELECT ra.id
-                        FROM {local_labvirtual_courses} lc
+                        FROM {local_virtuallab_courses} lc
                         JOIN {context} ctx ON ctx.instanceid  = lc.courseid
                                          AND ctx.contextlevel = :ctxlevel
                         JOIN {role_assignments} ra ON ra.contextid = ctx.id
@@ -107,7 +107,7 @@ if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $cours
         if ($iseditorelsewhere) {
             redirect(
                 $viewurl,
-                get_string('error_already_editor_in_batch', 'local_labvirtual'),
+                get_string('error_already_editor_in_batch', 'local_virtuallab'),
                 null,
                 \core\output\notification::NOTIFY_ERROR
             );
@@ -133,11 +133,11 @@ $labs       = $repository->get_panel_data($batchid, $USER->id);
 // Only batch managers (admin or the responsible teachers) get the "view course" link;
 // they can open the lab courses without enrolling.
 $canmanage = has_capability(
-    'local/labvirtual:manage',
+    'local/virtuallab:manage',
     context_coursecat::instance($batch->categoryid)
 );
 
-$renderer = $PAGE->get_renderer('local_labvirtual');
+$renderer = $PAGE->get_renderer('local_virtuallab');
 
 echo $OUTPUT->header();
 echo $renderer->render_labs_panel($batch, $teachernames, $labs, $batchid, $canmanage);

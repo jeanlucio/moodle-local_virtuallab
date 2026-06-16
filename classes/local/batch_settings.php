@@ -17,12 +17,12 @@
 /**
  * Resolves the effective lifecycle settings for a batch.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 /**
  * Merges per-batch overrides with the global defaults.
@@ -40,19 +40,19 @@ class batch_settings {
         return (object) [
             'maxteachers'     => self::resolve(
                 $batch->maxteachers ?? null,
-                (int) (get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3)
+                (int) (get_config('local_virtuallab', 'max_teachers_per_lab') ?: 3)
             ),
             'lifecyclemonths' => self::resolve(
                 $batch->lifecyclemonths ?? null,
-                (int) get_config('local_labvirtual', 'lifecycle_months')
+                (int) get_config('local_virtuallab', 'lifecycle_months')
             ),
             'lifecycleaction' => self::resolve(
                 $batch->lifecycleaction ?? null,
-                (int) get_config('local_labvirtual', 'lifecycle_action')
+                (int) get_config('local_virtuallab', 'lifecycle_action')
             ),
             'warningdays'     => self::resolve(
                 $batch->warningdays ?? null,
-                (int) get_config('local_labvirtual', 'warning_days_before')
+                (int) get_config('local_virtuallab', 'warning_days_before')
             ),
         ];
     }

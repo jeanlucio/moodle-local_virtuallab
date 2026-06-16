@@ -17,23 +17,23 @@
 /**
  * Provisions the delegated batch-manager role.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 /**
  * Creates and maintains the role assigned to responsible teachers at their batch category.
  *
- * The role carries local/labvirtual:manage plus the standard "view course without
+ * The role carries local/virtuallab:manage plus the standard "view course without
  * participation" capabilities, so a teacher can manage and inspect the labs of their own
  * batch without being enrolled, while being unable to create courses elsewhere.
  */
 class role_provisioner {
     /** @var string Shortname of the delegated role. */
-    public const ROLE_SHORTNAME = 'labvirtualmanager';
+    public const ROLE_SHORTNAME = 'virtuallabmanager';
 
     /**
      * Ensures the delegated role exists with the right capabilities and context levels.
@@ -54,9 +54,9 @@ class role_provisioner {
         $roleid = (int) $DB->get_field('role', 'id', ['shortname' => self::ROLE_SHORTNAME]);
         if (!$roleid) {
             $roleid = create_role(
-                get_string('role_batchmanager', 'local_labvirtual'),
+                get_string('role_batchmanager', 'local_virtuallab'),
                 self::ROLE_SHORTNAME,
-                get_string('role_batchmanager_desc', 'local_labvirtual'),
+                get_string('role_batchmanager_desc', 'local_virtuallab'),
                 'editingteacher'
             );
         }
@@ -86,9 +86,9 @@ class role_provisioner {
         // On top of editingteacher: enter the courses without enrolling, and manage the batch.
         assign_capability('moodle/course:view', CAP_ALLOW, $roleid, $systemcontext->id, true);
         assign_capability('moodle/course:viewhiddensections', CAP_ALLOW, $roleid, $systemcontext->id, true);
-        assign_capability('local/labvirtual:manage', CAP_ALLOW, $roleid, $systemcontext->id, true);
+        assign_capability('local/virtuallab:manage', CAP_ALLOW, $roleid, $systemcontext->id, true);
 
-        set_config('managerroleid', $roleid, 'local_labvirtual');
+        set_config('managerroleid', $roleid, 'local_virtuallab');
 
         return $roleid;
     }
@@ -101,7 +101,7 @@ class role_provisioner {
     public static function get_role_id(): int {
         global $DB;
 
-        $roleid = (int) get_config('local_labvirtual', 'managerroleid');
+        $roleid = (int) get_config('local_virtuallab', 'managerroleid');
         if ($roleid && $DB->record_exists('role', ['id' => $roleid])) {
             return $roleid;
         }

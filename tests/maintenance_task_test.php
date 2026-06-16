@@ -17,22 +17,22 @@
 /**
  * PHPUnit tests for maintenance_task.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
-use local_labvirtual\task\maintenance_task;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
+use local_virtuallab\task\maintenance_task;
 
 /**
  * Tests for the lifecycle scheduled task: disabled states, reset, delete, and date logic.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -69,7 +69,7 @@ final class maintenance_task_test extends advanced_testcase {
     private function backdate_labs(int $batchid, int $months): void {
         global $DB;
         $past = mktime(0, 0, 0, (int)date('n') - $months, (int)date('j'), (int)date('Y'));
-        $DB->set_field('local_labvirtual_courses', 'timecreated', $past, ['batchid' => $batchid]);
+        $DB->set_field('local_virtuallab_courses', 'timecreated', $past, ['batchid' => $batchid]);
     }
 
     /**
@@ -87,15 +87,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_does_nothing_when_months_zero(): void {
         global $DB;
 
-        set_config('lifecycle_months', 0, 'local_labvirtual');
-        set_config('lifecycle_action', 1, 'local_labvirtual');
+        set_config('lifecycle_months', 0, 'local_virtuallab');
+        set_config('lifecycle_action', 1, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 12);
 
         $this->run_task();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertEquals(0, (int) $lab->lastreset);
     }
 
@@ -105,15 +105,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_does_nothing_when_action_zero(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', 0, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', 0, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 12);
 
         $this->run_task();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertEquals(0, (int) $lab->lastreset);
     }
 
@@ -123,15 +123,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_uses_per_batch_override(): void {
         global $DB;
 
-        set_config('lifecycle_months', 0, 'local_labvirtual');
-        set_config('lifecycle_action', 0, 'local_labvirtual');
+        set_config('lifecycle_months', 0, 'local_virtuallab');
+        set_config('lifecycle_action', 0, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 7);
 
-        $DB->set_field('local_labvirtual_batches', 'lifecyclemonths', 6, ['id' => $batchid]);
+        $DB->set_field('local_virtuallab_batches', 'lifecyclemonths', 6, ['id' => $batchid]);
         $DB->set_field(
-            'local_labvirtual_batches',
+            'local_virtuallab_batches',
             'lifecycleaction',
             maintenance_task::ACTION_RESET,
             ['id' => $batchid]
@@ -139,7 +139,7 @@ final class maintenance_task_test extends advanced_testcase {
 
         $this->run_task();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertGreaterThan(0, (int) $lab->lastreset, 'The per-batch override should trigger the reset.');
     }
 
@@ -149,15 +149,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_resets_overdue_lab(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
 
         ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 7);
 
         $this->run_task();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertGreaterThan(0, (int) $lab->lastreset, 'lastreset should have been updated.');
         $this->assertTrue($DB->record_exists('course', ['id' => $courseids[0]]), 'Course should still exist after reset.');
     }
@@ -168,15 +168,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_deletes_overdue_lab(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_DELETE, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_DELETE, 'local_virtuallab');
 
         ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 7);
 
         $this->run_task();
 
-        $this->assertFalse($DB->record_exists('local_labvirtual_courses', ['batchid' => $batchid]));
+        $this->assertFalse($DB->record_exists('local_virtuallab_courses', ['batchid' => $batchid]));
         $this->assertFalse($DB->record_exists('course', ['id' => $courseids[0]]));
     }
 
@@ -186,15 +186,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_skips_recent_lab(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         // No backdating: timecreated is now, which is within the 6-month window.
 
         $this->run_task();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertEquals(0, (int) $lab->lastreset, 'Recent lab should not have been reset.');
     }
 
@@ -205,18 +205,18 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_uses_lastreset_over_timecreated(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 12);
 
         $recentreset = time() - DAYSECS;
-        $DB->set_field('local_labvirtual_courses', 'lastreset', $recentreset, ['batchid' => $batchid]);
+        $DB->set_field('local_virtuallab_courses', 'lastreset', $recentreset, ['batchid' => $batchid]);
 
         $this->run_task();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertEquals($recentreset, (int) $lab->lastreset, 'lastreset should not have changed.');
     }
 
@@ -227,9 +227,9 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_warns_lab_in_window(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
-        set_config('warning_days_before', 7, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
+        set_config('warning_days_before', 7, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         // Backdating exactly 6 months places the reference date at the cutoff: warned, not yet overdue.
@@ -240,7 +240,7 @@ final class maintenance_task_test extends advanced_testcase {
         $messages = $sink->get_messages();
         $sink->close();
 
-        $lab = $DB->get_record('local_labvirtual_courses', ['batchid' => $batchid]);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertGreaterThan(0, (int) $lab->lastwarn, 'lastwarn should have been set.');
         $this->assertEquals(0, (int) $lab->lastreset, 'Lab in the warning window should not be reset.');
         $this->assertGreaterThanOrEqual(1, count($messages), 'A warning email should have been sent.');
@@ -252,13 +252,13 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_does_not_rewarn(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
-        set_config('warning_days_before', 7, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
+        set_config('warning_days_before', 7, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs();
         $this->backdate_labs($batchid, 6);
-        $DB->set_field('local_labvirtual_courses', 'lastwarn', time() - DAYSECS, ['batchid' => $batchid]);
+        $DB->set_field('local_virtuallab_courses', 'lastwarn', time() - DAYSECS, ['batchid' => $batchid]);
 
         $sink = $this->redirectEmails();
         $this->run_task();
@@ -274,15 +274,15 @@ final class maintenance_task_test extends advanced_testcase {
     public function test_execute_processes_all_overdue_labs(): void {
         global $DB;
 
-        set_config('lifecycle_months', 6, 'local_labvirtual');
-        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_labvirtual');
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
 
         ['batchid' => $batchid] = $this->create_batch_with_labs(3);
         $this->backdate_labs($batchid, 7);
 
         $this->run_task();
 
-        $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
+        $labs = $DB->get_records('local_virtuallab_courses', ['batchid' => $batchid]);
         $this->assertCount(3, $labs);
         foreach ($labs as $lab) {
             $this->assertGreaterThan(0, (int) $lab->lastreset, "Lab $lab->id should have been reset.");

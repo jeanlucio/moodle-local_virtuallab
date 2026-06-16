@@ -17,12 +17,12 @@
 /**
  * Form for creating a new Lab Virtual batch (turma).
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\form;
+namespace local_virtuallab\form;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -39,7 +39,7 @@ class create_batch_form extends \moodleform {
         $mform->addElement(
             'text',
             'name',
-            get_string('batch_name', 'local_labvirtual'),
+            get_string('batch_name', 'local_virtuallab'),
             ['size' => 60, 'maxlength' => 255]
         );
         $mform->setType('name', PARAM_TEXT);
@@ -53,12 +53,12 @@ class create_batch_form extends \moodleform {
         $mform->addElement(
             'autocomplete',
             'teacherids',
-            get_string('batch_teacher', 'local_labvirtual'),
+            get_string('batch_teacher', 'local_virtuallab'),
             [],
             $options
         );
         $mform->addRule('teacherids', null, 'required', null, 'client');
 
-        $this->add_action_buttons(false, get_string('create_batch', 'local_labvirtual'));
+        $this->add_action_buttons(false, get_string('create_batch', 'local_virtuallab'));
     }
 }

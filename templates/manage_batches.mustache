@@ -1,7 +1,7 @@
 {{!
-    @template local_labvirtual/manage_batches
+    @template local_virtuallab/manage_batches
 
-    List of Lab Virtual batches for the admin management page.
+    List of Virtual Lab batches for the admin management page.
 
     Example context (json):
     {
@@ -12,23 +12,23 @@
                 "teachername": "Jean Lúcio",
                 "categoryname": "Disciplinas EAD",
                 "labcount": 5,
-                "manageurl": "/local/labvirtual/manage.php?batchid=1",
-                "deleteurl": "/local/labvirtual/manage.php?action=deletebatch&targetbatchid=1",
+                "manageurl": "/local/virtuallab/manage.php?batchid=1",
+                "deleteurl": "/local/virtuallab/manage.php?action=deletebatch&targetbatchid=1",
                 "deletelabel": "Delete batch: Projeto de Interface 2026/1"
             }
         ],
         "hasbatches": true,
         "cancreate": true,
-        "createurl": "/local/labvirtual/manage.php?action=createbatch"
+        "createurl": "/local/virtuallab/manage.php?action=createbatch"
     }
 }}
-<div class="local-labvirtual-manage-batches">
+<div class="local-virtuallab-manage-batches">
     {{#hasbatches}}
     <div class="mb-3 d-flex justify-content-end">
         {{#cancreate}}
         <a href="{{createurl}}" class="btn btn-primary">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
-            {{#str}} create_batch, local_labvirtual {{/str}}
+            {{#str}} create_batch, local_virtuallab {{/str}}
         </a>
         {{/cancreate}}
     </div>
@@ -36,9 +36,9 @@
         <table class="table table-hover table-striped">
             <thead>
                 <tr>
-                    <th scope="col">{{#str}} batch_name, local_labvirtual {{/str}}</th>
-                    <th scope="col">{{#str}} batch_teacher, local_labvirtual {{/str}}</th>
-                    <th scope="col">{{#str}} batch_category, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} batch_name, local_virtuallab {{/str}}</th>
+                    <th scope="col">{{#str}} batch_teacher, local_virtuallab {{/str}}</th>
+                    <th scope="col">{{#str}} batch_category, local_virtuallab {{/str}}</th>
                     <th scope="col">Labs</th>
                     <th scope="col" aria-label="{{#str}} actions, core {{/str}}"></th>
                 </tr>
@@ -52,13 +52,13 @@
                     <td>{{labcount}}</td>
                     <td class="text-end text-nowrap">
                         <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary me-1">
-                            {{#str}} manage_labs, local_labvirtual, {{name}} {{/str}}
+                            {{#str}} manage_labs, local_virtuallab, {{name}} {{/str}}
                         </a>
                         <a href="{{deleteurl}}"
                            class="btn btn-sm btn-outline-danger"
                            aria-label="{{deletelabel}}">
                             <i class="fa fa-trash" aria-hidden="true"></i>
-                            {{#str}} delete_batch, local_labvirtual {{/str}}
+                            {{#str}} delete_batch, local_virtuallab {{/str}}
                         </a>
                     </td>
                 </tr>
@@ -69,11 +69,11 @@
     {{/hasbatches}}
     {{^hasbatches}}
     <div class="text-center py-5">
-        <p class="text-body-secondary mb-3">{{#str}} nobatches, local_labvirtual {{/str}}</p>
+        <p class="text-body-secondary mb-3">{{#str}} nobatches, local_virtuallab {{/str}}</p>
         {{#cancreate}}
         <a href="{{createurl}}" class="btn btn-primary">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
-            {{#str}} create_batch, local_labvirtual {{/str}}
+            {{#str}} create_batch, local_virtuallab {{/str}}
         </a>
         {{/cancreate}}
     </div>

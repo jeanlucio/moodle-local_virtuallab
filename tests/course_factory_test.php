@@ -17,21 +17,21 @@
 /**
  * PHPUnit tests for course_factory.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
 
 /**
  * Tests for bulk lab creation: courses, enrolment instances and registry rows.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -68,7 +68,7 @@ final class course_factory_test extends advanced_testcase {
         $courseids  = $factory->create_labs($batchid, 3);
 
         $this->assertCount(3, $courseids);
-        $this->assertEquals(3, $DB->count_records('local_labvirtual_courses', ['batchid' => $batchid]));
+        $this->assertEquals(3, $DB->count_records('local_virtuallab_courses', ['batchid' => $batchid]));
 
         foreach ($courseids as $courseid) {
             $this->assertTrue($DB->record_exists('course', ['id' => $courseid]));
@@ -87,7 +87,7 @@ final class course_factory_test extends advanced_testcase {
         $courseids = $factory->create_labs($batchid, 2);
 
         foreach ($courseids as $courseid) {
-            $lab    = $DB->get_record('local_labvirtual_courses', ['courseid' => $courseid]);
+            $lab    = $DB->get_record('local_virtuallab_courses', ['courseid' => $courseid]);
             $manual = $DB->get_record('enrol', ['id' => $lab->enrolid], '*', MUST_EXIST);
 
             $this->assertSame('manual', $manual->enrol);
@@ -112,7 +112,7 @@ final class course_factory_test extends advanced_testcase {
 
         foreach ($courseids as $courseid) {
             $this->assertTrue(
-                $DB->record_exists('local_labvirtual_courses', ['batchid' => $batchid, 'courseid' => $courseid])
+                $DB->record_exists('local_virtuallab_courses', ['batchid' => $batchid, 'courseid' => $courseid])
             );
         }
     }

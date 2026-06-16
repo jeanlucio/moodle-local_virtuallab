@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for local_labvirtual.
+ * Capability definitions for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,14 +25,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'local/labvirtual:manage' => [
+    'local/virtuallab:manage' => [
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSECAT,
         'archetypes'   => [
             'manager' => CAP_ALLOW,
         ],
     ],
-    'local/labvirtual:view' => [
+    'local/virtuallab:view' => [
         'captype'      => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes'   => [

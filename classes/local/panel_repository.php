@@ -17,12 +17,12 @@
 /**
  * Panel repository — bulk query for the student lab-selection panel.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\local;
+namespace local_virtuallab\local;
 
 /**
  * Fetches all panel data for a batch in a single JOIN query, aggregating in PHP.
@@ -39,7 +39,7 @@ class panel_repository {
      */
     public function __construct() {
         global $DB;
-        $this->maxteachers   = (int) get_config('local_labvirtual', 'max_teachers_per_lab') ?: 3;
+        $this->maxteachers   = (int) get_config('local_virtuallab', 'max_teachers_per_lab') ?: 3;
         $this->teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
     }
 
@@ -66,7 +66,7 @@ class panel_repository {
                        u.lastnamephonetic,
                        u.middlename,
                        u.alternatename
-                  FROM {local_labvirtual_courses} lc
+                  FROM {local_virtuallab_courses} lc
                   JOIN {course} c    ON c.id    = lc.courseid
              LEFT JOIN {context} ctx ON ctx.instanceid   = lc.courseid
                                     AND ctx.contextlevel  = :contextlevel
@@ -105,7 +105,7 @@ class panel_repository {
         global $DB;
 
         $sql = "SELECT ra.id, lc.courseid, ra.roleid
-                  FROM {local_labvirtual_courses} lc
+                  FROM {local_virtuallab_courses} lc
                   JOIN {context} ctx ON ctx.instanceid  = lc.courseid
                                     AND ctx.contextlevel = :contextlevel
                   JOIN {role_assignments} ra ON ra.contextid = ctx.id
@@ -204,11 +204,11 @@ class panel_repository {
      */
     private function status_label(array $lab): string {
         if ($lab['status_full']) {
-            return get_string('lab_full', 'local_labvirtual');
+            return get_string('lab_full', 'local_virtuallab');
         }
         if ($lab['status_in_use']) {
-            return get_string('lab_in_use', 'local_labvirtual');
+            return get_string('lab_in_use', 'local_virtuallab');
         }
-        return get_string('lab_available', 'local_labvirtual');
+        return get_string('lab_available', 'local_virtuallab');
     }
 }

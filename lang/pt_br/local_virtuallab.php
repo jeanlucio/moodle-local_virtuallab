@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Brazilian Portuguese language strings for local_labvirtual.
+ * Brazilian Portuguese language strings for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -91,8 +91,8 @@ $string['lab_reset'] = 'Laboratório resetado com sucesso.';
 $string['labs_bulk_deleted'] = '{$a} laboratório(s) excluído(s) com sucesso.';
 $string['labs_bulk_reset'] = '{$a} laboratório(s) resetado(s) com sucesso.';
 $string['labs_created'] = '{$a} laboratório(s) criado(s) com sucesso.';
-$string['labvirtual:manage'] = 'Gerenciar Lab Virtual (criar turmas e laboratórios, resetar, excluir)';
-$string['labvirtual:view'] = 'Visualizar painel de estudantes do Lab Virtual';
+$string['virtuallab:manage'] = 'Gerenciar Lab Virtual (criar turmas e laboratórios, resetar, excluir)';
+$string['virtuallab:view'] = 'Visualizar painel de estudantes do Lab Virtual';
 $string['lastreset'] = 'Último reset';
 $string['manage_batches'] = 'Gerenciar Lab Virtual';
 $string['manage_labs'] = 'Gerenciar laboratórios — {$a}';

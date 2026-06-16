@@ -17,14 +17,14 @@
 /**
  * Plugin version definition.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_labvirtual';
+$plugin->component = 'local_virtuallab';
 $plugin->version   = 2026061600;
 $plugin->requires  = 2024100700; // Moodle 4.5+.
 $plugin->supported = [405, 502];

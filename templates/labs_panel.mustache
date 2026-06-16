@@ -1,5 +1,5 @@
 {{!
-    @template local_labvirtual/labs_panel
+    @template local_virtuallab/labs_panel
 
     Student self-service panel for choosing a lab sandbox within a batch.
 
@@ -10,7 +10,7 @@
         "batchid": 1,
         "canmanage": true,
         "sesskey": "abc123",
-        "viewurl": "/local/labvirtual/view.php?batchid=1",
+        "viewurl": "/local/virtuallab/view.php?batchid=1",
         "haslabs": true,
         "labs": [
             {
@@ -32,7 +32,7 @@
         ]
     }
 }}
-<div class="local-labvirtual-panel">
+<div class="local-virtuallab-panel">
     <div class="page-header mb-4">
         <p class="mb-1">
             <i class="fa fa-user-tie me-1" aria-hidden="true"></i>
@@ -47,11 +47,11 @@
                 <tr>
                     <th scope="col">Ambiente</th>
                     <th scope="col">Status</th>
-                    <th scope="col">{{#str}} currenteditors, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} currenteditors, local_virtuallab {{/str}}</th>
                     {{#canmanage}}
-                    <th scope="col">{{#str}} view_course, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} view_course, local_virtuallab {{/str}}</th>
                     {{/canmanage}}
-                    <th scope="col">{{#str}} enrol_join, local_labvirtual {{/str}}</th>
+                    <th scope="col">{{#str}} enrol_join, local_virtuallab {{/str}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,16 +75,16 @@
                     <td>
                         <a href="{{courseurl}}"
                            class="btn btn-sm btn-outline-secondary"
-                           aria-label="{{#str}} view_course_label, local_labvirtual, {{coursename}} {{/str}}">
+                           aria-label="{{#str}} view_course_label, local_virtuallab, {{coursename}} {{/str}}">
                             <i class="fa fa-eye me-1" aria-hidden="true"></i>
-                            {{#str}} view_course, local_labvirtual {{/str}}
+                            {{#str}} view_course, local_virtuallab {{/str}}
                         </a>
                     </td>
                     {{/canmanage}}
                     <td class="text-nowrap">
                         {{#user_enrolled_here}}
                         <span class="badge bg-secondary lv-badge-enrolled">
-                            {{#str}} already_enrolled, local_labvirtual {{/str}}
+                            {{#str}} already_enrolled, local_virtuallab {{/str}}
                         </span>
                         {{/user_enrolled_here}}
                         {{^user_enrolled_here}}
@@ -97,7 +97,7 @@
                             <input type="hidden" name="sesskey" value="{{sesskey}}">
                             <button type="submit"
                                     class="btn btn-sm btn-primary me-1"
-                                    aria-label="{{#str}} access_as_editor, local_labvirtual, {{coursename}} {{/str}}">
+                                    aria-label="{{#str}} access_as_editor, local_virtuallab, {{coursename}} {{/str}}">
                                 Editor
                             </button>
                         </form>
@@ -106,7 +106,7 @@
                         <button type="button"
                                 class="btn btn-sm btn-primary me-1"
                                 disabled
-                                aria-label="{{#str}} lab_full, local_labvirtual {{/str}}">
+                                aria-label="{{#str}} lab_full, local_virtuallab {{/str}}">
                             Editor
                         </button>
                         {{/can_enrol_editor}}
@@ -118,7 +118,7 @@
                             <input type="hidden" name="sesskey" value="{{sesskey}}">
                             <button type="submit"
                                     class="btn btn-sm btn-outline-secondary"
-                                    aria-label="{{#str}} access_as_visitor, local_labvirtual, {{coursename}} {{/str}}">
+                                    aria-label="{{#str}} access_as_visitor, local_virtuallab, {{coursename}} {{/str}}">
                                 Visitante
                             </button>
                         </form>
@@ -131,6 +131,6 @@
     </div>
     {{/haslabs}}
     {{^haslabs}}
-    <p class="text-body-secondary">{{#str}} nolabs, local_labvirtual {{/str}}</p>
+    <p class="text-body-secondary">{{#str}} nolabs, local_virtuallab {{/str}}</p>
     {{/haslabs}}
 </div>

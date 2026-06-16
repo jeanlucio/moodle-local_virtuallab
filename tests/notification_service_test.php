@@ -17,23 +17,23 @@
 /**
  * PHPUnit tests for notification_service.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use advanced_testcase;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_factory;
-use local_labvirtual\local\notification_service;
-use local_labvirtual\task\maintenance_task;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_factory;
+use local_virtuallab\local\notification_service;
+use local_virtuallab\task\maintenance_task;
 
 /**
  * Tests the lifecycle warning and summary email service.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
@@ -60,7 +60,7 @@ final class notification_service_test extends advanced_testcase {
         $batchid  = $mgr->create_batch('Notif Test Batch', [$teacher->id], 'Lab');
         $factory  = new course_factory();
         $factory->create_labs($batchid, $labcount);
-        $labs = $DB->get_records('local_labvirtual_courses', ['batchid' => $batchid]);
+        $labs = $DB->get_records('local_virtuallab_courses', ['batchid' => $batchid]);
 
         return ['teacher' => $teacher, 'batchid' => $batchid, 'labs' => $labs];
     }
@@ -114,7 +114,7 @@ final class notification_service_test extends advanced_testcase {
      * send_summary copies the administrator when notify_admin_copy is enabled.
      */
     public function test_send_summary_emails_teacher_and_admin(): void {
-        set_config('notify_admin_copy', 1, 'local_labvirtual');
+        set_config('notify_admin_copy', 1, 'local_virtuallab');
 
         ['teacher' => $teacher, 'labs' => $labs] = $this->create_batch_with_labs();
 

@@ -1,4 +1,4 @@
-@local @local_labvirtual
+@local @local_virtuallab
 Feature: Lab Virtual student panel
   In order to choose and access a lab sandbox
   As a student

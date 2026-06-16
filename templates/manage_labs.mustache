@@ -1,5 +1,5 @@
 {{!
-    @template local_labvirtual/manage_labs
+    @template local_virtuallab/manage_labs
 
     List of labs within a batch for the admin management page.
     Includes per-row reset/delete actions and a bulk action form.
@@ -8,7 +8,7 @@
     {
         "batchname": "Projeto de Interface 2026/1",
         "batchid": 1,
-        "manageurl": "/local/labvirtual/manage.php",
+        "manageurl": "/local/virtuallab/manage.php",
         "labs": [
             {
                 "id": 1,
@@ -16,44 +16,44 @@
                 "shortname": "lab-ead-b1-lab01",
                 "courseurl": "/course/view.php?id=42",
                 "lastreset": "—",
-                "reseturl": "/local/labvirtual/manage.php?batchid=1&action=resetlab&labid=1",
-                "deleteurl": "/local/labvirtual/manage.php?batchid=1&action=deletelab&labid=1",
+                "reseturl": "/local/virtuallab/manage.php?batchid=1&action=resetlab&labid=1",
+                "deleteurl": "/local/virtuallab/manage.php?batchid=1&action=deletelab&labid=1",
                 "resetlabel": "Reset lab: Lab EAD 01",
                 "deletelabel": "Delete lab: Lab EAD 01"
             }
         ],
         "haslabs": true,
-        "panelurl": "https://moodle.example.com/local/labvirtual/view.php?batchid=1",
-        "createurl": "/local/labvirtual/manage.php?batchid=1&action=createlabs",
-        "editurl": "/local/labvirtual/manage.php?batchid=1&action=editbatch",
+        "panelurl": "https://moodle.example.com/local/virtuallab/view.php?batchid=1",
+        "createurl": "/local/virtuallab/manage.php?batchid=1&action=createlabs",
+        "editurl": "/local/virtuallab/manage.php?batchid=1&action=editbatch",
         "sesskey": "abc123",
         "strpanelhelp": "Share this URL with students..."
     }
 }}
-<div class="local-labvirtual-manage-labs">
+<div class="local-virtuallab-manage-labs">
     <div class="card mb-4 border-primary">
         <div class="card-header bg-primary text-white">
             <i class="fa fa-link me-1" aria-hidden="true"></i>
-            {{#str}} panel_url, local_labvirtual {{/str}}
+            {{#str}} panel_url, local_virtuallab {{/str}}
         </div>
         <div class="card-body">
             <p class="text-body-secondary small mb-2">{{strpanelhelp}}</p>
             <div class="input-group">
                 <input type="text"
-                       id="local-labvirtual-panel-url"
+                       id="local-virtuallab-panel-url"
                        class="form-control"
                        readonly
                        value="{{panelurl}}"
-                       aria-label="{{#str}} panel_url, local_labvirtual {{/str}}">
+                       aria-label="{{#str}} panel_url, local_virtuallab {{/str}}">
                 <button class="btn btn-outline-secondary"
                         type="button"
-                        id="local-labvirtual-copy-link"
+                        id="local-virtuallab-copy-link"
                         data-action="copytoclipboard"
-                        data-clipboard-target="#local-labvirtual-panel-url"
-                        data-clipboard-success-message="{{#str}} panel_url_copied, local_labvirtual {{/str}}"
-                        aria-label="{{#str}} copy_panel_link, local_labvirtual {{/str}}">
+                        data-clipboard-target="#local-virtuallab-panel-url"
+                        data-clipboard-success-message="{{#str}} panel_url_copied, local_virtuallab {{/str}}"
+                        aria-label="{{#str}} copy_panel_link, local_virtuallab {{/str}}">
                     <i class="fa fa-clipboard" aria-hidden="true"></i>
-                    {{#str}} copy_panel_link, local_labvirtual {{/str}}
+                    {{#str}} copy_panel_link, local_virtuallab {{/str}}
                 </button>
             </div>
         </div>
@@ -63,19 +63,19 @@
         {{#editurl}}
         <a href="{{editurl}}" class="btn btn-outline-secondary me-2">
             <i class="fa fa-pen me-1" aria-hidden="true"></i>
-            {{#str}} edit_batch, local_labvirtual {{/str}}
+            {{#str}} edit_batch, local_virtuallab {{/str}}
         </a>
         {{/editurl}}
         {{#haslabs}}
         <a href="{{createurl}}" class="btn btn-success">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
-            {{#str}} create_labs, local_labvirtual {{/str}}
+            {{#str}} create_labs, local_virtuallab {{/str}}
         </a>
         {{/haslabs}}
     </div>
 
     {{#haslabs}}
-    <form id="local-labvirtual-bulk-form"
+    <form id="local-virtuallab-bulk-form"
           method="post"
           action="{{manageurl}}">
         <input type="hidden" name="batchid" value="{{batchid}}">
@@ -85,9 +85,9 @@
             <table class="table table-hover table-striped">
                 <thead>
                     <tr>
-                        <th scope="col" class="text-center local-labvirtual-select-col">
+                        <th scope="col" class="text-center local-virtuallab-select-col">
                             <input type="checkbox"
-                                   id="local-labvirtual-selectall"
+                                   id="local-virtuallab-selectall"
                                    data-action="toggle"
                                    data-togglegroup="labs-select"
                                    data-toggle="master"
@@ -95,7 +95,7 @@
                         </th>
                         <th scope="col">Lab</th>
                         <th scope="col">Shortname</th>
-                        <th scope="col">{{#str}} lastreset, local_labvirtual {{/str}}</th>
+                        <th scope="col">{{#str}} lastreset, local_virtuallab {{/str}}</th>
                         <th scope="col" class="text-end"
                             aria-label="{{#str}} actions, core {{/str}}"></th>
                     </tr>
@@ -105,7 +105,7 @@
                     <tr>
                         <td class="text-center">
                             <input type="checkbox"
-                                   class="local-labvirtual-lab-checkbox"
+                                   class="local-virtuallab-lab-checkbox"
                                    name="labids[]"
                                    value="{{id}}"
                                    data-action="toggle"
@@ -123,13 +123,13 @@
                                class="btn btn-sm btn-outline-warning me-1"
                                aria-label="{{resetlabel}}">
                                 <i class="fa fa-rotate-right" aria-hidden="true"></i>
-                                {{#str}} reset_lab, local_labvirtual {{/str}}
+                                {{#str}} reset_lab, local_virtuallab {{/str}}
                             </a>
                             <a href="{{deleteurl}}"
                                class="btn btn-sm btn-outline-danger"
                                aria-label="{{deletelabel}}">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
-                                {{#str}} delete_lab, local_labvirtual {{/str}}
+                                {{#str}} delete_lab, local_virtuallab {{/str}}
                             </a>
                         </td>
                     </tr>
@@ -138,16 +138,16 @@
             </table>
         </div>
 
-        <div class="d-flex align-items-center local-labvirtual-bulk-actions mt-2">
-            <label for="local-labvirtual-bulkaction" class="mb-0 text-nowrap">
-                {{#str}} bulk_action, local_labvirtual {{/str}}:
+        <div class="d-flex align-items-center local-virtuallab-bulk-actions mt-2">
+            <label for="local-virtuallab-bulkaction" class="mb-0 text-nowrap">
+                {{#str}} bulk_action, local_virtuallab {{/str}}:
             </label>
-            <select id="local-labvirtual-bulkaction"
+            <select id="local-virtuallab-bulkaction"
                     name="bulkaction"
-                    class="form-select form-select-sm local-labvirtual-bulk-select">
+                    class="form-select form-select-sm local-virtuallab-bulk-select">
                 <option value="">—</option>
-                <option value="reset">{{#str}} bulk_action_reset, local_labvirtual {{/str}}</option>
-                <option value="delete">{{#str}} bulk_action_delete, local_labvirtual {{/str}}</option>
+                <option value="reset">{{#str}} bulk_action_reset, local_virtuallab {{/str}}</option>
+                <option value="delete">{{#str}} bulk_action_delete, local_virtuallab {{/str}}</option>
             </select>
             <button type="submit" class="btn btn-sm btn-secondary">
                 {{#str}} go, core {{/str}}
@@ -157,10 +157,10 @@
     {{/haslabs}}
     {{^haslabs}}
     <div class="text-center py-5">
-        <p class="text-body-secondary mb-3">{{#str}} nolabs, local_labvirtual {{/str}}</p>
+        <p class="text-body-secondary mb-3">{{#str}} nolabs, local_virtuallab {{/str}}</p>
         <a href="{{createurl}}" class="btn btn-success">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
-            {{#str}} create_labs, local_labvirtual {{/str}}
+            {{#str}} create_labs, local_virtuallab {{/str}}
         </a>
     </div>
     {{/haslabs}}

@@ -17,12 +17,12 @@
 /**
  * Event fired when a Lab Virtual lab course is deleted.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual\event;
+namespace local_virtuallab\event;
 
 /**
  * Triggered after a lab course is permanently deleted via maintenance_service.
@@ -35,17 +35,17 @@ class course_deleted extends \core\event\base {
     protected function init(): void {
         $this->data['crud']        = 'd';
         $this->data['edulevel']    = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'local_labvirtual_courses';
+        $this->data['objecttable'] = 'local_virtuallab_courses';
     }
 
     #[\Override]
     public static function get_name(): string {
-        return get_string('eventcoursedeleted', 'local_labvirtual');
+        return get_string('eventcoursedeleted', 'local_virtuallab');
     }
 
     #[\Override]
     public function get_description(): string {
-        return get_string('eventcoursedeleted_desc', 'local_labvirtual', (object) [
+        return get_string('eventcoursedeleted_desc', 'local_virtuallab', (object) [
             'courseid' => $this->other['courseid'],
             'batchid'  => $this->other['batchid'],
         ]);
@@ -53,6 +53,6 @@ class course_deleted extends \core\event\base {
 
     #[\Override]
     public function get_url(): \moodle_url {
-        return new \moodle_url('/local/labvirtual/manage.php', ['batchid' => $this->other['batchid']]);
+        return new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $this->other['batchid']]);
     }
 }

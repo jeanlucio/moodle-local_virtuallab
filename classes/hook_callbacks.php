@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Hook callbacks for local_labvirtual.
+ * Hook callbacks for local_virtuallab.
  *
- * @package    local_labvirtual
+ * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_labvirtual;
+namespace local_virtuallab;
 
 use core\hook\output\before_standard_top_of_body_html_generation;
-use local_labvirtual\local\batch_manager;
-use local_labvirtual\local\course_registry;
+use local_virtuallab\local\batch_manager;
+use local_virtuallab\local\course_registry;
 
 /**
  * Hook callbacks.
@@ -63,7 +63,7 @@ class hook_callbacks {
             return;
         }
 
-        $batchid = $DB->get_field('local_labvirtual_courses', 'batchid', ['courseid' => $courseid]);
+        $batchid = $DB->get_field('local_virtuallab_courses', 'batchid', ['courseid' => $courseid]);
         if (!$batchid) {
             return;
         }
@@ -74,7 +74,7 @@ class hook_callbacks {
         }
 
         $names   = implode(', ', array_map(fn($teacher) => fullname($teacher), $teachers));
-        $message = get_string('access_via_teacher', 'local_labvirtual', $names);
+        $message = get_string('access_via_teacher', 'local_virtuallab', $names);
 
         $hook->add_html($OUTPUT->notification($message, \core\output\notification::NOTIFY_INFO));
     }
