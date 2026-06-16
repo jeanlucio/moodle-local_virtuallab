@@ -27,6 +27,7 @@
                 "status_full": false,
                 "statuslabel": "Disponível",
                 "editorcount": 0,
+                "slotsleft_label": "2 vagas",
                 "editors": []
             }
         ]
@@ -58,10 +59,13 @@
                 {{#labs}}
                 <tr>
                     <td><strong>{{coursename}}</strong></td>
-                    <td>
+                    <td class="text-nowrap">
                         <span class="badge {{#status_available}}bg-success{{/status_available}}{{#status_in_use}}bg-warning text-dark{{/status_in_use}}{{#status_full}}bg-danger{{/status_full}}">
                             {{statuslabel}}
                         </span>
+                        {{#slotsleft_label}}
+                        <span class="badge lv-badge-slots ms-1">{{slotsleft_label}}</span>
+                        {{/slotsleft_label}}
                     </td>
                     <td>
                         {{#editors}}

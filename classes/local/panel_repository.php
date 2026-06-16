@@ -189,11 +189,33 @@ class panel_repository {
                 && !$lab['user_is_editor_anywhere'];
             $lab['can_enrol_visitor'] = !$lab['user_enrolled_here'];
             $lab['statuslabel']       = $this->status_label($lab);
+            $lab['slotsleft_label']   = $lab['status_in_use']
+                ? $this->slots_left_label($this->maxteachers - $editorcount)
+                : '';
 
             $result[] = $lab;
         }
 
         return $result;
+    }
+
+    /**
+     * Returns the localized status label for a lab.
+     *
+     * @param array $lab Lab data array with status flags.
+     * @return string Localized status string.
+     */
+    /**
+     * Returns the localized "X vagas" label for the remaining editor slots.
+     *
+     * @param int $count Number of remaining slots.
+     * @return string Localized label.
+     */
+    private function slots_left_label(int $count): string {
+        if ($count === 1) {
+            return get_string('lab_slots_left_one', 'local_virtuallab');
+        }
+        return get_string('lab_slots_left', 'local_virtuallab', $count);
     }
 
     /**
