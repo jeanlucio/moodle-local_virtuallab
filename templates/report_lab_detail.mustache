@@ -1,0 +1,94 @@
+{{!
+    @template local_virtuallab/report_lab_detail
+
+    Per-student event summary for a single lab in the usage report.
+
+    Example context (json):
+    {
+        "batchname": "Projeto de Interface 2026/1",
+        "labname": "Lab EAD 01",
+        "reporturl": "/local/virtuallab/report.php?batchid=1",
+        "manageurl": "/local/virtuallab/manage.php?batchid=1",
+        "hasusers": true,
+        "users": [
+            {
+                "fullname": "Ana Souza",
+                "iseditor": true,
+                "rolelabel": "Editor",
+                "enrolledat": "10/06/2026 14:32",
+                "hasevents": true,
+                "events": [
+                    {
+                        "componentlabel": "Tarefa",
+                        "actionlabel": "enviado",
+                        "cnt": 4,
+                        "lasttime": "12/06/2026 19:30"
+                    }
+                ]
+            }
+        ]
+    }
+}}
+<div class="local-virtuallab-report-detail">
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa fa-arrow-left me-1" aria-hidden="true"></i>
+            {{#str}} manage_labs, local_virtuallab, {{batchname}} {{/str}}
+        </a>
+        <a href="{{reporturl}}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa fa-list me-1" aria-hidden="true"></i>
+            {{#str}} report_back_to_batch, local_virtuallab {{/str}}
+        </a>
+    </div>
+    {{#hasusers}}
+    {{#users}}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header d-flex align-items-center gap-2 flex-wrap">
+            <strong>{{fullname}}</strong>
+            <span class="badge {{#iseditor}}bg-primary{{/iseditor}}{{^iseditor}}bg-secondary lv-role-visitor{{/iseditor}}">
+                {{rolelabel}}
+            </span>
+            <small class="text-body-secondary ms-auto">
+                {{#str}} report_col_enrolled_at, local_virtuallab {{/str}}: {{enrolledat}}
+            </small>
+        </div>
+        <div class="card-body p-0">
+            {{#hasevents}}
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">{{#str}} report_col_component, local_virtuallab {{/str}}</th>
+                            <th scope="col">{{#str}} report_col_action, local_virtuallab {{/str}}</th>
+                            <th scope="col" class="text-end">{{#str}} report_col_count, local_virtuallab {{/str}}</th>
+                            <th scope="col">{{#str}} report_col_last_time, local_virtuallab {{/str}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#events}}
+                        <tr>
+                            <td>{{componentlabel}}</td>
+                            <td>{{actionlabel}}</td>
+                            <td class="text-end fw-semibold">{{cnt}}</td>
+                            <td>{{lasttime}}</td>
+                        </tr>
+                        {{/events}}
+                    </tbody>
+                </table>
+            </div>
+            {{/hasevents}}
+            {{^hasevents}}
+            <p class="text-body-secondary mb-0 p-3">
+                {{#str}} report_no_activity, local_virtuallab {{/str}}
+            </p>
+            {{/hasevents}}
+        </div>
+    </div>
+    {{/users}}
+    {{/hasusers}}
+    {{^hasusers}}
+    <div class="text-center py-5">
+        <p class="text-body-secondary">{{#str}} report_no_enrolments, local_virtuallab {{/str}}</p>
+    </div>
+    {{/hasusers}}
+</div>

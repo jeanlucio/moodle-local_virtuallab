@@ -48,6 +48,10 @@
     color: var(--bs-dark, #000);
 }
 
+.path-local-virtuallab .badge.lv-role-visitor {
+    color: var(--bs-dark, #000);
+}
+
 .path-local-virtuallab .local-virtuallab-select-col {
     width: 2.5rem;
 }

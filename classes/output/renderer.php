@@ -24,6 +24,7 @@
 
 namespace local_virtuallab\output;
 
+use local_virtuallab\local\report_repository;
 use plugin_renderer_base;
 
 /**
@@ -126,6 +127,11 @@ class renderer extends plugin_renderer_base {
                     '/local/virtuallab/manage.php',
                     ['batchid' => $batch->id]
                 ))->out(false),
+                'reporturl'    => (new \moodle_url(
+                    '/local/virtuallab/report.php',
+                    ['batchid' => $batch->id]
+                ))->out(false),
+                'reportlabel'  => get_string('report_view_report_label', 'local_virtuallab', format_string($batch->name)),
                 'deleteurl'    => (new \moodle_url('/local/virtuallab/manage.php', [
                     'action'        => 'deletebatch',
                     'targetbatchid' => $batch->id,
@@ -201,5 +207,143 @@ class renderer extends plugin_renderer_base {
         ];
 
         return $this->render_from_template('local_virtuallab/manage_labs', $context);
+    }
+
+    /**
+     * Renders the paginated batch overview table for the usage report.
+     *
+     * @param \stdClass   $batch       Batch record.
+     * @param \stdClass[] $enrolments  Paginated enrolment rows from report_repository.
+     * @param array       $rolemap     Role map keyed by [userid][courseid].
+     * @param array       $logsummary  Log summary keyed by [userid][courseid].
+     * @param int         $batchid     Batch ID (for the detail link).
+     * @return string Rendered HTML.
+     */
+    public function render_report_batch(
+        \stdClass $batch,
+        array $enrolments,
+        array $rolemap,
+        array $logsummary,
+        int $batchid
+    ): string {
+        $dtformat = get_string('strftimedatetime', 'langconfig');
+        $teacherroleid = $this->get_teacher_role_id();
+
+        $rows = [];
+        foreach ($enrolments as $row) {
+            $uid = (int) $row->userid;
+            $cid = (int) $row->courseid;
+            $lid = (int) $row->labid;
+
+            $roleid     = $rolemap[$uid][$cid] ?? 0;
+            $iseditor   = ($roleid === $teacherroleid);
+            $logentry   = $logsummary[$uid][$cid] ?? null;
+            $lastaccess = $logentry ? userdate($logentry['lastactivity'], $dtformat) : '';
+            $eventcount = $logentry ? $logentry['eventcount'] : 0;
+
+            $rows[] = [
+                'labname'       => format_string($row->coursename),
+                'labdetailurl'  => (new \moodle_url(
+                    '/local/virtuallab/report.php',
+                    ['batchid' => $batchid, 'labid' => $lid]
+                ))->out(false),
+                'fullname'      => s(fullname($row)),
+                'iseditor'      => $iseditor,
+                'rolelabel'     => get_string(
+                    $iseditor ? 'report_role_editor' : 'report_role_visitor',
+                    'local_virtuallab'
+                ),
+                'enrolledat'    => userdate($row->enrolledat, $dtformat),
+                'haslastaccess' => $lastaccess !== '',
+                'lastaccess'    => $lastaccess,
+                'eventcount'    => $eventcount,
+            ];
+        }
+
+        $context = [
+            'batchname' => format_string($batch->name),
+            'manageurl' => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
+            'hasrows'   => !empty($rows),
+            'rows'      => $rows,
+        ];
+
+        return $this->render_from_template('local_virtuallab/report_batch', $context);
+    }
+
+    /**
+     * Renders the per-student event summary for a single lab.
+     *
+     * @param \stdClass   $batch       Batch record.
+     * @param \stdClass   $lab         Lab record (with coursename).
+     * @param \stdClass[] $enrolments  All enrolled users from report_repository.
+     * @param array       $rolemap     Role map keyed by [userid][courseid].
+     * @param array       $breakdown   Event breakdown keyed by userid.
+     * @return string Rendered HTML.
+     */
+    public function render_report_lab_detail(
+        \stdClass $batch,
+        \stdClass $lab,
+        array $enrolments,
+        array $rolemap,
+        array $breakdown
+    ): string {
+        $dtformat      = get_string('strftimedatetime', 'langconfig');
+        $teacherroleid = $this->get_teacher_role_id();
+        $courseid      = (int) $lab->courseid;
+        $batchid       = (int) $lab->batchid;
+
+        $users = [];
+        foreach ($enrolments as $row) {
+            $uid      = (int) $row->userid;
+            $roleid   = $rolemap[$uid][$courseid] ?? 0;
+            $iseditor = ($roleid === $teacherroleid);
+
+            $eventrows = [];
+            foreach ($breakdown[$uid] ?? [] as $entry) {
+                $eventrows[] = [
+                    'componentlabel' => s(report_repository::component_label($entry['component'])),
+                    'actionlabel'    => s(report_repository::action_label($entry['action'])),
+                    'cnt'            => $entry['cnt'],
+                    'lasttime'       => userdate($entry['lasttime'], $dtformat),
+                ];
+            }
+
+            $users[] = [
+                'fullname'  => s(fullname($row)),
+                'iseditor'  => $iseditor,
+                'rolelabel' => get_string(
+                    $iseditor ? 'report_role_editor' : 'report_role_visitor',
+                    'local_virtuallab'
+                ),
+                'enrolledat' => userdate($row->enrolledat, $dtformat),
+                'hasevents'  => !empty($eventrows),
+                'events'     => $eventrows,
+            ];
+        }
+
+        $context = [
+            'batchname' => format_string($batch->name),
+            'labname'   => format_string($lab->coursename),
+            'reporturl' => (new \moodle_url('/local/virtuallab/report.php', ['batchid' => $batchid]))->out(false),
+            'manageurl' => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
+            'hasusers'  => !empty($users),
+            'users'     => $users,
+        ];
+
+        return $this->render_from_template('local_virtuallab/report_lab_detail', $context);
+    }
+
+    /**
+     * Returns the editingteacher role ID, fetched once per request.
+     *
+     * @return int
+     */
+    private function get_teacher_role_id(): int {
+        global $DB;
+        static $id = null;
+        if ($id === null) {
+            $id = (int) $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
+        }
+        return $id;
     }
 }

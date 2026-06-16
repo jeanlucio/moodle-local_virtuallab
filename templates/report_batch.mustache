@@ -1,0 +1,77 @@
+{{!
+    @template local_virtuallab/report_batch
+
+    Paginated batch overview table for the lab usage report.
+
+    Example context (json):
+    {
+        "batchname": "Projeto de Interface 2026/1",
+        "manageurl": "/local/virtuallab/manage.php?batchid=1",
+        "hasrows": true,
+        "rows": [
+            {
+                "labname": "Lab EAD 01",
+                "labdetailurl": "/local/virtuallab/report.php?batchid=1&labid=1",
+                "fullname": "Ana Souza",
+                "iseditor": true,
+                "rolelabel": "Editor",
+                "enrolledat": "10/06/2026 14:32",
+                "haslastaccess": true,
+                "lastaccess": "12/06/2026 20:15",
+                "eventcount": 47
+            }
+        ]
+    }
+}}
+<div class="local-virtuallab-report-batch">
+    <div class="mb-3">
+        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary">
+            <i class="fa fa-arrow-left me-1" aria-hidden="true"></i>
+            {{#str}} manage_labs, local_virtuallab, {{batchname}} {{/str}}
+        </a>
+    </div>
+    {{#hasrows}}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">{{#str}} report_col_lab, local_virtuallab {{/str}}</th>
+                    <th scope="col">{{#str}} report_col_student, local_virtuallab {{/str}}</th>
+                    <th scope="col">{{#str}} report_col_role, local_virtuallab {{/str}}</th>
+                    <th scope="col">{{#str}} report_col_enrolled_at, local_virtuallab {{/str}}</th>
+                    <th scope="col">{{#str}} report_col_last_access, local_virtuallab {{/str}}</th>
+                    <th scope="col" class="text-end">{{#str}} report_col_events, local_virtuallab {{/str}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#rows}}
+                <tr>
+                    <td>
+                        <a href="{{labdetailurl}}" class="fw-semibold text-decoration-none">
+                            {{labname}}
+                        </a>
+                    </td>
+                    <td>{{fullname}}</td>
+                    <td>
+                        <span class="badge {{#iseditor}}bg-primary{{/iseditor}}{{^iseditor}}bg-secondary lv-role-visitor{{/iseditor}}">
+                            {{rolelabel}}
+                        </span>
+                    </td>
+                    <td>{{enrolledat}}</td>
+                    <td>
+                        {{#haslastaccess}}{{lastaccess}}{{/haslastaccess}}
+                        {{^haslastaccess}}<span class="text-body-secondary">{{#str}} report_never, local_virtuallab {{/str}}</span>{{/haslastaccess}}
+                    </td>
+                    <td class="text-end fw-semibold">{{eventcount}}</td>
+                </tr>
+                {{/rows}}
+            </tbody>
+        </table>
+    </div>
+    {{/hasrows}}
+    {{^hasrows}}
+    <div class="text-center py-5">
+        <p class="text-body-secondary">{{#str}} report_no_enrolments, local_virtuallab {{/str}}</p>
+    </div>
+    {{/hasrows}}
+</div>
