@@ -81,13 +81,10 @@ if ($hassiteconfig) {
         0
     ));
 
-    $settings->add(new admin_setting_heading(
-        'local_labvirtual/heading_manage',
-        '',
-        \html_writer::link(
-            new moodle_url('/local/labvirtual/manage.php'),
-            get_string('manage_batches', 'local_labvirtual'),
-            ['class' => 'btn btn-primary']
-        )
+    $ADMIN->add('localplugins', new admin_externalpage(
+        'local_labvirtual_manage',
+        get_string('manage_batches', 'local_labvirtual'),
+        new moodle_url('/local/labvirtual/manage.php'),
+        'moodle/site:config'
     ));
 }

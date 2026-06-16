@@ -23,15 +23,15 @@
     }
 }}
 <div class="local-labvirtual-manage-batches">
-    {{#cancreate}}
+    {{#hasbatches}}
     <div class="mb-3 d-flex justify-content-end">
+        {{#cancreate}}
         <a href="{{createurl}}" class="btn btn-primary">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
             {{#str}} create_batch, local_labvirtual {{/str}}
         </a>
+        {{/cancreate}}
     </div>
-    {{/cancreate}}
-    {{#hasbatches}}
     <div class="table-responsive">
         <table class="table table-hover table-striped">
             <thead>
@@ -68,6 +68,14 @@
     </div>
     {{/hasbatches}}
     {{^hasbatches}}
-    <p class="text-body-secondary">{{#str}} nobatches, local_labvirtual {{/str}}</p>
+    <div class="text-center py-5">
+        <p class="text-body-secondary mb-3">{{#str}} nobatches, local_labvirtual {{/str}}</p>
+        {{#cancreate}}
+        <a href="{{createurl}}" class="btn btn-primary">
+            <i class="fa fa-plus me-1" aria-hidden="true"></i>
+            {{#str}} create_batch, local_labvirtual {{/str}}
+        </a>
+        {{/cancreate}}
+    </div>
     {{/hasbatches}}
 </div>

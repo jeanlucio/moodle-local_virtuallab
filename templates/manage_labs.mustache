@@ -66,10 +66,12 @@
             {{#str}} edit_batch, local_labvirtual {{/str}}
         </a>
         {{/editurl}}
+        {{#haslabs}}
         <a href="{{createurl}}" class="btn btn-success">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
             {{#str}} create_labs, local_labvirtual {{/str}}
         </a>
+        {{/haslabs}}
     </div>
 
     {{#haslabs}}
@@ -154,7 +156,13 @@
     </form>
     {{/haslabs}}
     {{^haslabs}}
-    <p class="text-body-secondary">{{#str}} nolabs, local_labvirtual {{/str}}</p>
+    <div class="text-center py-5">
+        <p class="text-body-secondary mb-3">{{#str}} nolabs, local_labvirtual {{/str}}</p>
+        <a href="{{createurl}}" class="btn btn-success">
+            <i class="fa fa-plus me-1" aria-hidden="true"></i>
+            {{#str}} create_labs, local_labvirtual {{/str}}
+        </a>
+    </div>
     {{/haslabs}}
 </div>
 {{#js}}
