@@ -57,7 +57,7 @@ class edit_batch_form extends \moodleform {
             'autocomplete',
             'teacherids',
             get_string('batch_teacher', 'local_virtuallab'),
-            [],
+            $this->_customdata['teachers'] ?? [],
             $options
         );
         $mform->addRule('teacherids', null, 'required', null, 'client');

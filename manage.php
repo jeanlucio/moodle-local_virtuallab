@@ -108,7 +108,15 @@ if ($batchid) {
             '/local/virtuallab/manage.php',
             ['batchid' => $batchid, 'action' => 'editbatch']
         );
-        $form = new edit_batch_form($editurl->out(false));
+        $teachers = $batchmgr->get_teachers($batchid);
+        $teacheroptions = [];
+        foreach ($teachers as $teacher) {
+            $teacheroptions[$teacher->id] = fullname($teacher);
+        }
+        $form = new edit_batch_form(
+            $editurl->out(false),
+            ['teachers' => $teacheroptions]
+        );
 
         if ($form->is_cancelled()) {
             redirect($level2url);
@@ -134,7 +142,7 @@ if ($batchid) {
         $form->set_data([
             'batchid'         => $batchid,
             'name'            => $batch->name,
-            'teacherids'      => array_keys($batchmgr->get_teachers($batchid)),
+            'teacherids'      => array_keys($teachers),
             'nameprefix'      => $batch->nameprefix,
             'maxteachers'     => $batch->maxteachers,
             'lifecyclemonths' => $batch->lifecyclemonths,
