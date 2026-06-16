@@ -22,7 +22,7 @@ Feature: Lab Virtual student panel
   Scenario: Student enrols as editor and is redirected to the course
     Given I log in as "student1"
     When I visit the student panel for batch "UI 2026"
-    And I click on "Editor" "button" in the "Lab EAD 01" "table_row"
+    And I click on "Slot holder" "button" in the "Lab EAD 01" "table_row"
     Then I should see "Lab EAD 01"
     And I should see "Participants"
 
@@ -31,7 +31,7 @@ Feature: Lab Virtual student panel
     And I log in as "student1"
     When I visit the student panel for batch "UI 2026"
     Then I should see "Enrolled" in the "Lab EAD 01" "table_row"
-    And the "Editor" "button" should be disabled
+    And the "Slot holder" "button" should be disabled
 
   Scenario: Non-authenticated user cannot access the panel
     When I visit the student panel for batch "UI 2026"
