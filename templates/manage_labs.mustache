@@ -31,6 +31,15 @@
     }
 }}
 <div class="local-virtuallab-manage-labs">
+    <div class="mb-3 d-flex justify-content-end">
+        {{#editurl}}
+        <a href="{{editurl}}" class="btn btn-outline-secondary">
+            <i class="fa fa-pen me-1" aria-hidden="true"></i>
+            {{#str}} edit_batch, local_virtuallab {{/str}}
+        </a>
+        {{/editurl}}
+    </div>
+
     <div class="card mb-4 border-primary">
         <div class="card-header bg-primary text-white">
             <i class="fa fa-link me-1" aria-hidden="true"></i>
@@ -59,22 +68,13 @@
         </div>
     </div>
 
+    {{#haslabs}}
     <div class="mb-3 d-flex justify-content-end">
-        {{#editurl}}
-        <a href="{{editurl}}" class="btn btn-outline-secondary me-2">
-            <i class="fa fa-pen me-1" aria-hidden="true"></i>
-            {{#str}} edit_batch, local_virtuallab {{/str}}
-        </a>
-        {{/editurl}}
-        {{#haslabs}}
         <a href="{{createurl}}" class="btn btn-success">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
             {{#str}} create_labs, local_virtuallab {{/str}}
         </a>
-        {{/haslabs}}
     </div>
-
-    {{#haslabs}}
     <form id="local-virtuallab-bulk-form"
           method="post"
           action="{{manageurl}}">
