@@ -25,12 +25,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
+    $ADMIN->add('localplugins', new admin_category(
+        'local_labvirtual_category',
+        get_string('pluginname', 'local_labvirtual')
+    ));
+
     $settings = new admin_settingpage(
         'local_labvirtual',
-        get_string('pluginname', 'local_labvirtual')
+        get_string('settings', 'moodle')
     );
-
-    $ADMIN->add('localplugins', $settings);
 
     $settings->add(new admin_setting_configtext(
         'local_labvirtual/max_teachers_per_lab',
@@ -81,7 +84,9 @@ if ($hassiteconfig) {
         0
     ));
 
-    $ADMIN->add('localplugins', new admin_externalpage(
+    $ADMIN->add('local_labvirtual_category', $settings);
+
+    $ADMIN->add('local_labvirtual_category', new admin_externalpage(
         'local_labvirtual_manage',
         get_string('manage_batches', 'local_labvirtual'),
         new moodle_url('/local/labvirtual/manage.php'),
