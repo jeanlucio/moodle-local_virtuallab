@@ -92,12 +92,13 @@ class course_factory {
             }
             $existingshortnames[$shortname] = true;
 
-            $coursedata            = new \stdClass();
-            $coursedata->fullname  = $labname;
-            $coursedata->shortname = $shortname;
-            $coursedata->category  = $batch->categoryid;
-            $coursedata->format    = 'topics';
-            $coursedata->visible   = 1;
+            $coursedata              = new \stdClass();
+            $coursedata->fullname   = $labname;
+            $coursedata->shortname  = $shortname;
+            $coursedata->category   = $batch->categoryid;
+            $coursedata->format     = 'topics';
+            $coursedata->numsections = (int) get_config('moodlecourse', 'numsections') ?: 4;
+            $coursedata->visible    = 1;
 
             $course = create_course($coursedata);
 
