@@ -1,7 +1,6 @@
 # Moodle Local Virtual Lab
 
 [![Moodle Plugin CI](https://github.com/jeanlucio/moodle-local_virtuallab/actions/workflows/ci.yml/badge.svg)](https://github.com/jeanlucio/moodle-local_virtuallab/actions/workflows/ci.yml)
-[![MDL Shield](https://img.shields.io/endpoint?url=https%3A%2F%2Fmdlshield.com%2Fapi%2Fbadge%2Flocal_virtuallab)](https://mdlshield.com/plugins/local_virtuallab)
 ![Moodle](https://img.shields.io/badge/Moodle-4.5%2B-orange?style=flat-square&logo=moodle&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Alpha-yellow?style=flat-square)
