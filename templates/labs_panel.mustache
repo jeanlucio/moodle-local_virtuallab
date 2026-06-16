@@ -102,7 +102,7 @@
                             <button type="submit"
                                     class="btn btn-sm btn-primary me-1"
                                     aria-label="{{#str}} access_as_editor, local_virtuallab, {{coursename}} {{/str}}">
-                                Titular
+                                {{#str}} report_role_editor, local_virtuallab {{/str}}
                             </button>
                         </form>
                         {{/can_enrol_editor}}
@@ -111,7 +111,7 @@
                                 class="btn btn-sm btn-primary me-1"
                                 disabled
                                 aria-label="{{#str}} lab_full, local_virtuallab {{/str}}">
-                            Titular
+                            {{#str}} report_role_editor, local_virtuallab {{/str}}
                         </button>
                         {{/can_enrol_editor}}
                         <form method="post" action="{{viewurl}}" class="d-inline">
@@ -123,7 +123,7 @@
                             <button type="submit"
                                     class="btn btn-sm btn-outline-secondary"
                                     aria-label="{{#str}} access_as_visitor, local_virtuallab, {{coursename}} {{/str}}">
-                                Visitante
+                                {{#str}} report_role_visitor, local_virtuallab {{/str}}
                             </button>
                         </form>
                         {{/user_enrolled_here}}

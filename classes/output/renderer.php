@@ -171,8 +171,12 @@ class renderer extends plugin_renderer_base {
     ): string {
         $qrsvg = '';
         if ($panelurl !== '') {
-            $qrcode = new \core_qrcode($panelurl);
-            $qrsvg = 'data:image/svg+xml;base64,' . base64_encode($qrcode->getBarcodeSVGcode(4, 4));
+            try {
+                $qrcode = new \core_qrcode($panelurl);
+                $qrsvg = 'data:image/svg+xml;base64,' . base64_encode($qrcode->getBarcodeSVGcode(4, 4));
+            } catch (\Throwable $e) {
+                $qrsvg = '';
+            }
         }
 
         $rows = [];
