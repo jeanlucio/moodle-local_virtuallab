@@ -69,7 +69,6 @@ class edit_batch_form extends \moodleform {
             ['size' => 40, 'maxlength' => 255]
         );
         $mform->setType('nameprefix', PARAM_TEXT);
-        $mform->addRule('nameprefix', null, 'required', null, 'client');
 
         $mform->addElement('header', 'overrides', get_string('batch_overrides', 'local_virtuallab'));
         $mform->addElement(
