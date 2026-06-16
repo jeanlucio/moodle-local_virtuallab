@@ -261,10 +261,18 @@ class renderer extends plugin_renderer_base {
         }
 
         $context = [
-            'batchname' => format_string($batch->name),
-            'manageurl' => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
-            'hasrows'   => !empty($rows),
-            'rows'      => $rows,
+            'batchname'      => format_string($batch->name),
+            'manageurl'      => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
+            'exportcsvurl'   => (new \moodle_url(
+                '/local/virtuallab/report_export.php',
+                ['batchid' => $batchid, 'format' => 'csv']
+            ))->out(false),
+            'exportexcelurl' => (new \moodle_url(
+                '/local/virtuallab/report_export.php',
+                ['batchid' => $batchid, 'format' => 'excel']
+            ))->out(false),
+            'hasrows'        => !empty($rows),
+            'rows'           => $rows,
         ];
 
         return $this->render_from_template('local_virtuallab/report_batch', $context);
@@ -322,12 +330,20 @@ class renderer extends plugin_renderer_base {
         }
 
         $context = [
-            'batchname' => format_string($batch->name),
-            'labname'   => format_string($lab->coursename),
-            'reporturl' => (new \moodle_url('/local/virtuallab/report.php', ['batchid' => $batchid]))->out(false),
-            'manageurl' => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
-            'hasusers'  => !empty($users),
-            'users'     => $users,
+            'batchname'      => format_string($batch->name),
+            'labname'        => format_string($lab->coursename),
+            'reporturl'      => (new \moodle_url('/local/virtuallab/report.php', ['batchid' => $batchid]))->out(false),
+            'manageurl'      => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
+            'exportcsvurl'   => (new \moodle_url(
+                '/local/virtuallab/report_export.php',
+                ['batchid' => $batchid, 'labid' => $lab->id, 'format' => 'csv']
+            ))->out(false),
+            'exportexcelurl' => (new \moodle_url(
+                '/local/virtuallab/report_export.php',
+                ['batchid' => $batchid, 'labid' => $lab->id, 'format' => 'excel']
+            ))->out(false),
+            'hasusers'       => !empty($users),
+            'users'          => $users,
         ];
 
         return $this->render_from_template('local_virtuallab/report_lab_detail', $context);

@@ -7,6 +7,8 @@
     {
         "batchname": "Projeto de Interface 2026/1",
         "manageurl": "/local/virtuallab/manage.php?batchid=1",
+        "exportcsvurl": "/local/virtuallab/report_export.php?batchid=1&format=csv",
+        "exportexcelurl": "/local/virtuallab/report_export.php?batchid=1&format=excel",
         "hasrows": true,
         "rows": [
             {
@@ -24,11 +26,23 @@
     }
 }}
 <div class="local-virtuallab-report-batch">
-    <div class="mb-3">
+    <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary">
             <i class="fa fa-arrow-left me-1" aria-hidden="true"></i>
             {{#str}} manage_labs, local_virtuallab, {{batchname}} {{/str}}
         </a>
+        {{#hasrows}}
+        <div class="d-flex gap-2">
+            <a href="{{exportcsvurl}}" class="btn btn-sm btn-outline-success" title="{{#str}} export_csv, local_virtuallab {{/str}}">
+                <i class="fa fa-download me-1" aria-hidden="true"></i>
+                {{#str}} export_csv, local_virtuallab {{/str}}
+            </a>
+            <a href="{{exportexcelurl}}" class="btn btn-sm btn-outline-success" title="{{#str}} export_excel, local_virtuallab {{/str}}">
+                <i class="fa fa-file-excel-o me-1" aria-hidden="true"></i>
+                {{#str}} export_excel, local_virtuallab {{/str}}
+            </a>
+        </div>
+        {{/hasrows}}
     </div>
     {{#hasrows}}
     <div class="table-responsive">

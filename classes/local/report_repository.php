@@ -43,6 +43,15 @@ class report_repository {
     }
 
     /**
+     * Returns the editingteacher role ID, resolved once in the constructor.
+     *
+     * @return int
+     */
+    public function get_teacher_role_id(): int {
+        return $this->teacherroleid;
+    }
+
+    /**
      * Total number of student enrolment rows for a batch (for pagination).
      *
      * @param int $batchid Batch ID.
@@ -74,20 +83,46 @@ class report_repository {
     public function get_batch_enrolments(int $batchid, int $page): array {
         global $DB;
 
-        $sql = "SELECT ue.id, ue.userid, ue.timecreated AS enrolledat,
-                       lc.id AS labid, lc.courseid,
-                       c.fullname AS coursename,
-                       u.firstname, u.lastname, u.firstnamephonetic,
-                       u.lastnamephonetic, u.middlename, u.alternatename
-                  FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.id = ue.enrolid
-                  JOIN {local_virtuallab_courses} lc ON lc.enrolid = e.id
-                  JOIN {course} c ON c.id = lc.courseid
-                  JOIN {user} u ON u.id = ue.userid AND u.deleted = 0
-                 WHERE lc.batchid = :batchid
-              ORDER BY c.fullname ASC, u.lastname ASC, u.firstname ASC";
+        $records = $DB->get_records_sql(
+            $this->batch_enrolments_sql(),
+            ['batchid' => $batchid],
+            $page * self::PER_PAGE,
+            self::PER_PAGE
+        );
 
-        return array_values($DB->get_records_sql($sql, ['batchid' => $batchid], $page * self::PER_PAGE, self::PER_PAGE));
+        return array_values($records);
+    }
+
+    /**
+     * All enrolment rows for the batch overview, unpaginated (used for full exports).
+     *
+     * @param int $batchid Batch ID.
+     * @return \stdClass[]
+     */
+    public function get_all_batch_enrolments(int $batchid): array {
+        global $DB;
+
+        return array_values($DB->get_records_sql($this->batch_enrolments_sql(), ['batchid' => $batchid]));
+    }
+
+    /**
+     * Shared SQL for the batch overview enrolment rows.
+     *
+     * @return string
+     */
+    private function batch_enrolments_sql(): string {
+        return "SELECT ue.id, ue.userid, ue.timecreated AS enrolledat,
+                        lc.id AS labid, lc.courseid,
+                        c.fullname AS coursename,
+                        u.firstname, u.lastname, u.firstnamephonetic,
+                        u.lastnamephonetic, u.middlename, u.alternatename
+                   FROM {user_enrolments} ue
+                   JOIN {enrol} e ON e.id = ue.enrolid
+                   JOIN {local_virtuallab_courses} lc ON lc.enrolid = e.id
+                   JOIN {course} c ON c.id = lc.courseid
+                   JOIN {user} u ON u.id = ue.userid AND u.deleted = 0
+                  WHERE lc.batchid = :batchid
+               ORDER BY c.fullname ASC, u.lastname ASC, u.firstname ASC";
     }
 
     /**

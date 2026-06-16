@@ -16,4 +16,5 @@ Initial public release.
 - Audit events: lab reset, lab deleted, batch deleted
 - Teacher discovery: responsible teachers see a **Manage Virtual Lab** link in the primary navigation (top bar / mobile menu) without needing an admin-supplied URL; the link is visible only to users assigned to at least one batch or holding the `local/virtuallab:manage` capability
 - Batch assignment notification: when a teacher is added to a batch, they receive a Moodle notification (bell icon) and an email with the management link; the notification uses the `batch_assigned` message provider, allowing users to configure their preferred channels
+- Consolidated lab usage report: paginated batch overview plus a per-student event breakdown for each lab, with CSV and Excel export at both levels
 - PHPUnit integration test suite covering all core classes, the scheduled task, the primary navigation hook and the batch assignment notification logic
