@@ -34,6 +34,8 @@ Each batch lives in its own course subcategory, and its **responsible teachers m
 * ⏰ **Automatic lifecycle maintenance:** A nightly scheduled task resets or deletes overdue labs, applying each batch's own settings, with advance warning emails.
 * 📧 **Lifecycle notifications:** Warning and summary emails are sent to the responsible teachers and to each affected course's editors; the administrator copy is optional.
 * 🙋 **Helpful access notice:** A logged-in visitor who reaches a lab course without access sees a notice naming the responsible teacher(s) to contact.
+* 🔔 **Batch assignment notification:** When a teacher is added to a batch they receive a Moodle notification (bell) and an email containing the management link. The `batch_assigned` message provider can be configured per-user under **Preferences → Message**.
+* 🔗 **Teacher navigation shortcut:** Responsible teachers see a **Manage Virtual Lab** link directly in the Moodle top bar (and mobile menu) without needing an admin-supplied URL.
 * 🔐 **Ownership guard & audit events:** Every write operation validates that the lab belongs to the expected batch; events are emitted on course reset, course deletion and batch deletion.
 
 ---
@@ -113,6 +115,7 @@ The **Manage Virtual Lab** button in the settings page links directly to the man
 
 #### Teacher workflow
 
+1. When assigned to a batch the teacher receives a **Moodle notification** (bell icon) and an **email** with a direct link to the management page. The **Manage Virtual Lab** shortcut also appears in the top navigation bar on every page.
 1. The responsible teacher opens the management page and sees **only their own batches**.
 2. **Create labs:** choose the lab name prefix (remembered for next time) and how many labs to create (up to 50 at a time).
 3. From the batch page they can add more labs, reset/delete labs (individually or in bulk), open any lab course to edit content and grades, copy the student panel URL, and **edit the batch** (name, co-responsible teachers, prefix, and per-batch lifecycle settings).
@@ -151,16 +154,17 @@ Virtual Lab ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 
 | Test file | Cases | What is covered |
 |-----------|------:|----------------|
-| `batch_manager_test.php` | 7 | Batch create/get, auto subcategory, multiple teachers, delegated-role isolation, update batch, set prefix, listing |
+| `batch_manager_test.php` | 12 | Batch create/get, auto subcategory, multiple teachers, delegated-role isolation, update batch, set prefix, listing; batch assignment notifications sent only to new teachers; suspended users excluded; re-saving same list sends no message |
 | `batch_settings_test.php` | 2 | Effective settings: global default vs per-batch override |
 | `category_manager_test.php` | 3 | Safe deletion guard: empty batch subcategory removed; non-child or non-empty category kept |
 | `course_factory_test.php` | 4 | Correct lab count; labs use the manual enrolment instance and no self instance; all IDs returned; excessive count rejected |
 | `course_registry_test.php` | 10 | Ownership checks, bulk lookup and enrol-for-batch validation |
+| `hook_callbacks_test.php` | 5 | Primary navigation node visible to admins and batch teachers; invisible to regular users, guests and logged-out requests |
 | `maintenance_service_test.php` | 5 | Reset/delete behaviour and wrong-batch guards; batch deletion |
 | `maintenance_task_test.php` | 10 | Disabled cases, reset/delete overdue labs, per-batch override, reference-date logic |
 | `notification_service_test.php` | 7 | Warning/summary to teachers and editors; admin copy gated by setting; course link |
 | `panel_status_test.php` | 6 | Available/in-use/full flags; enrolment and one-editor-per-batch rules |
-| **Total** | **54** | |
+| **Total** | **64** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
@@ -227,6 +231,8 @@ Cada turma vive na sua própria subcategoria de cursos, e seus **professores res
 * ⏰ **Manutenção automática do ciclo de vida:** Tarefa noturna reseta ou exclui labs vencidos, aplicando as configurações próprias de cada turma, com e-mails de aviso antecipado.
 * 📧 **Notificações de ciclo de vida:** E-mails de aviso e resumo para os professores responsáveis e para os editores de cada curso afetado; a cópia ao administrador é opcional.
 * 🙋 **Aviso de acesso:** Um visitante logado que chega a um curso-lab sem acesso vê um aviso com o nome do(s) professor(es) responsável(is) para contato.
+* 🔔 **Notificação de designação:** Quando um professor é adicionado a uma turma, ele recebe uma notificação Moodle (sino) e um e-mail com o link do painel de gerenciamento. O provider `batch_assigned` pode ser configurado por usuário em **Preferências → Mensagens**.
+* 🔗 **Atalho de navegação para o professor:** Professores responsáveis veem o link **Gerenciar Lab Virtual** direto na barra superior do Moodle (e no menu mobile), sem precisar de uma URL fornecida pelo admin.
 * 🔐 **Proteção de propriedade e eventos de auditoria:** Toda operação de escrita valida que o lab pertence à turma esperada; eventos são emitidos ao resetar curso, excluir curso e excluir turma.
 
 ---
@@ -306,6 +312,7 @@ O botão **Gerenciar Lab Virtual** na página de configurações leva direto ao 
 
 #### Fluxo do professor
 
+1. Ao ser designado para uma turma, o professor recebe uma **notificação Moodle** (sino) e um **e-mail** com link direto para o painel. O atalho **Gerenciar Lab Virtual** também aparece na barra de navegação superior em todas as páginas.
 1. O professor responsável abre a página de gerenciamento e vê **apenas as turmas dele**.
 2. **Criar labs:** escolhe o prefixo do nome dos labs (lembrado para a próxima vez) e quantos labs criar (até 50 por vez).
 3. Na página da turma ele pode adicionar mais labs, resetar/excluir labs (individual ou em lote), abrir qualquer curso-lab para editar conteúdo e notas, copiar a URL do painel e **editar a turma** (nome, co-responsáveis, prefixo e configurações de ciclo de vida da turma).
@@ -344,16 +351,17 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 
 | Arquivo de teste | Casos | O que é coberto |
 |-----------------|------:|----------------|
-| `batch_manager_test.php` | 7 | Criar/obter turma, subcategoria automática, múltiplos professores, isolamento do papel delegado, editar turma, definir prefixo, listagem |
+| `batch_manager_test.php` | 12 | Criar/obter turma, subcategoria automática, múltiplos professores, isolamento do papel delegado, editar turma, definir prefixo, listagem; notificações enviadas apenas a professores novos; usuários suspensos excluídos; re-salvar a mesma lista não envia mensagem |
 | `batch_settings_test.php` | 2 | Configuração efetiva: padrão global vs override da turma |
 | `category_manager_test.php` | 3 | Guard de exclusão segura: subcategoria vazia da turma é removida; categoria não-filha ou não-vazia é mantida |
 | `course_factory_test.php` | 4 | Quantidade correta de labs; labs usam a instância manual e nenhuma self; todos os IDs retornados; quantidade excessiva rejeitada |
 | `course_registry_test.php` | 10 | Verificações de propriedade, busca em lote e validação de inscrição por turma |
+| `hook_callbacks_test.php` | 5 | Nó de navegação primária visível para admins e professores de turma; invisível para usuários comuns, visitantes e sessões deslogadas |
 | `maintenance_service_test.php` | 5 | Reset/exclusão e guards de turma errada; exclusão de turma |
 | `maintenance_task_test.php` | 10 | Casos desabilitados, reset/exclusão de labs vencidos, override por turma, lógica de data de referência |
 | `notification_service_test.php` | 7 | Aviso/resumo para professores e editores; cópia ao admin condicionada à config; link do curso |
 | `panel_status_test.php` | 6 | Flags disponível/em uso/cheio; regras de inscrição e de um editor por turma |
-| **Total** | **54** | |
+| **Total** | **64** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite

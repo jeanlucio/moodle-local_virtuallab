@@ -14,4 +14,6 @@ Initial public release.
 - Summary emails: after each maintenance run, each affected teacher receives a summary of what happened to their labs
 - Visitor notice: a logged-in user who opens a managed lab without access sees the responsible teacher(s) to contact
 - Audit events: lab reset, lab deleted, batch deleted
-- PHPUnit integration test suite covering all core classes and the scheduled task
+- Teacher discovery: responsible teachers see a **Manage Virtual Lab** link in the primary navigation (top bar / mobile menu) without needing an admin-supplied URL; the link is visible only to users assigned to at least one batch or holding the `local/virtuallab:manage` capability
+- Batch assignment notification: when a teacher is added to a batch, they receive a Moodle notification (bell icon) and an email with the management link; the notification uses the `batch_assigned` message provider, allowing users to configure their preferred channels
+- PHPUnit integration test suite covering all core classes, the scheduled task, the primary navigation hook and the batch assignment notification logic
