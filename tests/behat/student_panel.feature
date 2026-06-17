@@ -1,5 +1,5 @@
 @local @local_virtuallab
-Feature: Lab Virtual student panel
+Feature: Virtual Lab student panel
   In order to choose and access a lab sandbox
   As a student
   I need a self-service panel listing the labs of my batch
@@ -9,7 +9,7 @@ Feature: Lab Virtual student panel
       | username | firstname | lastname | email          |
       | teacher1 | Teacher   | One      | t1@example.com |
       | student1 | Student   | One      | s1@example.com |
-    And a lab virtual batch "UI 2026" exists with teacher "teacher1" and 2 labs
+    And a virtual lab batch "UI 2026" exists with teacher "teacher1" and 2 labs
 
   Scenario: Authenticated student sees the panel with the correct header
     Given I log in as "student1"

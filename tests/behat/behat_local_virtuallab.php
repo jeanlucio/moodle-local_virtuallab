@@ -52,7 +52,7 @@ class behat_local_virtuallab extends behat_base {
      * The batch uses the fixed lab name prefix "Lab", so labs are named
      * "Lab 01", "Lab 02", etc. The referenced teacher must already exist.
      *
-     * @Given a lab virtual batch :name exists with teacher :username and :count labs
+     * @Given a virtual lab batch :name exists with teacher :username and :count labs
      * @param string $name     Human-readable batch name.
      * @param string $username Username of the responsible teacher.
      * @param string $count    Number of labs to create.
@@ -104,7 +104,7 @@ class behat_local_virtuallab extends behat_base {
     /**
      * Navigates to the admin batches management page.
      *
-     * @When I visit the lab virtual management page
+     * @When I visit the virtual lab management page
      */
     public function i_visit_the_lab_virtual_management_page(): void {
         $this->execute('behat_general::i_visit', ['/local/virtuallab/manage.php']);

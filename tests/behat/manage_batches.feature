@@ -1,8 +1,8 @@
 @local @local_virtuallab
-Feature: Manage Lab Virtual batches
+Feature: Manage Virtual Lab batches
   In order to organise lab sandboxes per class
   As an administrator
-  I need to create and delete Lab Virtual batches
+  I need to create and delete Virtual Lab batches
 
   Background:
     Given the following "users" exist:
@@ -12,7 +12,7 @@ Feature: Manage Lab Virtual batches
 
   @javascript
   Scenario: Admin creates a batch
-    When I visit the lab virtual management page
+    When I visit the virtual lab management page
     And I follow "New batch"
     And I set the field "Batch name" to "Interface 2026/1"
     And I set the field "Responsible teacher" to "Teacher One"
@@ -22,7 +22,7 @@ Feature: Manage Lab Virtual batches
 
   @javascript
   Scenario: Manager edits a batch name
-    Given a lab virtual batch "UI 2026" exists with teacher "teacher1" and 0 labs
+    Given a virtual lab batch "UI 2026" exists with teacher "teacher1" and 0 labs
     When I visit the labs page for batch "UI 2026"
     And I follow "Edit batch"
     And I set the field "Batch name" to "UI 2026 renamed"
@@ -31,8 +31,8 @@ Feature: Manage Lab Virtual batches
     And I should see "UI 2026 renamed"
 
   Scenario: Admin deletes a batch
-    Given a lab virtual batch "Interface 2026/1" exists with teacher "teacher1" and 2 labs
-    When I visit the lab virtual management page
+    Given a virtual lab batch "Interface 2026/1" exists with teacher "teacher1" and 2 labs
+    When I visit the virtual lab management page
     And I should see "Interface 2026/1"
     And I click on "Delete batch" "link" in the "Interface 2026/1" "table_row"
     Then I should see "Are you sure you want to delete the batch"

@@ -1,5 +1,5 @@
 @local @local_virtuallab
-Feature: Manage labs within a Lab Virtual batch
+Feature: Manage labs within a Virtual Lab batch
   In order to provision and maintain lab sandboxes
   As an administrator
   I need to create and reset labs inside a batch
@@ -11,7 +11,7 @@ Feature: Manage labs within a Lab Virtual batch
     And I log in as "admin"
 
   Scenario: Admin creates labs and sees the student panel URL
-    Given a lab virtual batch "T 2026" exists with teacher "teacher1" and 0 labs
+    Given a virtual lab batch "T 2026" exists with teacher "teacher1" and 0 labs
     When I visit the labs page for batch "T 2026"
     And I follow "Create labs"
     And I set the field "Number of labs" to "3"
@@ -22,7 +22,7 @@ Feature: Manage labs within a Lab Virtual batch
     And I should see "Lab 03"
 
   Scenario: Admin resets a single lab
-    Given a lab virtual batch "T 2026" exists with teacher "teacher1" and 2 labs
+    Given a virtual lab batch "T 2026" exists with teacher "teacher1" and 2 labs
     When I visit the labs page for batch "T 2026"
     And I click on "Reset" "link" in the "Lab 01" "table_row"
     Then I should see "Are you sure you want to reset"
