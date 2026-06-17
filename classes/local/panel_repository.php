@@ -202,6 +202,15 @@ class panel_repository {
                 && !$lab['user_enrolled_here']
                 && !$lab['user_is_editor_anywhere'];
             $lab['can_enrol_visitor'] = !$lab['user_enrolled_here'];
+            // When the editor button is disabled, tell the student why: the one-editor rule
+            // (editor elsewhere) takes precedence over a full lab, since the lab may have a
+            // free slot yet still be blocked for this student.
+            $lab['editor_blocked_elsewhere'] = !$lab['can_enrol_editor']
+                && !$lab['user_enrolled_here']
+                && $lab['user_is_editor_anywhere'];
+            $lab['editor_block_aria'] = $lab['editor_blocked_elsewhere']
+                ? get_string('cannot_editor_elsewhere', 'local_virtuallab')
+                : get_string('lab_full', 'local_virtuallab');
             $lab['statuslabel']       = $this->status_label($lab);
             $lab['slotsleft_label']   = $lab['status_in_use']
                 ? $this->slots_left_label($this->maxteachers - $editorcount)

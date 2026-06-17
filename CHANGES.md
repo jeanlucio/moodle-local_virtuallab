@@ -7,7 +7,8 @@ Initial public release.
 - Batch management: admins create batches linked to a dedicated Moodle category; each batch can have one or more responsible teachers
 - Lab generation: generate up to 50 lab courses per batch from a configurable name prefix
 - Student self-service panel: shows lab status (available / in use / full) and lets students enrol themselves as editor or visitor with one click; shareable URL per batch
-- One-editor-anywhere rule: a student cannot hold editor slots in more than one lab per batch simultaneously
+- One-editor-anywhere rule: a student cannot hold editor slots in more than one lab per batch simultaneously; the panel explains why the editor button is disabled (already an editor elsewhere vs. lab full)
+- Self-service in the panel: becoming an editor asks for confirmation first, and a student can leave a lab they joined to free the slot and switch
 - Delegated teacher management: responsible teachers can rename their batch, manage co-teachers, set the lab prefix and override lifecycle settings, scoped to their own subcategory
 - Shared checklist task list per batch: when the Teacher Checklist block (`block_teacher_checklist`) is installed, the batch edit form gains a task list field; tasks entered there are pushed into the Teacher Checklist block of every lab created afterwards, and the block is added to each lab automatically. An "Apply task list to existing labs" action propagates the current task list to labs already created. The feature degrades silently when the block is not installed: the field is hidden and lab creation is unaffected
 - Lifecycle maintenance task: automatically resets or deletes overdue labs on a nightly schedule, with configurable thresholds per site and per batch

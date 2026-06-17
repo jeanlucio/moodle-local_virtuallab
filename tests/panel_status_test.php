@@ -174,6 +174,30 @@ final class panel_status_test extends advanced_testcase {
         $this->assertFalse($lab2['user_enrolled_here']);
         $this->assertFalse($lab2['can_enrol_editor']);
         $this->assertTrue($lab2['can_enrol_visitor']);
+        // The disabled editor button must explain the real reason, not "lab full".
+        $this->assertTrue($lab2['editor_blocked_elsewhere']);
+        $this->assertEquals(
+            get_string('cannot_editor_elsewhere', 'local_virtuallab'),
+            $lab2['editor_block_aria']
+        );
+    }
+
+    /**
+     * A full lab (not the one-editor rule) reports "full" as the editor block reason.
+     */
+    public function test_full_lab_block_reason_is_not_elsewhere(): void {
+        set_config('max_teachers_per_lab', 1, 'local_virtuallab');
+
+        ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs(1);
+        $this->enrol_as_editor($this->getDataGenerator()->create_user()->id, $courseids[0]);
+
+        $viewer = $this->getDataGenerator()->create_user();
+        $repo   = new panel_repository();
+        $labs   = $repo->get_panel_data($batchid, $viewer->id);
+
+        $this->assertFalse($labs[0]['can_enrol_editor']);
+        $this->assertFalse($labs[0]['editor_blocked_elsewhere']);
+        $this->assertEquals(get_string('lab_full', 'local_virtuallab'), $labs[0]['editor_block_aria']);
     }
 
     /**

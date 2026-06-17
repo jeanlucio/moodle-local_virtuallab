@@ -57,6 +57,7 @@ $PAGE->set_heading(format_string($batch->name));
 $action   = optional_param('action', '', PARAM_ALPHA);
 $role     = optional_param('role', '', PARAM_ALPHA);
 $courseid = optional_param('courseid', 0, PARAM_INT);
+$confirm  = optional_param('confirm', 0, PARAM_INT);
 
 if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $courseid) {
     require_sesskey();
@@ -112,6 +113,27 @@ if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $cours
                 \core\output\notification::NOTIFY_ERROR
             );
         }
+
+        // Becoming an editor commits the student to this lab (the one-editor rule blocks
+        // the others), so confirm before the irreversible-by-self enrolment.
+        if (!$confirm) {
+            $coursename = $DB->get_field('course', 'fullname', ['id' => $courseid], MUST_EXIST);
+            $confirmurl = new moodle_url($viewurl, [
+                'action'   => 'enrol',
+                'role'     => 'editor',
+                'courseid' => $courseid,
+                'confirm'  => 1,
+                'sesskey'  => sesskey(),
+            ]);
+            echo $OUTPUT->header();
+            echo $OUTPUT->confirm(
+                get_string('confirm_become_editor', 'local_virtuallab', format_string($coursename)),
+                $confirmurl,
+                $viewurl
+            );
+            echo $OUTPUT->footer();
+            exit;
+        }
     }
 
     require_once($CFG->libdir . '/enrollib.php');
@@ -121,6 +143,43 @@ if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $cours
 
     $courseurl = new moodle_url('/course/view.php', ['id' => $courseid]);
     redirect($courseurl);
+}
+
+if ($action === 'leave' && $courseid) {
+    require_sesskey();
+
+    $registry = new course_registry();
+    $lab      = $registry->get_lab_for_enrol($courseid, $batchid);
+
+    if (!$confirm) {
+        $coursename = $DB->get_field('course', 'fullname', ['id' => $courseid], MUST_EXIST);
+        $confirmurl = new moodle_url($viewurl, [
+            'action'   => 'leave',
+            'courseid' => $courseid,
+            'confirm'  => 1,
+            'sesskey'  => sesskey(),
+        ]);
+        echo $OUTPUT->header();
+        echo $OUTPUT->confirm(
+            get_string('confirm_leave_lab', 'local_virtuallab', format_string($coursename)),
+            $confirmurl,
+            $viewurl
+        );
+        echo $OUTPUT->footer();
+        exit;
+    }
+
+    require_once($CFG->libdir . '/enrollib.php');
+    $enrolinstance = $DB->get_record('enrol', ['id' => $lab->enrolid, 'courseid' => $courseid], '*', MUST_EXIST);
+    $enrolplugin   = enrol_get_plugin('manual');
+    $enrolplugin->unenrol_user($enrolinstance, $USER->id);
+
+    redirect(
+        $viewurl,
+        get_string('left_lab', 'local_virtuallab'),
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 // Render panel.

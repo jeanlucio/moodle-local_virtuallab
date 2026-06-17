@@ -38,6 +38,8 @@
                 "can_enrol_visitor": true,
                 "user_enrolled_here": false,
                 "user_is_editor_anywhere": false,
+                "editor_blocked_elsewhere": false,
+                "editor_block_aria": "Lab full",
                 "status_available": true,
                 "status_in_use": false,
                 "status_full": false,
@@ -109,9 +111,21 @@
                     {{/canmanage}}
                     <td class="text-nowrap">
                         {{#user_enrolled_here}}
-                        <span class="badge bg-secondary lv-badge-enrolled">
+                        <span class="badge bg-secondary lv-badge-enrolled me-1">
                             {{#str}} already_enrolled, local_virtuallab {{/str}}
                         </span>
+                        <form method="post" action="{{viewurl}}" class="d-inline">
+                            <input type="hidden" name="action" value="leave">
+                            <input type="hidden" name="batchid" value="{{batchid}}">
+                            <input type="hidden" name="courseid" value="{{courseid}}">
+                            <input type="hidden" name="sesskey" value="{{sesskey}}">
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-danger"
+                                    aria-label="{{#str}} leave_lab_label, local_virtuallab, {{coursename}} {{/str}}">
+                                <i class="fa fa-arrow-right-from-bracket me-1" aria-hidden="true"></i>
+                                {{#str}} leave_lab, local_virtuallab {{/str}}
+                            </button>
+                        </form>
                         {{/user_enrolled_here}}
                         {{^user_enrolled_here}}
                         {{#can_enrol_editor}}
@@ -132,7 +146,7 @@
                         <button type="button"
                                 class="btn btn-sm btn-primary me-1"
                                 disabled
-                                aria-label="{{#str}} lab_full, local_virtuallab {{/str}}">
+                                aria-label="{{editor_block_aria}}">
                             {{#str}} report_role_editor, local_virtuallab {{/str}}
                         </button>
                         {{/can_enrol_editor}}
@@ -148,6 +162,11 @@
                                 {{#str}} report_role_visitor, local_virtuallab {{/str}}
                             </button>
                         </form>
+                        {{#editor_blocked_elsewhere}}
+                        <div class="small text-body-secondary mt-1">
+                            <i class="fa fa-circle-info me-1" aria-hidden="true"></i>{{editor_block_aria}}
+                        </div>
+                        {{/editor_blocked_elsewhere}}
                         {{/user_enrolled_here}}
                     </td>
                 </tr>

@@ -19,10 +19,11 @@ Feature: Lab Virtual student panel
     And I should see "Lab EAD 01"
     And I should see "Available"
 
-  Scenario: Student enrols as editor and is redirected to the course
+  Scenario: Student enrols as editor after confirming and is redirected to the course
     Given I log in as "student1"
     When I visit the student panel for batch "UI 2026"
     And I click on "Slot holder" "button" in the "Lab EAD 01" "table_row"
+    And I press "Continue"
     Then I should see "Lab EAD 01"
     And I should see "Participants"
 
@@ -32,6 +33,15 @@ Feature: Lab Virtual student panel
     When I visit the student panel for batch "UI 2026"
     Then I should see "Enrolled" in the "Lab EAD 01" "table_row"
     And the "Slot holder" "button" should be disabled
+    And I should see "You are already an editor in another lab in this batch."
+
+  Scenario: Student leaves a lab and frees the slot
+    Given the user "student1" is already enrolled as editor in a lab of batch "UI 2026"
+    And I log in as "student1"
+    When I visit the student panel for batch "UI 2026"
+    And I click on "Leave" "button" in the "Lab EAD 01" "table_row"
+    And I press "Continue"
+    Then I should see "You have left the lab."
 
   Scenario: Non-authenticated user cannot access the panel
     When I visit the student panel for batch "UI 2026"
