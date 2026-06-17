@@ -175,4 +175,30 @@ final class panel_status_test extends advanced_testcase {
         $this->assertFalse($lab2['can_enrol_editor']);
         $this->assertTrue($lab2['can_enrol_visitor']);
     }
+
+    /**
+     * The panel honours the batch's maxteachers override, not the global default.
+     *
+     * Regression: the panel used to read only the global max_teachers_per_lab, so a batch
+     * that lowered the cap showed a wrong status and an editor button that view.php refused.
+     */
+    public function test_panel_honours_batch_maxteachers_override(): void {
+        global $DB;
+
+        set_config('max_teachers_per_lab', 3, 'local_virtuallab');
+
+        ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs(1);
+        $DB->set_field('local_virtuallab_batches', 'maxteachers', 1, ['id' => $batchid]);
+
+        $this->enrol_as_editor($this->getDataGenerator()->create_user()->id, $courseids[0]);
+
+        $viewer = $this->getDataGenerator()->create_user();
+        $repo   = new panel_repository();
+        $labs   = $repo->get_panel_data($batchid, $viewer->id);
+
+        // With the override of 1 and one editor present, the lab is full — not "in use".
+        $this->assertTrue($labs[0]['status_full']);
+        $this->assertFalse($labs[0]['status_in_use']);
+        $this->assertFalse($labs[0]['can_enrol_editor']);
+    }
 }

@@ -28,7 +28,7 @@ namespace local_virtuallab\local;
  * Fetches all panel data for a batch in a single JOIN query, aggregating in PHP.
  */
 class panel_repository {
-    /** @var int Maximum editors per lab (from plugin config). */
+    /** @var int Maximum editors per lab (effective value for the batch being rendered). */
     private int $maxteachers;
 
     /** @var int Role ID for editingteacher, cached to avoid repeated queries. */
@@ -39,7 +39,6 @@ class panel_repository {
      */
     public function __construct() {
         global $DB;
-        $this->maxteachers   = (int) get_config('local_virtuallab', 'max_teachers_per_lab') ?: 3;
         $this->teacherroleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
     }
 
@@ -52,6 +51,11 @@ class panel_repository {
      */
     public function get_panel_data(int $batchid, int $userid): array {
         global $DB;
+
+        // Resolve the editor cap from the batch's effective settings (per-batch override or
+        // global default) so the panel status matches what view.php enforces on enrolment.
+        $batch = $DB->get_record('local_virtuallab_batches', ['id' => $batchid], '*', MUST_EXIST);
+        $this->maxteachers = batch_settings::effective($batch)->maxteachers;
 
         $sql = "SELECT lc.id          AS labid,
                        lc.courseid,
