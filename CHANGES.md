@@ -15,7 +15,7 @@ Initial public release.
 - Visible lifecycle deadline: a single "Scheduled: reset/delete on DATE" line sits above the manage list and the student panel, expanding to a per-lab date only when an individual reset makes the dates diverge
 - Safe recount on policy change: enabling or tightening the lifecycle (globally or per batch) restarts the countdown from that moment for existing labs, so no lab is ever reset or deleted without first going through the warning window
 - Reset restores the lab name: resetting a lab (manually or via the maintenance task) returns its course fullname and shortname to the values they had at creation, undoing any rename a student made
-- Warning emails: responsible teachers are notified a configurable number of days before a lifecycle action runs, using each lab's real deadline (the soonest among the warned labs) instead of a fixed window
+- Warning emails: responsible teachers are notified a configurable number of days before a lifecycle action runs, using each lab's real deadline instead of a fixed window; the email shows one date when all labs share it and a per-lab date when they diverge
 - Summary emails: after each maintenance run, each affected teacher receives a summary of what happened to their labs
 - Visitor notice: a logged-in user who opens a managed lab without access sees the responsible teacher(s) to contact
 - Audit events: lab reset, lab deleted, batch deleted

@@ -58,32 +58,23 @@ class notification_service {
         $teachers    = $this->get_teachers_by_batch(array_keys($bybatch));
         $coursenames = $this->get_course_names($labs);
         $actionlabel = $this->action_label($action);
-        $datestr     = userdate($cutoffdate->getTimestamp(), get_string('strftimedate', 'langconfig'));
         $days        = max(0, (int) ceil(($cutoffdate->getTimestamp() - time()) / DAYSECS));
         $from        = \core_user::get_noreply_user();
+
+        $subject = get_string('email_warning_subject', 'local_virtuallab', (object) [
+            'action' => $actionlabel,
+            'days'   => $days,
+        ]);
 
         foreach ($bybatch as $batchid => $batchlabs) {
             if (empty($teachers[$batchid])) {
                 continue;
             }
 
-            $subject = get_string('email_warning_subject', 'local_virtuallab', (object) [
-                'action' => $actionlabel,
-                'days'   => $days,
-            ]);
+            $list = $this->warning_items($batchlabs, $coursenames);
 
-            $intro = get_string('email_warning_body', 'local_virtuallab', (object) [
-                'action' => $actionlabel,
-                'date'   => $datestr,
-            ]);
-
-            $items = [];
-            foreach ($batchlabs as $lab) {
-                $items[] = $coursenames[$lab->courseid] ?? ('#' . $lab->courseid);
-            }
-
-            $html = \html_writer::tag('p', s($intro));
-            $html .= $this->render_list($items);
+            $html = \html_writer::tag('p', s($this->warning_intro('email_warning_body', $actionlabel, $list)));
+            $html .= $this->render_list($list['items']);
             $html .= $this->link_paragraph(
                 new \moodle_url('/local/virtuallab/view.php', ['batchid' => $batchid]),
                 'email_panel_link'
@@ -96,41 +87,79 @@ class notification_service {
             }
         }
 
-        $this->send_warning_editors($labs, $coursenames, $actionlabel, $datestr, $days, $from);
+        $this->send_warning_editors($labs, $coursenames, $actionlabel, $from);
 
         if ($this->notify_admin()) {
+            $adminlist = $this->warning_items($labs, $coursenames);
             $this->send_admin_copy(
-                get_string('email_warning_subject', 'local_virtuallab', (object) [
-                    'action' => $actionlabel,
-                    'days'   => $days,
-                ]),
-                get_string('email_warning_body', 'local_virtuallab', (object) [
-                    'action' => $actionlabel,
-                    'date'   => $datestr,
-                ]),
-                array_map(fn($lab) => $coursenames[$lab->courseid] ?? ('#' . $lab->courseid), $labs),
+                $subject,
+                $this->warning_intro('email_warning_body', $actionlabel, $adminlist),
+                $adminlist['items'],
                 $from
             );
         }
     }
 
     /**
+     * Builds the lab list lines for a warning email, collapsing the date when every lab
+     * shares it and appending each lab's own date when they diverge.
+     *
+     * @param \stdClass[] $labs        Labs carrying courseid and lifecycledeadline.
+     * @param string[]    $coursenames Course full names indexed by course ID.
+     * @return array{shared: bool, deadline: int, items: string[]}
+     */
+    private function warning_items(array $labs, array $coursenames): array {
+        $summary = lifecycle::summarise_deadlines(array_map(
+            static fn($lab) => (int) ($lab->lifecycledeadline ?? 0),
+            $labs
+        ));
+
+        $items = [];
+        foreach ($labs as $lab) {
+            $name = $coursenames[$lab->courseid] ?? ('#' . $lab->courseid);
+            $deadline = (int) ($lab->lifecycledeadline ?? 0);
+            if (!$summary['shared'] && $deadline > 0) {
+                $name .= ' — ' . userdate($deadline, get_string('strftimedate', 'langconfig'));
+            }
+            $items[] = $name;
+        }
+
+        return ['shared' => $summary['shared'], 'deadline' => $summary['deadline'], 'items' => $items];
+    }
+
+    /**
+     * Returns the warning intro: the dated string when all labs share a deadline, or the
+     * date-free "_multi" variant when the dates are shown per lab.
+     *
+     * @param string $sharedkey   Language key used when the deadline is shared.
+     * @param string $actionlabel Localised action verb.
+     * @param array  $list        Result of warning_items (shared flag and deadline).
+     * @return string
+     */
+    private function warning_intro(string $sharedkey, string $actionlabel, array $list): string {
+        if ($list['shared']) {
+            return get_string($sharedkey, 'local_virtuallab', (object) [
+                'action' => $actionlabel,
+                'date'   => userdate($list['deadline'], get_string('strftimedate', 'langconfig')),
+            ]);
+        }
+
+        return get_string($sharedkey . '_multi', 'local_virtuallab', (object) ['action' => $actionlabel]);
+    }
+
+    /**
      * Sends warning emails to the editors of each affected course, one email per
      * editor listing all of their labs in the warning window.
      *
-     * @param \stdClass[] $labs        Warned lab rows.
+     * @param \stdClass[] $labs        Warned lab rows carrying lifecycledeadline.
      * @param string[]    $coursenames Course full names indexed by course ID.
      * @param string      $actionlabel Localised action verb.
-     * @param string      $datestr     Formatted deadline date.
-     * @param int         $days        Days until the deadline.
      * @param \stdClass   $from        No-reply sender.
      */
     private function send_warning_editors(
         array $labs,
         array $coursenames,
         string $actionlabel,
-        string $datestr,
-        int $days,
         \stdClass $from
     ): void {
         $courseids = array_map(fn($lab) => $lab->courseid, $labs);
@@ -140,21 +169,43 @@ class notification_service {
             return;
         }
 
-        $subject = get_string('email_warning_subject', 'local_virtuallab', (object) [
-            'action' => $actionlabel,
-            'days'   => $days,
-        ]);
-        $intro = get_string('email_warning_editor_body', 'local_virtuallab', (object) [
-            'action' => $actionlabel,
-            'date'   => $datestr,
-        ]);
+        $labbycourse = [];
+        foreach ($labs as $lab) {
+            $labbycourse[$lab->courseid] = $lab;
+        }
 
         foreach ($byeditor as $entry) {
-            $courses = [];
+            $editorlabs = [];
             foreach ($entry['courseids'] as $cid) {
-                $courses[$cid] = $coursenames[$cid] ?? ('#' . $cid);
+                if (isset($labbycourse[$cid])) {
+                    $editorlabs[] = $labbycourse[$cid];
+                }
             }
-            $html = \html_writer::tag('p', s($intro)) . $this->render_course_links($courses);
+
+            $summary = lifecycle::summarise_deadlines(array_map(
+                static fn($lab) => (int) ($lab->lifecycledeadline ?? 0),
+                $editorlabs
+            ));
+            $soonest = $editorlabs
+                ? min(array_map(static fn($lab) => (int) ($lab->lifecycledeadline ?? 0), $editorlabs))
+                : 0;
+
+            $subject = get_string('email_warning_subject', 'local_virtuallab', (object) [
+                'action' => $actionlabel,
+                'days'   => max(0, (int) ceil(($soonest - time()) / DAYSECS)),
+            ]);
+            $intro = $this->warning_intro('email_warning_editor_body', $actionlabel, $summary);
+
+            $courses = [];
+            $dates   = [];
+            foreach ($editorlabs as $lab) {
+                $courses[$lab->courseid] = $coursenames[$lab->courseid] ?? ('#' . $lab->courseid);
+                if (!$summary['shared'] && (int) ($lab->lifecycledeadline ?? 0) > 0) {
+                    $dates[$lab->courseid] = (int) $lab->lifecycledeadline;
+                }
+            }
+
+            $html = \html_writer::tag('p', s($intro)) . $this->render_course_links($courses, $dates);
             $text = html_to_text($html);
             email_to_user($entry['user'], $from, $subject, $text, $html);
         }
@@ -427,16 +478,22 @@ class notification_service {
     }
 
     /**
-     * Renders a list of courses as links to their course pages.
+     * Renders a list of courses as links to their course pages, optionally appending each
+     * course's lifecycle deadline.
      *
      * @param string[] $coursenames Course full names indexed by course ID.
+     * @param int[]    $dates       Deadline timestamps indexed by course ID (optional).
      * @return string HTML markup.
      */
-    private function render_course_links(array $coursenames): string {
+    private function render_course_links(array $coursenames, array $dates = []): string {
         $listitems = '';
         foreach ($coursenames as $courseid => $name) {
-            $url = new \moodle_url('/course/view.php', ['id' => $courseid]);
-            $listitems .= \html_writer::tag('li', \html_writer::link($url, $name));
+            $url   = new \moodle_url('/course/view.php', ['id' => $courseid]);
+            $label = \html_writer::link($url, $name);
+            if (!empty($dates[$courseid])) {
+                $label .= ' — ' . s(userdate((int) $dates[$courseid], get_string('strftimedate', 'langconfig')));
+            }
+            $listitems .= \html_writer::tag('li', $label);
         }
 
         return \html_writer::tag('ul', $listitems);

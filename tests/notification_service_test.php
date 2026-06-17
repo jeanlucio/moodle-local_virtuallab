@@ -103,6 +103,52 @@ final class notification_service_test extends advanced_testcase {
     }
 
     /**
+     * When the warned labs share one deadline, the email shows it once and lists plain names.
+     */
+    public function test_send_warnings_collapses_shared_deadline(): void {
+        ['labs' => $labs] = $this->create_batch_with_labs();
+        $labs = array_values($labs);
+
+        $deadline = time() + 5 * DAYSECS;
+        foreach ($labs as $lab) {
+            $lab->lifecycledeadline = $deadline;
+        }
+
+        $sink = $this->redirectEmails();
+        (new notification_service())->send_warnings($labs, maintenance_task::ACTION_RESET, new \DateTime("@{$deadline}"));
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $body = quoted_printable_decode($messages[0]->body);
+        $datestr = userdate($deadline, get_string('strftimedate', 'langconfig'));
+        $this->assertStringContainsString($datestr, $body, 'The shared date should appear in the intro.');
+        $this->assertStringNotContainsString(' — ', $body, 'Per-lab dates should not be repeated when shared.');
+    }
+
+    /**
+     * When the warned labs have different deadlines, each lab carries its own date.
+     */
+    public function test_send_warnings_shows_per_lab_dates_when_divergent(): void {
+        ['labs' => $labs] = $this->create_batch_with_labs();
+        $labs = array_values($labs);
+
+        $early = time() + 3 * DAYSECS;
+        $late  = time() + 9 * DAYSECS;
+        $labs[0]->lifecycledeadline = $early;
+        $labs[1]->lifecycledeadline = $late;
+
+        $sink = $this->redirectEmails();
+        (new notification_service())->send_warnings($labs, maintenance_task::ACTION_RESET, new \DateTime("@{$early}"));
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $body = quoted_printable_decode($messages[0]->body);
+        $this->assertStringContainsString(userdate($early, get_string('strftimedate', 'langconfig')), $body);
+        $this->assertStringContainsString(userdate($late, get_string('strftimedate', 'langconfig')), $body);
+        $this->assertStringContainsString(' — ', $body, 'Diverging labs should show a per-lab date.');
+    }
+
+    /**
      * send_warnings does nothing when given no labs.
      */
     public function test_send_warnings_empty_sends_nothing(): void {
