@@ -123,7 +123,7 @@ class course_factory {
             }
             if (!$manual) {
                 $manualid = $manualplugin->add_instance($course);
-                $manual   = $DB->get_record('enrol', ['id' => $manualid], '*', MUST_EXIST);
+                $manual   = (object) ['id' => $manualid];
             }
 
             $records[] = (object) [

@@ -85,11 +85,84 @@ class checklist_integration {
             ['batchid' => $batchid]
         );
 
-        foreach ($courseids as $courseid) {
-            $this->provision_course((int) $courseid, $titles);
+        if (!$courseids) {
+            return 0;
         }
 
+        foreach ($courseids as $courseid) {
+            \block_teacher_checklist\local\external_tasks::replace(
+                (int) $courseid,
+                self::SOURCE,
+                $titles
+            );
+        }
+
+        $this->ensure_blocks_bulk($courseids);
+
         return count($courseids);
+    }
+
+    /**
+     * Adds the checklist block to every course in the list that does not yet have one.
+     *
+     * Uses two bulk queries to determine which courses need the block, then fetches
+     * course records for those courses in a third bulk query before acting.
+     *
+     * @param int[]|string[] $courseids Lab course IDs to inspect.
+     */
+    private function ensure_blocks_bulk(array $courseids): void {
+        global $DB;
+
+        [$insql, $inparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+        $inparams['ctxlevel'] = CONTEXT_COURSE;
+        $ctxrecords = $DB->get_records_sql(
+            "SELECT id, instanceid FROM {context} WHERE contextlevel = :ctxlevel AND instanceid $insql",
+            $inparams
+        );
+
+        if (!$ctxrecords) {
+            return;
+        }
+
+        $contextidtocourseid = [];
+        foreach ($ctxrecords as $rec) {
+            $contextidtocourseid[(int) $rec->id] = (int) $rec->instanceid;
+        }
+
+        [$ctxinsql, $ctxparams] = $DB->get_in_or_equal(
+            array_keys($contextidtocourseid),
+            SQL_PARAMS_NAMED
+        );
+        $ctxparams['blockname'] = 'teacher_checklist';
+        $existingctxids = $DB->get_fieldset_select(
+            'block_instances',
+            'parentcontextid',
+            "blockname = :blockname AND parentcontextid $ctxinsql",
+            $ctxparams
+        );
+
+        $existingset = array_flip($existingctxids);
+        $missingids  = [];
+        foreach ($contextidtocourseid as $ctxid => $courseid) {
+            if (!isset($existingset[$ctxid])) {
+                $missingids[] = $courseid;
+            }
+        }
+
+        if (!$missingids) {
+            return;
+        }
+
+        [$cinsql, $cparams] = $DB->get_in_or_equal($missingids, SQL_PARAMS_NAMED);
+        $courses = $DB->get_records_sql("SELECT * FROM {course} WHERE id $cinsql", $cparams);
+        foreach ($courses as $course) {
+            $page = new \moodle_page();
+            $page->set_course($course);
+            $page->blocks->add_blocks(
+                [self::BLOCKREGION => ['teacher_checklist']],
+                'course-view-*'
+            );
+        }
     }
 
     /**
