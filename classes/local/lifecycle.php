@@ -88,4 +88,43 @@ class lifecycle {
 
         return strtotime('+' . $settings->lifecyclemonths . ' months', self::reference($batch, $lab));
     }
+
+    /**
+     * Decides whether a set of lab deadlines can collapse to a single batch-wide line.
+     *
+     * @param int[] $deadlines One deadline timestamp per lab (0 when the lifecycle is off).
+     * @return array{shared: bool, deadline: int} shared is true only when every lab carries
+     *         the same non-zero deadline; deadline then holds that shared timestamp, else 0.
+     */
+    public static function summarise_deadlines(array $deadlines): array {
+        if (empty($deadlines)) {
+            return ['shared' => false, 'deadline' => 0];
+        }
+
+        $distinct = array_unique($deadlines);
+        if (count($distinct) === 1 && (int) reset($distinct) > 0) {
+            return ['shared' => true, 'deadline' => (int) reset($distinct)];
+        }
+
+        return ['shared' => false, 'deadline' => 0];
+    }
+
+    /**
+     * Builds the "Scheduled: reset/delete on DATE" label for a batch-wide deadline.
+     *
+     * @param \stdClass $batch    Batch record (resolves the reset/delete verb).
+     * @param int       $deadline Shared deadline timestamp.
+     * @return string Localised label, or empty string when no deadline applies.
+     */
+    public static function scheduled_label(\stdClass $batch, int $deadline): string {
+        if ($deadline <= 0) {
+            return '';
+        }
+
+        $key = (int) batch_settings::effective($batch)->lifecycleaction === 2
+            ? 'scheduled_action_delete'
+            : 'scheduled_action_reset';
+
+        return get_string($key, 'local_virtuallab', userdate($deadline, get_string('strftimedate', 'langconfig')));
+    }
 }

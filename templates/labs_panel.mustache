@@ -28,6 +28,7 @@
         "sesskey": "abc123",
         "viewurl": "/local/virtuallab/view.php?batchid=1",
         "haslabs": true,
+        "scheduledlabel": "Scheduled: reset on 17 April 2027",
         "labs": [
             {
                 "labid": 1,
@@ -59,6 +60,12 @@
             {{teachername}}
         </p>
     </div>
+
+    {{#scheduledlabel}}
+    <p class="text-body-secondary mb-3">
+        <i class="fa fa-clock me-1" aria-hidden="true"></i>{{scheduledlabel}}
+    </p>
+    {{/scheduledlabel}}
 
     {{#haslabs}}
     <div class="table-responsive">

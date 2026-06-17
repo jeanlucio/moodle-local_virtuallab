@@ -40,6 +40,8 @@
             }
         ],
         "haslabs": true,
+        "scheduledlabel": "Scheduled: delete on 12 Sep 2026",
+        "divergent": false,
         "panelurl": "https://moodle.example.com/local/virtuallab/view.php?batchid=1",
         "qrsvg": "data:image/svg+xml;base64,PHN2Zy8+",
         "qralt": "QR code do painel de estudantes",
@@ -117,6 +119,11 @@
     </div>
 
     {{#haslabs}}
+    {{#scheduledlabel}}
+    <p class="text-body-secondary mb-3">
+        <i class="fa fa-clock me-1" aria-hidden="true"></i>{{scheduledlabel}}
+    </p>
+    {{/scheduledlabel}}
     <div class="mb-3 d-flex justify-content-end">
         <a href="{{createurl}}" class="btn btn-success">
             <i class="fa fa-plus me-1" aria-hidden="true"></i>
@@ -144,7 +151,9 @@
                         <th scope="col">Lab</th>
                         <th scope="col">Shortname</th>
                         <th scope="col">{{#str}} lastreset, local_virtuallab {{/str}}</th>
+                        {{#divergent}}
                         <th scope="col">{{#str}} next_action, local_virtuallab {{/str}}</th>
+                        {{/divergent}}
                         <th scope="col" class="text-end"
                             aria-label="{{#str}} actions, core {{/str}}"></th>
                     </tr>
@@ -167,7 +176,9 @@
                         </td>
                         <td><code>{{shortname}}</code></td>
                         <td>{{lastreset}}</td>
+                        {{#divergent}}
                         <td class="text-nowrap">{{nextaction}}</td>
+                        {{/divergent}}
                         <td class="text-end text-nowrap">
                             <a href="{{reseturl}}"
                                class="btn btn-sm btn-outline-warning me-1"

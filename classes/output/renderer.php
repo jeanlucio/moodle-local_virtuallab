@@ -87,9 +87,19 @@ class renderer extends plugin_renderer_base {
         int $batchid,
         bool $canmanage = false
     ): string {
+        // When every lab shares one deadline, collapse it into a single line above the table;
+        // only keep the per-lab date when an individual reset made the dates diverge.
+        $summary = lifecycle::summarise_deadlines(array_map(
+            static fn($lab) => (int) ($lab['deadline'] ?? 0),
+            $labs
+        ));
+
         $labrows = [];
         foreach ($labs as $lab) {
             $lab['courseurl'] = (new \moodle_url('/course/view.php', ['id' => $lab['courseid']]))->out(false);
+            if ($summary['shared']) {
+                $lab['deadline_label'] = '';
+            }
             $labrows[] = $lab;
         }
 
@@ -102,6 +112,7 @@ class renderer extends plugin_renderer_base {
             'viewurl'         => (new \moodle_url('/local/virtuallab/view.php', ['batchid' => $batchid]))->out(false),
             'haslabs'         => !empty($labs),
             'labs'            => $labrows,
+            'scheduledlabel'  => lifecycle::scheduled_label($batch, $summary['deadline']),
         ];
 
         return $this->render_from_template('local_virtuallab/labs_panel', $context);
@@ -184,10 +195,19 @@ class renderer extends plugin_renderer_base {
         $action = (int) batch_settings::effective($batch)->lifecycleaction;
         $actionkey = $action === 2 ? 'next_action_delete' : 'next_action_reset';
 
+        // Collapse a shared deadline into one line above the table; show the per-lab column
+        // only when an individual reset made the dates diverge.
+        $deadlines = [];
+        foreach ($labs as $lab) {
+            $deadlines[$lab->id] = lifecycle::deadline($batch, $lab);
+        }
+        $summary   = lifecycle::summarise_deadlines($deadlines);
+        $divergent = !$summary['shared'] && (bool) array_filter($deadlines);
+
         $rows = [];
 
         foreach ($labs as $lab) {
-            $deadline = lifecycle::deadline($batch, $lab);
+            $deadline = $deadlines[$lab->id];
             $rows[] = [
                 'id'          => $lab->id,
                 'coursename'  => format_string($lab->coursename),
@@ -232,6 +252,8 @@ class renderer extends plugin_renderer_base {
             'syncurl'      => $syncurl,
             'sesskey'      => sesskey(),
             'strpanelhelp' => get_string('panel_url_help', 'local_virtuallab'),
+            'scheduledlabel' => lifecycle::scheduled_label($batch, $summary['deadline']),
+            'divergent'    => $divergent,
         ];
 
         return $this->render_from_template('local_virtuallab/manage_labs', $context);
