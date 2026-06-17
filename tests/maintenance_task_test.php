@@ -27,6 +27,7 @@ namespace local_virtuallab;
 use advanced_testcase;
 use local_virtuallab\local\batch_manager;
 use local_virtuallab\local\course_factory;
+use local_virtuallab\local\lifecycle;
 use local_virtuallab\task\maintenance_task;
 
 /**
@@ -244,6 +245,43 @@ final class maintenance_task_test extends advanced_testcase {
         $this->assertGreaterThan(0, (int) $lab->lastwarn, 'lastwarn should have been set.');
         $this->assertEquals(0, (int) $lab->lastreset, 'Lab in the warning window should not be reset.');
         $this->assertGreaterThanOrEqual(1, count($messages), 'A warning email should have been sent.');
+    }
+
+    /**
+     * The warning email reflects the lab's real deadline, not now + warning_days_before.
+     *
+     * Regression: the email used to promise the full warning window even for a lab whose
+     * action is imminent. With a 30-day window and a lab already at its cutoff, the email
+     * must report the real (near-zero) days remaining.
+     */
+    public function test_warning_email_uses_real_deadline(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
+        set_config('warning_days_before', 30, 'local_virtuallab');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 6);
+
+        $batch        = (new batch_manager())->get_batch($batchid);
+        $lab          = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
+        $realdeadline = lifecycle::deadline($batch, $lab);
+        $expecteddays = max(0, (int) ceil(($realdeadline - time()) / DAYSECS));
+
+        $sink = $this->redirectEmails();
+        $this->run_task();
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertGreaterThanOrEqual(1, count($messages));
+        $expectedsubject = get_string('email_warning_subject', 'local_virtuallab', (object) [
+            'action' => get_string('email_action_reset', 'local_virtuallab'),
+            'days'   => $expecteddays,
+        ]);
+        $this->assertEquals($expectedsubject, $messages[0]->subject);
+        // The old fixed-deadline behaviour would have claimed the full 30-day window.
+        $this->assertNotEquals(30, $expecteddays);
     }
 
     /**

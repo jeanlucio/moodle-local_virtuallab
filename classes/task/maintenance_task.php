@@ -135,7 +135,12 @@ class maintenance_task extends \core\task\scheduled_task {
             }
 
             if ($warnlabs) {
-                $deadline = time() + $warningdays * DAYSECS;
+                // Warn with the soonest real deadline among these labs, not a fixed
+                // now + warningdays, so the email never promises more time than exists.
+                $deadline = min(array_map(
+                    static fn($warnlab) => lifecycle::deadline($batch, $warnlab),
+                    $warnlabs
+                ));
                 $notification->send_warnings($warnlabs, $action, new \DateTime("@{$deadline}"));
                 foreach ($warnlabs as $warnlab) {
                     $warnedids[] = $warnlab->id;
