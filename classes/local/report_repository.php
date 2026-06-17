@@ -277,40 +277,30 @@ class report_repository {
     }
 
     /**
-     * Returns a human-readable label for a Moodle event component.
+     * Returns a human-readable, localised label for a Moodle event component.
      *
-     * Falls back to the raw component string for unknown values.
+     * Modules reuse their own localised plugin name; 'core' maps to a plugin string.
+     * Falls back to the raw component for anything unknown.
      *
      * @param string $component Raw component name (e.g. 'mod_assign').
      * @return string
      */
     public static function component_label(string $component): string {
-        $map = [
-            'core'         => 'Curso',
-            'mod_assign'   => 'Tarefa',
-            'mod_forum'    => 'Fórum',
-            'mod_quiz'     => 'Questionário',
-            'mod_resource' => 'Arquivo',
-            'mod_page'     => 'Página',
-            'mod_url'      => 'URL',
-            'mod_folder'   => 'Pasta',
-            'mod_wiki'     => 'Wiki',
-            'mod_glossary' => 'Glossário',
-            'mod_chat'     => 'Chat',
-            'mod_book'     => 'Livro',
-            'mod_lti'      => 'Ferramenta externa',
-            'mod_scorm'    => 'SCORM',
-            'mod_feedback' => 'Feedback',
-            'mod_survey'   => 'Pesquisa',
-            'mod_choice'   => 'Escolha',
-            'mod_data'     => 'Base de dados',
-            'mod_lesson'   => 'Lição',
-        ];
-        return $map[$component] ?? $component;
+        if ($component === 'core') {
+            return get_string('report_component_core', 'local_virtuallab');
+        }
+
+        $ismodule = strpos($component, 'mod_') === 0
+            && get_string_manager()->string_exists('pluginname', $component);
+        if ($ismodule) {
+            return get_string('pluginname', $component);
+        }
+
+        return $component;
     }
 
     /**
-     * Returns a human-readable label for a Moodle event action.
+     * Returns a human-readable, localised label for a Moodle event action.
      *
      * Falls back to the raw action string for unknown values.
      *
@@ -318,20 +308,11 @@ class report_repository {
      * @return string
      */
     public static function action_label(string $action): string {
-        $map = [
-            'viewed'    => 'visualizado',
-            'submitted' => 'enviado',
-            'created'   => 'criado',
-            'updated'   => 'atualizado',
-            'deleted'   => 'excluído',
-            'graded'    => 'avaliado',
-            'uploaded'  => 'enviado (arquivo)',
-            'downloaded' => 'baixado',
-            'started'   => 'iniciado',
-            'attempted' => 'tentativa realizada',
-            'finished'  => 'concluído',
-            'failed'    => 'reprovado',
-        ];
-        return $map[$action] ?? $action;
+        $key = 'report_action_' . $action;
+        if (get_string_manager()->string_exists($key, 'local_virtuallab')) {
+            return get_string($key, 'local_virtuallab');
+        }
+
+        return $action;
     }
 }
