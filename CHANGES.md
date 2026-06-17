@@ -11,6 +11,7 @@ Initial public release.
 - Delegated teacher management: responsible teachers can rename their batch, manage co-teachers, set the lab prefix and override lifecycle settings, scoped to their own subcategory
 - Shared checklist task list per batch: when the Teacher Checklist block (`block_teacher_checklist`) is installed, the batch edit form gains a task list field; tasks entered there are pushed into the Teacher Checklist block of every lab created afterwards, and the block is added to each lab automatically. An "Apply task list to existing labs" action propagates the current task list to labs already created. The feature degrades silently when the block is not installed: the field is hidden and lab creation is unaffected
 - Lifecycle maintenance task: automatically resets or deletes overdue labs on a nightly schedule, with configurable thresholds per site and per batch
+- Reset restores the lab name: resetting a lab (manually or via the maintenance task) returns its course fullname and shortname to the values they had at creation, undoing any rename a student made
 - Warning emails: responsible teachers are notified a configurable number of days before a lifecycle action runs
 - Summary emails: after each maintenance run, each affected teacher receives a summary of what happened to their labs
 - Visitor notice: a logged-in user who opens a managed lab without access sees the responsible teacher(s) to contact

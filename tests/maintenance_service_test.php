@@ -80,6 +80,53 @@ final class maintenance_service_test extends advanced_testcase {
     }
 
     /**
+     * Resetting a lab restores the course fullname and shortname a student renamed.
+     */
+    public function test_reset_lab_restores_original_name(): void {
+        global $DB;
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs(1);
+
+        $lab           = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
+        $originalname  = $lab->originalfullname;
+        $originalshort = $lab->originalshortname;
+        $this->assertNotEmpty($originalname);
+
+        // Simulate a student renaming their sandbox course.
+        $DB->set_field('course', 'fullname', 'Renamed by student', ['id' => $lab->courseid]);
+        $DB->set_field('course', 'shortname', 'renamed-short', ['id' => $lab->courseid]);
+
+        $service = new maintenance_service();
+        $service->reset_lab((int) $lab->id, $batchid);
+
+        $course = $DB->get_record('course', ['id' => $lab->courseid], 'fullname, shortname');
+        $this->assertEquals($originalname, $course->fullname);
+        $this->assertEquals($originalshort, $course->shortname);
+    }
+
+    /**
+     * The shortname is not restored when another course already holds it, so the reset
+     * cannot fail on the unique-shortname constraint.
+     */
+    public function test_reset_lab_keeps_shortname_when_taken(): void {
+        global $DB;
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs(1);
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
+
+        // Rename the lab, then let another course occupy the original shortname.
+        $DB->set_field('course', 'shortname', 'renamed-short', ['id' => $lab->courseid]);
+        $this->getDataGenerator()->create_course(['shortname' => $lab->originalshortname]);
+
+        $service = new maintenance_service();
+        $service->reset_lab((int) $lab->id, $batchid);
+
+        $course = $DB->get_record('course', ['id' => $lab->courseid], 'fullname, shortname');
+        $this->assertEquals('renamed-short', $course->shortname);
+        $this->assertEquals($lab->originalfullname, $course->fullname);
+    }
+
+    /**
      * Resetting a lab with a wrong batchid throws because the ownership check fails.
      */
     public function test_reset_lab_wrong_batch_throws(): void {

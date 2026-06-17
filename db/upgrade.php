@@ -53,5 +53,57 @@ function xmldb_local_virtuallab_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061605, 'local', 'virtuallab');
     }
 
+    if ($oldversion < 2026061700) {
+        $table = new xmldb_table('local_virtuallab_courses');
+
+        $fullnamefield = new xmldb_field(
+            'originalfullname',
+            XMLDB_TYPE_CHAR,
+            '1333',
+            null,
+            null,
+            null,
+            null,
+            'lastwarn'
+        );
+        if (!$dbman->field_exists($table, $fullnamefield)) {
+            $dbman->add_field($table, $fullnamefield);
+        }
+
+        $shortnamefield = new xmldb_field(
+            'originalshortname',
+            XMLDB_TYPE_CHAR,
+            '255',
+            null,
+            null,
+            null,
+            null,
+            'originalfullname'
+        );
+        if (!$dbman->field_exists($table, $shortnamefield)) {
+            $dbman->add_field($table, $shortnamefield);
+        }
+
+        // Backfill the baseline from each lab's current course name. For labs already
+        // created this is the best reference available; newly created labs store their
+        // name at creation time.
+        $rs = $DB->get_recordset_sql(
+            "SELECT lc.id, c.fullname, c.shortname
+               FROM {local_virtuallab_courses} lc
+               JOIN {course} c ON c.id = lc.courseid
+              WHERE lc.originalfullname IS NULL"
+        );
+        foreach ($rs as $row) {
+            $DB->update_record('local_virtuallab_courses', (object) [
+                'id'                => $row->id,
+                'originalfullname'  => $row->fullname,
+                'originalshortname' => $row->shortname,
+            ]);
+        }
+        $rs->close();
+
+        upgrade_plugin_savepoint(true, 2026061700, 'local', 'virtuallab');
+    }
+
     return true;
 }

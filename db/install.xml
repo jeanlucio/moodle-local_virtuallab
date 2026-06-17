@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/virtuallab/db" VERSION="20260616"
+<XMLDB PATH="local/virtuallab/db" VERSION="20260617"
     COMMENT="XMLDB file for local plugin virtuallab"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
@@ -59,6 +59,8 @@
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of lab creation — base for lifecycle"/>
         <FIELD NAME="lastreset" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last successful reset (0 = never)"/>
         <FIELD NAME="lastwarn" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unix timestamp of last lifecycle warning email sent to the teacher (0 = never)"/>
+        <FIELD NAME="originalfullname" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false" COMMENT="Course fullname at creation, restored on reset"/>
+        <FIELD NAME="originalshortname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Course shortname at creation, restored on reset"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

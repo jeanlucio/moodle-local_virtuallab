@@ -124,11 +124,13 @@ class course_factory {
             }
 
             $record = (object) [
-                'batchid'     => $batchid,
-                'courseid'    => $course->id,
-                'enrolid'     => $manual->id,
-                'timecreated' => time(),
-                'lastreset'   => 0,
+                'batchid'           => $batchid,
+                'courseid'          => $course->id,
+                'enrolid'           => $manual->id,
+                'timecreated'       => time(),
+                'lastreset'         => 0,
+                'originalfullname'  => $course->fullname,
+                'originalshortname' => $course->shortname,
             ];
 
             $DB->insert_record('local_virtuallab_courses', $record);

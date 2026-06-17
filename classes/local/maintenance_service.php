@@ -58,6 +58,10 @@ class maintenance_service {
         $resetdata = $this->build_reset_data($lab->courseid);
         reset_course_userdata($resetdata);
 
+        // A reset returns the sandbox to its starting point, so restore the name and
+        // shortname it had at creation in case a student renamed the course.
+        $this->restore_course_name($lab);
+
         // Clearing lastwarn starts a fresh lifecycle cycle so a new warning is sent next time.
         $DB->update_record('local_virtuallab_courses', (object) [
             'id'        => $labid,
@@ -71,6 +75,50 @@ class maintenance_service {
             'other'    => ['batchid' => $batchid, 'labid' => $labid],
         ]);
         $event->trigger();
+    }
+
+    /**
+     * Restores a lab course to the fullname and shortname captured at creation.
+     *
+     * The shortname is only restored when it is still free, so a name taken elsewhere
+     * cannot make the reset fail on the unique-shortname constraint. Requires
+     * course/lib.php to be loaded by the caller.
+     *
+     * @param \stdClass $lab Lab row carrying originalfullname and originalshortname.
+     * @return void
+     */
+    private function restore_course_name(\stdClass $lab): void {
+        global $DB;
+
+        if (empty($lab->originalfullname) && empty($lab->originalshortname)) {
+            return;
+        }
+
+        $course  = $DB->get_record('course', ['id' => $lab->courseid], 'id, fullname, shortname', MUST_EXIST);
+        $changed = false;
+
+        if (!empty($lab->originalfullname) && $course->fullname !== $lab->originalfullname) {
+            $course->fullname = $lab->originalfullname;
+            $changed = true;
+        }
+
+        $shortnametaken = !empty($lab->originalshortname) && $DB->record_exists_select(
+            'course',
+            'shortname = :shortname AND id <> :id',
+            ['shortname' => $lab->originalshortname, 'id' => $course->id]
+        );
+        $restoreshortname = !empty($lab->originalshortname)
+            && $course->shortname !== $lab->originalshortname
+            && !$shortnametaken;
+
+        if ($restoreshortname) {
+            $course->shortname = $lab->originalshortname;
+            $changed = true;
+        }
+
+        if ($changed) {
+            update_course($course);
+        }
     }
 
     /**
