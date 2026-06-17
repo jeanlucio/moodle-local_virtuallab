@@ -29,7 +29,7 @@ namespace local_virtuallab\local;
  */
 class course_registry {
     /**
-     * Returns true if the given course ID is managed by Lab Virtual.
+     * Returns true if the given course ID is managed by Virtual Lab.
      *
      * @param int $courseid Moodle course ID.
      * @return bool

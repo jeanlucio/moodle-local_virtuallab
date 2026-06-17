@@ -68,7 +68,7 @@ class maintenance_task extends \core\task\scheduled_task {
         $alllabs = $batches ? $DB->get_records('local_virtuallab_courses') : [];
 
         if (empty($alllabs)) {
-            mtrace('Lab Virtual maintenance: no labs to process.');
+            mtrace('Virtual Lab maintenance: no labs to process.');
             return;
         }
 
@@ -157,7 +157,7 @@ class maintenance_task extends \core\task\scheduled_task {
             $notification->send_summary($results);
         }
 
-        mtrace("Lab Virtual maintenance: done. {$success} succeeded, {$errors} failed.");
+        mtrace("Virtual Lab maintenance: done. {$success} succeeded, {$errors} failed.");
     }
 
     /**

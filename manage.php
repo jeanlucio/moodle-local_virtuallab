@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Admin management page for Lab Virtual batches and labs.
+ * Admin management page for Virtual Lab batches and labs.
  *
  * Level 1 (no batchid): list of batches + create/delete batch.
  * Level 2 (batchid set): labs of a batch + create/reset/delete labs + bulk actions.

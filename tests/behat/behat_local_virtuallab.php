@@ -31,7 +31,7 @@ use local_virtuallab\local\batch_manager;
 use local_virtuallab\local\course_factory;
 
 /**
- * Custom steps to set up Lab Virtual data without going through the admin forms.
+ * Custom steps to set up Virtual Lab data without going through the admin forms.
  *
  * @package    local_virtuallab
  * @category   test
@@ -47,10 +47,10 @@ class behat_local_virtuallab extends behat_base {
     protected $batchids = [];
 
     /**
-     * Creates a Lab Virtual batch (and optionally its labs) owned by an existing user.
+     * Creates a Virtual Lab batch (and optionally its labs) owned by an existing user.
      *
-     * The batch uses the fixed lab name prefix "Lab EAD", so labs are named
-     * "Lab EAD 01", "Lab EAD 02", etc. The referenced teacher must already exist.
+     * The batch uses the fixed lab name prefix "Lab", so labs are named
+     * "Lab 01", "Lab 02", etc. The referenced teacher must already exist.
      *
      * @Given a lab virtual batch :name exists with teacher :username and :count labs
      * @param string $name     Human-readable batch name.
@@ -63,7 +63,7 @@ class behat_local_virtuallab extends behat_base {
         $teacher  = $DB->get_record('user', ['username' => $username], '*', MUST_EXIST);
 
         $batchmgr = new batch_manager();
-        $batchid  = $batchmgr->create_batch($name, [(int) $teacher->id], 'Lab EAD');
+        $batchid  = $batchmgr->create_batch($name, [(int) $teacher->id], 'Lab');
 
         if ((int) $count > 0) {
             $factory = new course_factory();
@@ -141,7 +141,7 @@ class behat_local_virtuallab extends behat_base {
      */
     protected function get_batchid(string $name): int {
         if (!isset($this->batchids[$name])) {
-            throw new \Exception("No Lab Virtual batch named '{$name}' was created in this scenario.");
+            throw new \Exception("No Virtual Lab batch named '{$name}' was created in this scenario.");
         }
 
         return $this->batchids[$name];

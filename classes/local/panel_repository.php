@@ -244,7 +244,7 @@ class panel_repository {
     }
 
     /**
-     * Returns the localized "X vagas" label for the remaining editor slots.
+     * Returns the localized "X spots left" label for the remaining editor slots.
      *
      * @param int $count Number of remaining slots.
      * @return string Localized label.

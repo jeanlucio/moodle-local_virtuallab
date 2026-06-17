@@ -52,20 +52,20 @@ final class batch_manager_test extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
 
         $mgr = new batch_manager();
-        $id  = $mgr->create_batch('Projeto de Interface 2026/1', [$user->id], 'Lab EAD');
+        $id  = $mgr->create_batch('Interface Design 2026/1', [$user->id], 'Lab');
 
         $this->assertIsInt($id);
         $this->assertGreaterThan(0, $id);
 
         $batch = $mgr->get_batch($id);
-        $this->assertSame('Projeto de Interface 2026/1', $batch->name);
-        $this->assertSame('Lab EAD', $batch->nameprefix);
+        $this->assertSame('Interface Design 2026/1', $batch->name);
+        $this->assertSame('Lab', $batch->nameprefix);
         $this->assertGreaterThan(0, (int) $batch->timecreated);
 
         // The batch lives in its own auto-created subcategory named after it.
         $this->assertGreaterThan(0, (int) $batch->categoryid);
         $subcategory = $DB->get_record('course_categories', ['id' => $batch->categoryid], 'name', MUST_EXIST);
-        $this->assertSame('Projeto de Interface 2026/1', $subcategory->name);
+        $this->assertSame('Interface Design 2026/1', $subcategory->name);
 
         $teachers = $mgr->get_teachers($id);
         $this->assertCount(1, $teachers);

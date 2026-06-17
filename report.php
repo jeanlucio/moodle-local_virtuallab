@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Consolidated usage report for a Lab Virtual batch.
+ * Consolidated usage report for a Virtual Lab batch.
  *
  * Level 1 (no labid): paginated enrolment table for all labs in the batch.
  * Level 2 (labid set): per-student event summary for a specific lab.

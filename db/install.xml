@@ -4,12 +4,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
-    <TABLE NAME="local_virtuallab_batches" COMMENT="Lab Virtual batches">
+    <TABLE NAME="local_virtuallab_batches" COMMENT="Virtual Lab batches">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Batch name (e.g. Projeto de Interface 2026/1)"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Batch name (e.g. Interface Design 2026/1)"/>
         <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle course_categories.id — the batch own subcategory"/>
-        <FIELD NAME="nameprefix" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Lab name prefix (e.g. Lab EAD → Lab EAD 01)"/>
+        <FIELD NAME="nameprefix" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Lab name prefix (e.g. Lab → Lab 01)"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Unix timestamp of batch creation"/>
         <FIELD NAME="maxteachers" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for max editors per lab; NULL uses the global default"/>
         <FIELD NAME="lifecyclemonths" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for lifecycle months; NULL uses the global default"/>
@@ -51,7 +51,7 @@
         <INDEX NAME="batchid-sortorder" UNIQUE="false" FIELDS="batchid, sortorder"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_virtuallab_courses" COMMENT="Lab Virtual individual labs (sandbox courses)">
+    <TABLE NAME="local_virtuallab_courses" COMMENT="Virtual Lab individual labs (sandbox courses)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="batchid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="FK local_virtuallab_batches.id"/>

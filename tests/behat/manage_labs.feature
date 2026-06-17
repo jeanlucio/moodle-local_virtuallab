@@ -18,13 +18,13 @@ Feature: Manage labs within a Lab Virtual batch
     And I press "Create labs"
     Then I should see "3 lab(s) created successfully"
     And I should see "Student panel URL"
-    And I should see "Lab EAD 01"
-    And I should see "Lab EAD 03"
+    And I should see "Lab 01"
+    And I should see "Lab 03"
 
   Scenario: Admin resets a single lab
     Given a lab virtual batch "T 2026" exists with teacher "teacher1" and 2 labs
     When I visit the labs page for batch "T 2026"
-    And I click on "Reset" "link" in the "Lab EAD 01" "table_row"
+    And I click on "Reset" "link" in the "Lab 01" "table_row"
     Then I should see "Are you sure you want to reset"
     When I press "Continue"
     Then I should see "Lab reset successfully"

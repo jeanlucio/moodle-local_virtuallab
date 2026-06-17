@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Maintenance service — reset and delete operations for Lab Virtual labs and batches.
+ * Maintenance service — reset and delete operations for Virtual Lab labs and batches.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio

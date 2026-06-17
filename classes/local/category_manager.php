@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Manages the course category structure used by Lab Virtual batches.
+ * Manages the course category structure used by Virtual Lab batches.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio

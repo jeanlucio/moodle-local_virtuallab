@@ -25,7 +25,7 @@
 namespace local_virtuallab\local;
 
 /**
- * Handles creation and retrieval of Lab Virtual batches.
+ * Handles creation and retrieval of Virtual Lab batches.
  */
 class batch_manager {
     /**
@@ -33,7 +33,7 @@ class batch_manager {
      *
      * @param string $name       Human-readable batch name.
      * @param int[]  $teacherids User IDs of the responsible teachers.
-     * @param string $nameprefix Prefix used to name labs (e.g. "Lab EAD"); set later by the teacher.
+     * @param string $nameprefix Prefix used to name labs (e.g. "Lab"); set later by the teacher.
      * @return int New batch ID.
      */
     public function create_batch(

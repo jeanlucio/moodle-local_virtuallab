@@ -27,7 +27,7 @@ namespace local_virtuallab\privacy;
 use core_privacy\local\metadata\null_provider;
 
 /**
- * Lab Virtual stores no personal data directly.
+ * Virtual Lab stores no personal data directly.
  */
 class provider implements null_provider {
     /**

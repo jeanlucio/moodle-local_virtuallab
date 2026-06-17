@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Form for editing an existing Lab Virtual batch.
+ * Form for editing an existing Virtual Lab batch.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
