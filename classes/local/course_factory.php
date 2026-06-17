@@ -69,6 +69,7 @@ class course_factory {
             : [];
 
         $createdcourseids = [];
+        $records          = [];
 
         // Bulk-load existing shortnames matching this batch prefix to avoid N+1 queries in the loop.
         $prefix = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $batch->nameprefix));
@@ -109,21 +110,23 @@ class course_factory {
 
             $course = create_course($coursedata);
 
-            // Remove the default self-enrolment instance so the manual instance is the only
-            // channel; the panel enrols programmatically and the standard enrolment-options
-            // page then offers nothing self-service.
-            $selfs = $DB->get_records('enrol', ['courseid' => $course->id, 'enrol' => 'self']);
-            foreach ($selfs as $self) {
-                $selfplugin->delete_instance($self);
+            // Read the new course's enrol instances once: drop the default self-enrolment
+            // instance so the manual instance is the only channel (the panel enrols
+            // programmatically), and keep the manual instance for the registry.
+            $manual = null;
+            foreach (enrol_get_instances($course->id, false) as $instance) {
+                if ($instance->enrol === 'self') {
+                    $selfplugin->delete_instance($instance);
+                } else if ($instance->enrol === 'manual') {
+                    $manual = $instance;
+                }
             }
-
-            $manual = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
             if (!$manual) {
                 $manualid = $manualplugin->add_instance($course);
                 $manual   = $DB->get_record('enrol', ['id' => $manualid], '*', MUST_EXIST);
             }
 
-            $record = (object) [
+            $records[] = (object) [
                 'batchid'           => $batchid,
                 'courseid'          => $course->id,
                 'enrolid'           => $manual->id,
@@ -132,13 +135,16 @@ class course_factory {
                 'originalfullname'  => $course->fullname,
                 'originalshortname' => $course->shortname,
             ];
-
-            $DB->insert_record('local_virtuallab_courses', $record);
             $createdcourseids[] = $course->id;
 
             if ($checklisttasks) {
                 $checklist->provision_course((int) $course->id, $checklisttasks);
             }
+        }
+
+        // Single bulk insert of all registry rows instead of one insert per iteration.
+        if ($records) {
+            $DB->insert_records('local_virtuallab_courses', $records);
         }
 
         return $createdcourseids;

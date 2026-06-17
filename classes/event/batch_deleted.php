@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Event fired when a Lab Virtual batch (turma) is deleted.
+ * Event fired when a Lab Virtual batch is deleted.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio

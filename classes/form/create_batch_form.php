@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Form for creating a new Lab Virtual batch (turma).
+ * Form for creating a new Lab Virtual batch.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Batch (turma) manager — CRUD operations for local_virtuallab_batches.
+ * Batch manager — CRUD operations for local_virtuallab_batches.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
@@ -29,7 +29,7 @@ namespace local_virtuallab\local;
  */
 class batch_manager {
     /**
-     * Creates a new batch (turma) in its own subcategory and returns its ID.
+     * Creates a new batch in its own subcategory and returns its ID.
      *
      * @param string $name       Human-readable batch name.
      * @param int[]  $teacherids User IDs of the responsible teachers.

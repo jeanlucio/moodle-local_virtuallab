@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
-    <TABLE NAME="local_virtuallab_batches" COMMENT="Lab Virtual batches (turmas de laboratório)">
+    <TABLE NAME="local_virtuallab_batches" COMMENT="Lab Virtual batches">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Batch name (e.g. Projeto de Interface 2026/1)"/>
