@@ -8,6 +8,7 @@ Initial public release.
 - Lab generation: generate up to 50 lab courses per batch from a configurable name prefix
 - Student self-service panel: shows lab status (available / in use / full) and lets students enrol themselves as editor or visitor with one click; shareable URL per batch
 - One-editor-anywhere rule: a student cannot hold editor slots in more than one lab per batch simultaneously; the panel explains why the editor button is disabled (already an editor elsewhere vs. lab full)
+- Concurrency-safe editor cap: editor enrolment runs under a per-course lock and re-checks the limit inside it, so two simultaneous joins can never exceed the configured number of editors
 - Self-service in the panel: becoming an editor asks for confirmation first, and a student can leave a lab they joined to free the slot and switch
 - Delegated teacher management: responsible teachers can rename their batch, manage co-teachers, set the lab prefix and override lifecycle settings, scoped to their own subcategory
 - Shared checklist task list per batch: when the Teacher Checklist block (`block_teacher_checklist`) is installed, the batch edit form gains a task list field; tasks entered there are pushed into the Teacher Checklist block of every lab created afterwards, and the block is added to each lab automatically. An "Apply task list to existing labs" action propagates the current task list to labs already created. The feature degrades silently when the block is not installed: the field is hidden and lab creation is unaffected

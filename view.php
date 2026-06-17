@@ -25,8 +25,8 @@
 require(__DIR__ . '/../../config.php');
 
 use local_virtuallab\local\batch_manager;
-use local_virtuallab\local\batch_settings;
 use local_virtuallab\local\course_registry;
+use local_virtuallab\local\enrolment_service;
 use local_virtuallab\local\panel_repository;
 
 $batchid = required_param('batchid', PARAM_INT);
@@ -62,56 +62,17 @@ $confirm  = optional_param('confirm', 0, PARAM_INT);
 if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $courseid) {
     require_sesskey();
 
-    $registry = new course_registry();
-    $lab      = $registry->get_lab_for_enrol($courseid, $batchid);
+    $registry  = new course_registry();
+    $lab       = $registry->get_lab_for_enrol($courseid, $batchid);
+    $courseurl = new moodle_url('/course/view.php', ['id' => $courseid]);
 
-    $isteacher = ($role === 'editor');
-    $roleid    = $DB->get_field(
-        'role',
-        'id',
-        ['shortname' => $isteacher ? 'editingteacher' : 'student'],
-        MUST_EXIST
-    );
+    if ($role === 'editor') {
+        $service = new enrolment_service();
 
-    if ($isteacher) {
-        $maxteachers   = batch_settings::effective($batch)->maxteachers;
-        $coursecontext = context_course::instance($courseid);
-        $editors       = get_enrolled_users($coursecontext, 'moodle/course:update');
-
-        if (count($editors) >= $maxteachers) {
-            redirect(
-                $viewurl,
-                get_string('error_lab_full', 'local_virtuallab'),
-                null,
-                \core\output\notification::NOTIFY_ERROR
-            );
-        }
-
-        $editorsql = "SELECT ra.id
-                        FROM {local_virtuallab_courses} lc
-                        JOIN {context} ctx ON ctx.instanceid  = lc.courseid
-                                         AND ctx.contextlevel = :ctxlevel
-                        JOIN {role_assignments} ra ON ra.contextid = ctx.id
-                                                  AND ra.userid    = :userid
-                                                  AND ra.roleid    = :roleid
-                       WHERE lc.batchid   = :batchid
-                         AND lc.courseid != :currentcourse";
-
-        $iseditorelsewhere = $DB->record_exists_sql($editorsql, [
-            'ctxlevel'      => CONTEXT_COURSE,
-            'userid'        => $USER->id,
-            'roleid'        => $roleid,
-            'batchid'       => $batchid,
-            'currentcourse' => $courseid,
-        ]);
-
-        if ($iseditorelsewhere) {
-            redirect(
-                $viewurl,
-                get_string('error_already_editor_in_batch', 'local_virtuallab'),
-                null,
-                \core\output\notification::NOTIFY_ERROR
-            );
+        // Fast pre-check so a full lab never reaches the confirmation page.
+        $reason = $service->editor_block_reason($lab, $batch, $USER->id);
+        if ($reason !== '') {
+            redirect($viewurl, $service->error_message($reason), null, \core\output\notification::NOTIFY_ERROR);
         }
 
         // Becoming an editor commits the student to this lab (the one-editor rule blocks
@@ -134,14 +95,22 @@ if ($action === 'enrol' && ($role === 'editor' || $role === 'visitor') && $cours
             echo $OUTPUT->footer();
             exit;
         }
+
+        // Authoritative enrolment under a per-course lock; re-checks the cap inside it.
+        $result = $service->enrol_editor($lab, $batch, $USER->id);
+        if ($result !== '') {
+            redirect($viewurl, $service->error_message($result), null, \core\output\notification::NOTIFY_ERROR);
+        }
+
+        redirect($courseurl);
     }
 
+    // Visitor: no cap, straight enrolment through the manual instance.
     require_once($CFG->libdir . '/enrollib.php');
+    $studentroleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
     $enrolinstance = $DB->get_record('enrol', ['id' => $lab->enrolid, 'courseid' => $courseid], '*', MUST_EXIST);
-    $enrolplugin   = enrol_get_plugin('manual');
-    $enrolplugin->enrol_user($enrolinstance, $USER->id, $roleid, time(), 0);
+    enrol_get_plugin('manual')->enrol_user($enrolinstance, $USER->id, $studentroleid, time(), 0);
 
-    $courseurl = new moodle_url('/course/view.php', ['id' => $courseid]);
     redirect($courseurl);
 }
 

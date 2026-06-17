@@ -90,6 +90,7 @@ $string['enrol_join'] = 'Acessar e ingressar';
 $string['error_already_editor_in_batch'] = 'Você já está inscrito como titular em outro laboratório desta turma.';
 $string['error_batch_not_found'] = 'Turma não encontrada ou não pertence a este site.';
 $string['error_course_not_managed'] = 'Este curso não é gerenciado pelo Lab Virtual.';
+$string['error_enrol_busy'] = 'Este ambiente está sendo atualizado por outra solicitação. Tente novamente.';
 $string['error_enrol_mismatch'] = 'Instância de inscrição não corresponde ao laboratório solicitado.';
 $string['error_lab_full'] = 'Este laboratório atingiu o número máximo de titulares.';
 $string['error_no_labs_selected'] = 'Nenhum laboratório selecionado. Selecione ao menos um laboratório.';

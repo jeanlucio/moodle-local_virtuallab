@@ -90,6 +90,7 @@ $string['enrol_join'] = 'Enrol and join';
 $string['error_already_editor_in_batch'] = 'You are already enrolled as a slot holder in another lab in this batch.';
 $string['error_batch_not_found'] = 'Batch not found or does not belong to this site.';
 $string['error_course_not_managed'] = 'This course is not managed by Virtual Lab.';
+$string['error_enrol_busy'] = 'This lab is being updated by another request. Please try again.';
 $string['error_enrol_mismatch'] = 'Enrollment instance does not match the requested lab.';
 $string['error_lab_full'] = 'This lab has reached the maximum number of slot holders.';
 $string['error_no_labs_selected'] = 'No labs selected. Please select at least one lab.';
