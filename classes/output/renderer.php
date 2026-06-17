@@ -24,6 +24,8 @@
 
 namespace local_virtuallab\output;
 
+use local_virtuallab\local\batch_settings;
+use local_virtuallab\local\lifecycle;
 use local_virtuallab\local\report_repository;
 use plugin_renderer_base;
 
@@ -179,14 +181,25 @@ class renderer extends plugin_renderer_base {
             }
         }
 
+        $action = (int) batch_settings::effective($batch)->lifecycleaction;
+        $actionkey = $action === 2 ? 'next_action_delete' : 'next_action_reset';
+
         $rows = [];
 
         foreach ($labs as $lab) {
+            $deadline = lifecycle::deadline($batch, $lab);
             $rows[] = [
                 'id'          => $lab->id,
                 'coursename'  => format_string($lab->coursename),
                 'shortname'   => s($lab->shortname),
                 'courseurl'   => (new \moodle_url('/course/view.php', ['id' => $lab->courseid]))->out(false),
+                'nextaction'  => $deadline > 0
+                    ? get_string(
+                        $actionkey,
+                        'local_virtuallab',
+                        userdate($deadline, get_string('strftimedate', 'langconfig'))
+                    )
+                    : '—',
                 'lastreset'   => $lab->lastreset > 0
                     ? userdate($lab->lastreset, get_string('strftimedatetime', 'langconfig'))
                     : '—',

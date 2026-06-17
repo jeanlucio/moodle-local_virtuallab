@@ -15,6 +15,7 @@
         <FIELD NAME="lifecyclemonths" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for lifecycle months; NULL uses the global default"/>
         <FIELD NAME="lifecycleaction" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for lifecycle action; NULL uses the global default"/>
         <FIELD NAME="warningdays" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Per-batch override for warning days; NULL uses the global default"/>
+        <FIELD NAME="lifecyclestart" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp the lifecycle clock counts from for this batch; NULL uses the global epoch"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

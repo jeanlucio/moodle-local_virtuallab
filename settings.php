@@ -49,15 +49,17 @@ if ($hassiteconfig) {
         ''
     ));
 
-    $settings->add(new admin_setting_configtext(
+    $lifecyclemonths = new admin_setting_configtext(
         'local_virtuallab/lifecycle_months',
         get_string('settings_lifecycle_months', 'local_virtuallab'),
         get_string('settings_lifecycle_months_desc', 'local_virtuallab'),
         0,
         PARAM_INT
-    ));
+    );
+    $lifecyclemonths->set_updatedcallback('local_virtuallab\local\lifecycle::on_global_setting_changed');
+    $settings->add($lifecyclemonths);
 
-    $settings->add(new admin_setting_configselect(
+    $lifecycleaction = new admin_setting_configselect(
         'local_virtuallab/lifecycle_action',
         get_string('settings_lifecycle_action', 'local_virtuallab'),
         get_string('settings_lifecycle_action_desc', 'local_virtuallab'),
@@ -67,7 +69,9 @@ if ($hassiteconfig) {
             1 => get_string('settings_lifecycle_action_reset', 'local_virtuallab'),
             2 => get_string('settings_lifecycle_action_delete', 'local_virtuallab'),
         ]
-    ));
+    );
+    $lifecycleaction->set_updatedcallback('local_virtuallab\local\lifecycle::on_global_setting_changed');
+    $settings->add($lifecycleaction);
 
     $settings->add(new admin_setting_configtext(
         'local_virtuallab/warning_days_before',

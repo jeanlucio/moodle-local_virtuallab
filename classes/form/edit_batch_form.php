@@ -120,6 +120,16 @@ class edit_batch_form extends \moodleform {
         );
         $mform->setType('maxteachers', PARAM_TEXT);
 
+        $mform->addElement(
+            'static',
+            'lifecyclerecountnote',
+            '',
+            \html_writer::div(
+                get_string('batch_lifecycle_recount_note', 'local_virtuallab'),
+                'alert alert-info mb-2'
+            )
+        );
+
         $lifecyclemonthsgrp = [
             $mform->createElement('text', 'lifecyclemonths', '', ['size' => 5]),
             $mform->createElement('static', '', '', \html_writer::span(

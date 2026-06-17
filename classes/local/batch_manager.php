@@ -89,6 +89,14 @@ class batch_manager {
             $record->$key = ($value === null || $value === '') ? null : (int) $value;
         }
 
+        // Changing the lifecycle policy restarts the clock from today for this batch, so
+        // existing labs are never made instantly overdue by a stricter setting.
+        $oldmonths = $batch->lifecyclemonths === null ? null : (int) $batch->lifecyclemonths;
+        $oldaction = $batch->lifecycleaction === null ? null : (int) $batch->lifecycleaction;
+        if ($record->lifecyclemonths !== $oldmonths || $record->lifecycleaction !== $oldaction) {
+            $record->lifecyclestart = time();
+        }
+
         $DB->update_record('local_virtuallab_batches', $record);
 
         if ($name !== $batch->name) {

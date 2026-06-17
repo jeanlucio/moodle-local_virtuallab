@@ -34,6 +34,12 @@ class panel_repository {
     /** @var int Role ID for editingteacher, cached to avoid repeated queries. */
     private int $teacherroleid;
 
+    /** @var \stdClass Batch being rendered, used to resolve lifecycle deadlines. */
+    private \stdClass $batch;
+
+    /** @var int Effective lifecycle action of the batch (0 disabled, 1 reset, 2 delete). */
+    private int $lifecycleaction;
+
     /**
      * Constructor reads plugin settings once.
      */
@@ -55,7 +61,10 @@ class panel_repository {
         // Resolve the editor cap from the batch's effective settings (per-batch override or
         // global default) so the panel status matches what view.php enforces on enrolment.
         $batch = $DB->get_record('local_virtuallab_batches', ['id' => $batchid], '*', MUST_EXIST);
-        $this->maxteachers = batch_settings::effective($batch)->maxteachers;
+        $this->batch           = $batch;
+        $effective             = batch_settings::effective($batch);
+        $this->maxteachers     = $effective->maxteachers;
+        $this->lifecycleaction = $effective->lifecycleaction;
 
         $sql = "SELECT lc.id          AS labid,
                        lc.courseid,
@@ -152,6 +161,7 @@ class panel_repository {
                     'coursename'              => format_string($row->coursename),
                     'user_enrolled_here'      => !empty($enrolledcourseids[(int) $row->courseid]),
                     'user_is_editor_anywhere' => $useriseditoranywhere,
+                    'deadline'                => lifecycle::deadline($this->batch, $row),
                     'editors'                 => [],
                 ];
             }
@@ -196,6 +206,7 @@ class panel_repository {
             $lab['slotsleft_label']   = $lab['status_in_use']
                 ? $this->slots_left_label($this->maxteachers - $editorcount)
                 : '';
+            $lab['deadline_label']    = $this->deadline_label((int) $lab['deadline']);
 
             $result[] = $lab;
         }
@@ -204,11 +215,25 @@ class panel_repository {
     }
 
     /**
-     * Returns the localized status label for a lab.
+     * Returns the localized "this lab will be reset/deleted on DATE" label.
      *
-     * @param array $lab Lab data array with status flags.
-     * @return string Localized status string.
+     * @param int $deadline Deadline timestamp, or 0 when the lifecycle is disabled.
+     * @return string Localized label, or empty string when no deadline applies.
      */
+    private function deadline_label(int $deadline): string {
+        if ($deadline <= 0) {
+            return '';
+        }
+
+        $key = $this->lifecycleaction === 2 ? 'next_action_delete' : 'next_action_reset';
+
+        return get_string(
+            $key,
+            'local_virtuallab',
+            userdate($deadline, get_string('strftimedate', 'langconfig'))
+        );
+    }
+
     /**
      * Returns the localized "X vagas" label for the remaining editor slots.
      *

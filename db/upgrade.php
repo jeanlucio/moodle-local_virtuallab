@@ -105,5 +105,23 @@ function xmldb_local_virtuallab_upgrade(int $oldversion): bool {
         upgrade_plugin_savepoint(true, 2026061700, 'local', 'virtuallab');
     }
 
+    if ($oldversion < 2026061701) {
+        $table = new xmldb_table('local_virtuallab_batches');
+
+        $field = new xmldb_field('lifecyclestart', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'warningdays');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Start the lifecycle clock from the upgrade moment so labs that are already
+        // overdue under an active policy get a fresh window instead of being actioned
+        // without warning on the next run.
+        if (!get_config('local_virtuallab', 'lifecycle_epoch')) {
+            set_config('lifecycle_epoch', time(), 'local_virtuallab');
+        }
+
+        upgrade_plugin_savepoint(true, 2026061701, 'local', 'virtuallab');
+    }
+
     return true;
 }

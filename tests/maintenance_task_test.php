@@ -247,6 +247,51 @@ final class maintenance_task_test extends advanced_testcase {
     }
 
     /**
+     * A freshly set global epoch protects an already-overdue lab, so enabling the policy
+     * never actions an old lab without giving it a fresh window first.
+     */
+    public function test_execute_global_epoch_protects_overdue_lab(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_DELETE, 'local_virtuallab');
+
+        ['batchid' => $batchid, 'courseids' => $courseids] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 12);
+
+        // Policy just enabled: the clock counts from now, so the old lab is not overdue.
+        set_config('lifecycle_epoch', time(), 'local_virtuallab');
+
+        $this->run_task();
+
+        $this->assertTrue(
+            $DB->record_exists('local_virtuallab_courses', ['batchid' => $batchid]),
+            'A lab protected by a fresh epoch must not be deleted.'
+        );
+        $this->assertTrue($DB->record_exists('course', ['id' => $courseids[0]]));
+    }
+
+    /**
+     * A per-batch epoch (lifecyclestart) defers the action for that batch's overdue labs.
+     */
+    public function test_execute_per_batch_epoch_protects_lab(): void {
+        global $DB;
+
+        set_config('lifecycle_months', 6, 'local_virtuallab');
+        set_config('lifecycle_action', maintenance_task::ACTION_RESET, 'local_virtuallab');
+
+        ['batchid' => $batchid] = $this->create_batch_with_labs();
+        $this->backdate_labs($batchid, 12);
+
+        $DB->set_field('local_virtuallab_batches', 'lifecyclestart', time(), ['id' => $batchid]);
+
+        $this->run_task();
+
+        $lab = $DB->get_record('local_virtuallab_courses', ['batchid' => $batchid]);
+        $this->assertEquals(0, (int) $lab->lastreset, 'A per-batch epoch must defer the reset.');
+    }
+
+    /**
      * A lab already warned (lastwarn > 0) is not warned again in the same cycle.
      */
     public function test_execute_does_not_rewarn(): void {

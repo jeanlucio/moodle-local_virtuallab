@@ -35,6 +35,7 @@ $string['batch_checklist_tasks'] = 'Lista de tarefas dos laboratórios';
 $string['batch_checklist_tasks_help'] = 'As tarefas informadas aqui, uma por linha, são adicionadas ao bloco Checklist do Professor de cada laboratório criado depois disso. Use "Aplicar lista de tarefas aos laboratórios existentes" para propagar mudanças aos laboratórios já criados. Deixe em branco para desativar.';
 $string['batch_created'] = 'Turma criada com sucesso.';
 $string['batch_deleted'] = 'Turma e todos os seus laboratórios excluídos com sucesso.';
+$string['batch_lifecycle_recount_note'] = 'Alterar a política de ciclo de vida abaixo reinicia a contagem a partir de hoje para todos os labs desta turma, então labs existentes nunca são resetados ou excluídos sem aviso.';
 $string['batch_lifecycle_zero_hint'] = '(0 = desabilitado)';
 $string['batch_name'] = 'Nome da turma';
 $string['batch_nameprefix'] = 'Prefixo do nome dos laboratórios';
@@ -109,6 +110,9 @@ $string['message_batch_assigned_body'] = 'Você foi designado como professor res
 $string['message_batch_assigned_small'] = 'Você foi designado como professor responsável de uma turma do Lab Virtual.';
 $string['message_batch_assigned_subject'] = 'Lab Virtual: você foi designado à turma "{$a}"';
 $string['messageprovider:batch_assigned'] = 'Designado como professor responsável de turma do Lab Virtual';
+$string['next_action'] = 'Próxima ação';
+$string['next_action_delete'] = 'Excluir em {$a}';
+$string['next_action_reset'] = 'Resetar em {$a}';
 $string['nobatches'] = 'Nenhuma turma encontrada. Clique no botão abaixo para adicionar uma nova turma.';
 $string['nolabs'] = 'Nenhum laboratório nesta turma ainda.';
 $string['panel_url'] = 'URL do painel de estudantes';

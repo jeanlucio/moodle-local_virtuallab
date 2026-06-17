@@ -35,6 +35,7 @@ $string['batch_checklist_tasks'] = 'Lab task list';
 $string['batch_checklist_tasks_help'] = 'Tasks entered here, one per line, are added to the Teacher Checklist block of every lab created afterwards. Use "Apply task list to existing labs" to push changes to labs that already exist. Leave empty to disable.';
 $string['batch_created'] = 'Batch created successfully.';
 $string['batch_deleted'] = 'Batch and all its labs deleted successfully.';
+$string['batch_lifecycle_recount_note'] = 'Changing the lifecycle policy below restarts the countdown from today for every lab in this batch, so existing labs are never reset or deleted without notice.';
 $string['batch_lifecycle_zero_hint'] = '(0 = disabled)';
 $string['batch_name'] = 'Batch name';
 $string['batch_nameprefix'] = 'Lab name prefix';
@@ -109,6 +110,9 @@ $string['message_batch_assigned_body'] = 'You have been assigned as responsible 
 $string['message_batch_assigned_small'] = 'You have been assigned as responsible teacher for a Virtual Lab batch.';
 $string['message_batch_assigned_subject'] = 'Virtual Lab: you have been assigned to batch "{$a}"';
 $string['messageprovider:batch_assigned'] = 'Assigned as Virtual Lab batch teacher';
+$string['next_action'] = 'Next action';
+$string['next_action_delete'] = 'Delete on {$a}';
+$string['next_action_reset'] = 'Reset on {$a}';
 $string['nobatches'] = 'No batches found. Click the button below to add a new batch.';
 $string['nolabs'] = 'No labs in this batch yet.';
 $string['panel_url'] = 'Student panel URL';

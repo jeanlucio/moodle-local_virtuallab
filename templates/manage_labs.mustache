@@ -32,6 +32,7 @@
                 "shortname": "lab-ead-b1-lab01",
                 "courseurl": "/course/view.php?id=42",
                 "lastreset": "—",
+                "nextaction": "Delete on 12 Sep 2026",
                 "reseturl": "/local/virtuallab/manage.php?batchid=1&action=resetlab&labid=1",
                 "deleteurl": "/local/virtuallab/manage.php?batchid=1&action=deletelab&labid=1",
                 "resetlabel": "Reset lab: Lab EAD 01",
@@ -143,6 +144,7 @@
                         <th scope="col">Lab</th>
                         <th scope="col">Shortname</th>
                         <th scope="col">{{#str}} lastreset, local_virtuallab {{/str}}</th>
+                        <th scope="col">{{#str}} next_action, local_virtuallab {{/str}}</th>
                         <th scope="col" class="text-end"
                             aria-label="{{#str}} actions, core {{/str}}"></th>
                     </tr>
@@ -165,6 +167,7 @@
                         </td>
                         <td><code>{{shortname}}</code></td>
                         <td>{{lastreset}}</td>
+                        <td class="text-nowrap">{{nextaction}}</td>
                         <td class="text-end text-nowrap">
                             <a href="{{reseturl}}"
                                class="btn btn-sm btn-outline-warning me-1"

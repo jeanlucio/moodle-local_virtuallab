@@ -25,6 +25,7 @@
 namespace local_virtuallab\task;
 
 use local_virtuallab\local\batch_settings;
+use local_virtuallab\local\lifecycle;
 use local_virtuallab\local\maintenance_service;
 use local_virtuallab\local\notification_service;
 
@@ -104,7 +105,7 @@ class maintenance_task extends \core\task\scheduled_task {
             $warnlabs = [];
 
             foreach ($labsbybatch[$batch->id] ?? [] as $lab) {
-                $ref = $lab->lastreset > 0 ? (int) $lab->lastreset : (int) $lab->timecreated;
+                $ref = lifecycle::reference($batch, $lab);
 
                 if ($ref < $cutoff) {
                     $name = $coursenames[$lab->courseid] ?? ('#' . $lab->courseid);

@@ -44,6 +44,7 @@
                 "statuslabel": "Disponível",
                 "editorcount": 0,
                 "slotsleft_label": "2 vagas",
+                "deadline_label": "Delete on 12 Sep 2026",
                 "editors": []
             }
         ]
@@ -82,6 +83,11 @@
                         {{#slotsleft_label}}
                         <span class="badge lv-badge-slots ms-1">{{slotsleft_label}}</span>
                         {{/slotsleft_label}}
+                        {{#deadline_label}}
+                        <div class="small text-body-secondary mt-1">
+                            <i class="fa fa-clock me-1" aria-hidden="true"></i>{{deadline_label}}
+                        </div>
+                        {{/deadline_label}}
                     </td>
                     <td>
                         {{#editors}}
