@@ -69,6 +69,12 @@ Tested against: Moodle 4.5, 5.0, 5.1, 5.2 × PostgreSQL and MariaDB.
 
 ---
 
+### 🏗️ Deployment recommendation
+
+We recommend installing the plugin on a **dedicated Moodle instance for laboratories**, separate from the formal LMS where students follow their regular courses. Keeping the two environments isolated prevents lab courses from appearing in students' regular course lists and concentrates the bulk creation, reset, and deletion workload on a controlled environment.
+
+---
+
 ### 🛠️ Installation
 
 1. Download the `.zip` file or clone this repository.
@@ -273,6 +279,12 @@ O core do Moodle já cria vários cursos de uma vez (a ferramenta *Enviar cursos
 | PHP        | 8.2+   |
 
 Testado contra: Moodle 4.5, 5.0, 5.1, 5.2 × PostgreSQL e MariaDB.
+
+---
+
+### 🏗️ Recomendação de implantação
+
+Recomendamos implantar o plugin num **Moodle dedicado a laboratórios**, separado do AVA formal onde os estudantes acompanham as disciplinas. Manter os dois ambientes isolados evita que os cursos-lab apareçam na lista de cursos regulares dos estudantes e concentra os recursos de criação, reset e exclusão em massa num ambiente controlado.
 
 ---
 
