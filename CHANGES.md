@@ -1,6 +1,6 @@
 # Changelog — Virtual Lab
 
-## [v1.0.0] — 2026-06-16
+## [v1.0.0] — 2026-06-18
 
 Initial public release.
 
