@@ -3,7 +3,7 @@
 [![Moodle Plugin CI](https://github.com/jeanlucio/moodle-local_virtuallab/actions/workflows/ci.yml/badge.svg)](https://github.com/jeanlucio/moodle-local_virtuallab/actions/workflows/ci.yml)
 ![Moodle](https://img.shields.io/badge/Moodle-4.5%2B-orange?style=flat-square&logo=moodle&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Alpha-yellow?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Stable-green?style=flat-square)
 
 [English](#english) | [Português](#português)
 
@@ -23,21 +23,24 @@ Each batch lives in its own course subcategory, and its **responsible teachers m
 * 🔓 **Key-free enrolment:** Students join straight from the panel — one click picks the role (editor or visitor) and enrols them through the course manual enrolment instance. There are no enrolment keys to share or manage.
 * 👥 **Multiple responsible teachers:** A batch can have several responsible teachers; all of them manage the batch and receive its notifications.
 * 🎓 **Delegated management:** Responsible teachers get a scoped role on their batch subcategory, giving them full control of *their own* lab courses (edit content, grades and enrolments, enter without enrolling) — but no access to the rest of the platform.
-* 🖥 **Self-service student panel:** Authenticated students see every lab in the batch, its current status, and join with a single click.
+* 🖥 **Self-service student panel:** Authenticated students see every lab in the batch, its current status, and join with a single click; joining as editor asks for confirmation, and a student can leave a lab they already joined to free the slot and switch.
 * 🚦 **Lab status logic:** Labs are automatically classified as *Available*, *In use*, or *Full* based on the number of enrolled editors.
 * 🔒 **One-editor-anywhere rule:** A student who is already an editor in one lab cannot take the editor slot in another lab in the same batch — they can still join as visitor.
 * ✏️ **Edit batch:** Rename a batch, add or remove co-responsible teachers, change the lab name prefix, and override lifecycle settings per batch.
 * ⚙️ **Per-batch settings:** Each batch can override the global defaults for editors-per-lab and the lifecycle policy (months, action, warning days); leaving a field empty inherits the site default.
 * 📋 **Shared checklist task list (optional):** When the [Teacher Checklist](https://github.com/jeanlucio/moodle-block_teacher_checklist) block is installed, a task list field appears in the batch edit form; tasks entered there are automatically provisioned into the Teacher Checklist block of every new lab and the block is added to each lab automatically. An **Apply to existing labs** button retroactively syncs the task list to labs already created. The feature degrades silently when the block is absent.
 * 🔗 **Shareable panel URL:** Managers can copy and share a direct link to each batch's student panel.
-* ♻️ **Reset / 🗑 delete / ☑️ bulk:** Reset clears user data and enrolments while keeping the course shell; delete removes the course and registry row; bulk actions reset or delete several labs at once.
+* ♻️ **Reset / 🗑 delete / ☑️ bulk:** Reset clears user data and enrolments, restores the course name to its original value, and keeps the course shell; delete removes the course and registry row; bulk actions reset or delete several labs at once.
 * 🏭 **Delete batch:** Removes a whole batch, its labs and its subcategory.
 * ⏰ **Automatic lifecycle maintenance:** A nightly scheduled task resets or deletes overdue labs, applying each batch's own settings, with advance warning emails.
+* 📅 **Visible lifecycle deadline:** A single "Scheduled: reset/delete on DATE" notice sits above the manage list and the student panel; it expands to per-lab dates only when individual resets cause deadlines to diverge.
+* 🛡 **Safe recount on policy change:** Enabling or tightening the lifecycle (globally or per batch) restarts the countdown from that moment for all existing labs, so no lab is ever processed without first going through the warning window.
 * 📧 **Lifecycle notifications:** Warning and summary emails are sent to the responsible teachers and to each affected course's editors; the administrator copy is optional.
 * 🙋 **Helpful access notice:** A logged-in visitor who reaches a lab course without access sees a notice naming the responsible teacher(s) to contact.
 * 🔔 **Batch assignment notification:** When a teacher is added to a batch they receive a Moodle notification (bell) and an email containing the management link. The `batch_assigned` message provider can be configured per-user under **Preferences → Message**.
 * 🔗 **Teacher navigation shortcut:** Responsible teachers see a **Manage Virtual Lab** link directly in the Moodle top bar (and mobile menu) without needing an admin-supplied URL.
 * 🔐 **Ownership guard & audit events:** Every write operation validates that the lab belongs to the expected batch; events are emitted on course reset, course deletion and batch deletion.
+* 📊 **Usage report:** Paginated batch overview plus a per-student event breakdown for each lab, with CSV and Excel export at both levels.
 
 ---
 
@@ -128,6 +131,7 @@ The **Manage Virtual Lab** button in the settings page links directly to the man
 3. Click **Editor** or **Visitor** on an available lab to join and be taken into the course.
    * One click enrols as `editingteacher` (editor) or `student` (visitor) — no keys involved.
 4. Once enrolled, the row shows **Enrolled**; a student already editing one lab cannot take an editor slot in another lab of the same batch.
+5. To switch labs, unenrol from the current lab to free the editor slot, then join a different one.
 
 ---
 
@@ -161,13 +165,16 @@ Virtual Lab ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 | `checklist_integration_test.php` | 7 | `is_available()` with block present; `provision_course()` seeds items, is idempotent, adds block, does not duplicate block; `sync_batch()` provisions all labs and handles empty task list gracefully |
 | `course_factory_test.php` | 4 | Correct lab count; labs use the manual enrolment instance and no self instance; all IDs returned; excessive count rejected |
 | `course_registry_test.php` | 10 | Ownership checks, bulk lookup and enrol-for-batch validation |
+| `enrolment_service_test.php` | 4 | Enrolment success; editor cap rejection; one-editor-per-batch guard; error message covers all block reasons |
 | `hook_callbacks_test.php` | 5 | Primary navigation node visible to admins and batch teachers; invisible to regular users, guests and logged-out requests |
-| `maintenance_service_test.php` | 5 | Reset/delete behaviour and wrong-batch guards; batch deletion |
-| `maintenance_task_test.php` | 10 | Disabled cases, reset/delete overdue labs, per-batch override, reference-date logic |
-| `notification_service_test.php` | 7 | Warning/summary to teachers and editors; admin copy gated by setting; course link |
-| `panel_status_test.php` | 6 | Available/in-use/full flags; enrolment and one-editor-per-batch rules |
+| `lifecycle_test.php` | 4 | Deadline summarisation (shared/divergent/disabled); scheduled notice label; component and action label rendering |
+| `maintenance_service_test.php` | 7 | Reset/delete behaviour and wrong-batch guards; reset restores original course name; shortname preserved when already taken; batch deletion |
+| `maintenance_task_test.php` | 13 | Disabled cases, reset/delete overdue labs, per-batch override, reference-date logic; global and per-batch epoch protects labs after policy tightening; no re-warning on consecutive runs |
+| `notification_service_test.php` | 9 | Warning/summary to teachers and editors; admin copy gated by setting; course link; deadline collapsed when shared; per-lab dates shown when divergent |
+| `panel_status_test.php` | 8 | Available/in-use/full flags; enrolment and one-editor-per-batch rules; block reason distinction (full vs elsewhere); per-batch maxteachers override |
+| `report_repository_test.php` | 3 | Component label from module pluginname; core component and fallback; action label known and fallback |
 | `task_manager_test.php` | 8 | `set_tasks_from_text()` parsing (LF, CRLF, blank lines, trim); `set_tasks()` replace semantics; `get_tasks()` sortorder; `get_tasks_text()` round-trip; empty list edge cases |
-| **Total** | **79** | |
+| **Total** | **99** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
@@ -181,8 +188,8 @@ End-to-end browser tests covering the admin, teacher and student flows.
 |---------|----------:|----------------|
 | `manage_batches.feature` | 3 | Admin creates a batch; a manager edits a batch; admin deletes a batch |
 | `manage_labs.feature` | 2 | Creating labs and seeing the student panel URL; resetting a single lab |
-| `student_panel.feature` | 4 | Panel header and labs list; enrolling as editor and landing in the course; the one-editor-per-batch block; guests sent to login |
-| **Total** | **9** | |
+| `student_panel.feature` | 5 | Panel header and labs list; enrolling as editor (with confirmation) and landing in the course; the one-editor-per-batch block; leaving a lab to free the slot; guests sent to login |
+| **Total** | **10** | |
 
 ```bash
 vendor/bin/behat --tags @local_virtuallab
@@ -223,21 +230,24 @@ Cada turma vive na sua própria subcategoria de cursos, e seus **professores res
 * 🔓 **Inscrição sem chaves:** O estudante entra direto pelo painel — um clique escolhe o papel (editor ou visitante) e o inscreve pela instância de inscrição manual do curso. Não há chaves de inscrição para compartilhar ou gerenciar.
 * 👥 **Múltiplos professores responsáveis:** Uma turma pode ter vários responsáveis; todos gerenciam a turma e recebem as notificações.
 * 🎓 **Gestão delegada:** Os responsáveis recebem um papel escopado na subcategoria da turma, com controle total dos cursos-lab *da turma deles* (editar conteúdo, notas e inscrições, entrar sem se inscrever) — sem acesso ao resto da plataforma.
-* 🖥 **Painel self-service para estudantes:** Estudantes autenticados veem todos os labs da turma, o status atual e entram com um clique.
+* 🖥 **Painel self-service para estudantes:** Estudantes autenticados veem todos os labs da turma, o status atual e entram com um clique; entrar como editor pede confirmação, e um estudante pode sair de um lab que já entrou para liberar a vaga e trocar.
 * 🚦 **Lógica de status do lab:** Classificados automaticamente como *Disponível*, *Em uso* ou *Cheio* conforme o número de editores inscritos.
 * 🔒 **Regra de um editor por turma:** Quem já é editor em um lab não assume a vaga de editor em outro lab da mesma turma — mas ainda entra como visitante.
 * ✏️ **Editar turma:** Renomear, adicionar/remover co-responsáveis, mudar o prefixo dos labs e sobrescrever as configurações de ciclo de vida por turma.
 * ⚙️ **Configurações por turma:** Cada turma pode sobrescrever os padrões globais de editores-por-lab e da política de ciclo de vida (meses, ação, dias de aviso); campo vazio herda o padrão do site.
 * 📋 **Lista de tarefas compartilhada da turma (opcional):** Quando o bloco [Teacher Checklist](https://github.com/jeanlucio/moodle-block_teacher_checklist) está instalado, o formulário de edição da turma ganha um campo de lista de tarefas; as tarefas são automaticamente provisionadas no bloco Teacher Checklist de cada novo lab criado, e o bloco é adicionado ao lab automaticamente. O botão **Aplicar a labs existentes** sincroniza retroativamente a lista para labs já criados. A funcionalidade é transparente quando o bloco não está instalado.
 * 🔗 **URL do painel compartilhável:** Gestores copiam e compartilham o link direto do painel de cada turma.
-* ♻️ **Resetar / 🗑 excluir / ☑️ em lote:** Reset limpa dados e inscrições preservando o curso; exclusão remove curso e registro; ações em lote resetam ou excluem vários labs de uma vez.
+* ♻️ **Resetar / 🗑 excluir / ☑️ em lote:** Reset limpa dados e inscrições, restaura o nome do curso ao valor original e preserva a estrutura do curso; exclusão remove curso e registro; ações em lote resetam ou excluem vários labs de uma vez.
 * 🏭 **Excluir turma:** Remove a turma inteira, seus labs e a subcategoria.
 * ⏰ **Manutenção automática do ciclo de vida:** Tarefa noturna reseta ou exclui labs vencidos, aplicando as configurações próprias de cada turma, com e-mails de aviso antecipado.
+* 📅 **Prazo do ciclo de vida visível:** Um aviso único "Agendado: reset/exclusão em DATA" aparece acima da lista de gerenciamento e do painel; ele se expande para datas por lab apenas quando resets individuais causam prazos diferentes.
+* 🛡 **Recontagem segura ao mudar política:** Ativar ou apertar o ciclo de vida (globalmente ou por turma) reinicia a contagem a partir desse momento para todos os labs existentes, de modo que nenhum lab é processado sem antes passar pela janela de aviso.
 * 📧 **Notificações de ciclo de vida:** E-mails de aviso e resumo para os professores responsáveis e para os editores de cada curso afetado; a cópia ao administrador é opcional.
 * 🙋 **Aviso de acesso:** Um visitante logado que chega a um curso-lab sem acesso vê um aviso com o nome do(s) professor(es) responsável(is) para contato.
 * 🔔 **Notificação de designação:** Quando um professor é adicionado a uma turma, ele recebe uma notificação Moodle (sino) e um e-mail com o link do painel de gerenciamento. O provider `batch_assigned` pode ser configurado por usuário em **Preferências → Mensagens**.
 * 🔗 **Atalho de navegação para o professor:** Professores responsáveis veem o link **Gerenciar Lab Virtual** direto na barra superior do Moodle (e no menu mobile), sem precisar de uma URL fornecida pelo admin.
 * 🔐 **Proteção de propriedade e eventos de auditoria:** Toda operação de escrita valida que o lab pertence à turma esperada; eventos são emitidos ao resetar curso, excluir curso e excluir turma.
+* 📊 **Relatório de uso:** Visão geral paginada por turma com detalhamento por estudante em cada lab, com exportação CSV e Excel em ambos os níveis.
 
 ---
 
@@ -328,6 +338,7 @@ O botão **Gerenciar Lab Virtual** na página de configurações leva direto ao 
 3. Clique em **Editor** ou **Visitante** em um lab disponível para entrar e ser levado ao curso.
    * Um clique inscreve como `editingteacher` (editor) ou `student` (visitante) — sem chaves.
 4. Após a inscrição, a linha mostra **Inscrito**; quem já edita um lab não assume vaga de editor em outro lab da mesma turma.
+5. Para trocar de lab, saia do lab atual para liberar a vaga de editor e depois entre em outro.
 
 ---
 
@@ -361,13 +372,16 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 | `checklist_integration_test.php` | 7 | `is_available()` com bloco presente; `provision_course()` semeia itens, é idempotente, adiciona bloco, não duplica bloco; `sync_batch()` provisiona todos os labs e lida com lista vazia sem erros |
 | `course_factory_test.php` | 4 | Quantidade correta de labs; labs usam a instância manual e nenhuma self; todos os IDs retornados; quantidade excessiva rejeitada |
 | `course_registry_test.php` | 10 | Verificações de propriedade, busca em lote e validação de inscrição por turma |
+| `enrolment_service_test.php` | 4 | Inscrição com sucesso; rejeição pelo limite de editores; guard de um editor por turma; mensagem de erro cobre todos os motivos de bloqueio |
 | `hook_callbacks_test.php` | 5 | Nó de navegação primária visível para admins e professores de turma; invisível para usuários comuns, visitantes e sessões deslogadas |
-| `maintenance_service_test.php` | 5 | Reset/exclusão e guards de turma errada; exclusão de turma |
-| `maintenance_task_test.php` | 10 | Casos desabilitados, reset/exclusão de labs vencidos, override por turma, lógica de data de referência |
-| `notification_service_test.php` | 7 | Aviso/resumo para professores e editores; cópia ao admin condicionada à config; link do curso |
-| `panel_status_test.php` | 6 | Flags disponível/em uso/cheio; regras de inscrição e de um editor por turma |
+| `lifecycle_test.php` | 4 | Sumarização de prazo (compartilhado/divergente/desabilitado); rótulo do aviso agendado; renderização de rótulos de componente e ação |
+| `maintenance_service_test.php` | 7 | Reset/exclusão e guards de turma errada; reset restaura nome original do curso; shortname preservado quando já existe; exclusão de turma |
+| `maintenance_task_test.php` | 13 | Casos desabilitados, reset/exclusão de labs vencidos, override por turma, lógica de data de referência; epoch global e por turma protege labs após mudança de política; sem re-aviso em execuções consecutivas |
+| `notification_service_test.php` | 9 | Aviso/resumo para professores e editores; cópia ao admin condicionada à config; link do curso; prazo colapsado quando compartilhado; datas por lab quando divergentes |
+| `panel_status_test.php` | 8 | Flags disponível/em uso/cheio; regras de inscrição e de um editor por turma; distinção do motivo de bloqueio (cheio vs editor em outro lab); override de maxteachers por turma |
+| `report_repository_test.php` | 3 | Rótulo de componente a partir do pluginname do módulo; componente core e fallback; rótulo de ação conhecido e fallback |
 | `task_manager_test.php` | 8 | Parsing de `set_tasks_from_text()` (LF, CRLF, linhas em branco, trim); semântica de substituição de `set_tasks()`; sortorder de `get_tasks()`; round-trip de `get_tasks_text()`; casos limite de lista vazia |
-| **Total** | **79** | |
+| **Total** | **99** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
@@ -381,8 +395,8 @@ Testes de navegador ponta a ponta cobrindo os fluxos de admin, professor e estud
 |---------|---------:|----------------|
 | `manage_batches.feature` | 3 | Admin cria turma; gestor edita turma; admin exclui turma |
 | `manage_labs.feature` | 2 | Criar labs e ver a URL do painel; resetar um lab |
-| `student_panel.feature` | 4 | Cabeçalho e lista de labs; inscrição como editor e entrada no curso; bloqueio de um editor por turma; visitante enviado ao login |
-| **Total** | **9** | |
+| `student_panel.feature` | 5 | Cabeçalho e lista de labs; inscrição como editor (com confirmação) e entrada no curso; bloqueio de um editor por turma; sair de um lab para liberar a vaga; visitante enviado ao login |
+| **Total** | **10** | |
 
 ```bash
 vendor/bin/behat --tags @local_virtuallab
