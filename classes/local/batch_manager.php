@@ -216,7 +216,14 @@ class batch_manager {
             $message->notification = 1;
             $message->contexturl = $url->out(false);
             $message->contexturlname = get_string('manage_batches', 'local_virtuallab');
-            message_send($message);
+            try {
+                ob_start();
+                message_send($message);
+                ob_end_clean();
+            } catch (\Throwable $e) {
+                ob_end_clean();
+                unset($e); // Notification failure must not abort batch creation.
+            }
         }
     }
 
