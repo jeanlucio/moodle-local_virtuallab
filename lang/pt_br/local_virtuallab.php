@@ -120,6 +120,7 @@ $string['leave_lab_label'] = 'Sair do laboratório: {$a}';
 $string['left_lab'] = 'Você saiu do laboratório.';
 $string['manage_batches'] = 'Gerenciar Lab Virtual';
 $string['manage_labs'] = 'Gerenciar laboratórios — {$a}';
+$string['manage_labs_short'] = 'Gerenciar laboratórios';
 $string['message_batch_assigned_body'] = 'Você foi designado como professor responsável pela turma "{$a}". Agora você pode gerenciar os laboratórios pelo link abaixo.';
 $string['message_batch_assigned_small'] = 'Você foi designado como professor responsável de uma turma do Lab Virtual.';
 $string['message_batch_assigned_subject'] = 'Lab Virtual: você foi designado à turma "{$a}"';

@@ -120,6 +120,7 @@ $string['leave_lab_label'] = 'Leave lab: {$a}';
 $string['left_lab'] = 'You have left the lab.';
 $string['manage_batches'] = 'Manage Virtual Lab';
 $string['manage_labs'] = 'Manage labs — {$a}';
+$string['manage_labs_short'] = 'Manage labs';
 $string['message_batch_assigned_body'] = 'You have been assigned as responsible teacher for the batch "{$a}". You can now manage its labs using the link below.';
 $string['message_batch_assigned_small'] = 'You have been assigned as responsible teacher for a Virtual Lab batch.';
 $string['message_batch_assigned_subject'] = 'Virtual Lab: you have been assigned to batch "{$a}"';

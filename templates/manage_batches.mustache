@@ -67,8 +67,9 @@
                     <td>{{categoryname}}</td>
                     <td>{{labcount}}</td>
                     <td class="text-end text-nowrap">
-                        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary me-1">
-                            {{#str}} manage_labs, local_virtuallab, {{name}} {{/str}}
+                        <a href="{{manageurl}}" class="btn btn-sm btn-outline-secondary me-1"
+                           aria-label="{{#str}} manage_labs, local_virtuallab, {{name}} {{/str}}">
+                            {{#str}} manage_labs_short, local_virtuallab {{/str}}
                         </a>
                         <a href="{{reporturl}}"
                            class="btn btn-sm btn-outline-info me-1"
