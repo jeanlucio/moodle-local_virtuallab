@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version definition.
+ * Event observers for local_virtuallab.
  *
  * @package    local_virtuallab
  * @copyright  2026 Jean Lúcio
@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_virtuallab';
-$plugin->version   = 2026070300;
-$plugin->requires  = 2024100700; // Moodle 4.5+.
-$plugin->supported = [405, 502];
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v1.0.0';
+$observers = [
+    [
+        'eventname' => \core\event\course_deleted::class,
+        'callback'  => \local_virtuallab\observer::class . '::course_deleted',
+    ],
+];
