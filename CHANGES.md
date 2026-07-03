@@ -1,5 +1,15 @@
 # Changelog — Virtual Lab
 
+## [v1.0.1] — 2026-07-03
+
+### Fixed
+
+- **Lab tracking row left behind after deleting a course outside the plugin** — a lab course
+  removed via the standard Moodle course management screen (instead of the batch/lab management
+  UI) left its `local_virtuallab_courses` row behind forever, with the lifecycle cron then
+  targeting a course that no longer existed. An observer now removes the tracking row whenever its
+  course is deleted, regardless of how the deletion happened.
+
 ## [v1.0.0] — 2026-06-18
 
 Initial public release.
