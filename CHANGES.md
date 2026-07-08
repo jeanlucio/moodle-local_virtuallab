@@ -1,5 +1,14 @@
 # Changelog — Virtual Lab
 
+## [v1.0.2] — 2026-07-08
+
+### Fixed
+
+- **Privacy Provider now declares the batch-teacher assignment** — the responsible-teacher list
+  per batch (`local_virtuallab_batch_teachers`) stores a user ID but was declared as a null
+  Privacy Provider. It is now fully declared, scoped to the batch's own category context, with
+  export and deletion support for a single user, a set of users, or the whole context.
+
 ## [v1.0.1] — 2026-07-03
 
 ### Fixed
