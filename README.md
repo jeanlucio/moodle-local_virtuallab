@@ -178,9 +178,10 @@ Virtual Lab ships with PHPUnit (unit/integration) and Behat (acceptance) test su
 | `maintenance_task_test.php` | 13 | Disabled cases, reset/delete overdue labs, per-batch override, reference-date logic; global and per-batch epoch protects labs after policy tightening; no re-warning on consecutive runs |
 | `notification_service_test.php` | 9 | Warning/summary to teachers and editors; admin copy gated by setting; course link; deadline collapsed when shared; per-lab dates shown when divergent |
 | `panel_status_test.php` | 8 | Available/in-use/full flags; enrolment and one-editor-per-batch rules; block reason distinction (full vs elsewhere); per-batch maxteachers override |
+| `privacy_provider_test.php` | 8 | Metadata declares `local_virtuallab_batch_teachers`; context discovery and user discovery scoped to the batch category context; export writes the batch name; full-context and per-user/per-users deletion; non-category contexts are safely ignored |
 | `report_repository_test.php` | 3 | Component label from module pluginname; core component and fallback; action label known and fallback |
 | `task_manager_test.php` | 8 | `set_tasks_from_text()` parsing (LF, CRLF, blank lines, trim); `set_tasks()` replace semantics; `get_tasks()` sortorder; `get_tasks_text()` round-trip; empty list edge cases |
-| **Total** | **99** | |
+| **Total** | **107** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
@@ -210,7 +211,7 @@ vendor/bin/behat --tags @local_virtuallab
 * Every write action checks the capability in the correct context and verifies `require_sesskey()`.
 * All DB queries use named parameters — no SQL injection surface.
 * Cross-batch ownership check on every reset and delete: a lab can only be modified via the batch it was created in. Batch subcategory deletion is guarded so only an empty, plugin-owned subcategory is ever removed.
-* The plugin does not store any personal data. The Privacy Provider declares this explicitly.
+* The only personal data stored is the responsible-teacher assignment per batch (`local_virtuallab_batch_teachers.userid`). The Privacy Provider declares it, scoped to the batch's category context, and supports export/deletion (single user, a set of users, or the whole context).
 
 ---
 
@@ -391,9 +392,10 @@ O Lab Virtual inclui suítes de testes PHPUnit (unitário/integração) e Behat 
 | `maintenance_task_test.php` | 13 | Casos desabilitados, reset/exclusão de labs vencidos, override por turma, lógica de data de referência; epoch global e por turma protege labs após mudança de política; sem re-aviso em execuções consecutivas |
 | `notification_service_test.php` | 9 | Aviso/resumo para professores e editores; cópia ao admin condicionada à config; link do curso; prazo colapsado quando compartilhado; datas por lab quando divergentes |
 | `panel_status_test.php` | 8 | Flags disponível/em uso/cheio; regras de inscrição e de um editor por turma; distinção do motivo de bloqueio (cheio vs editor em outro lab); override de maxteachers por turma |
+| `privacy_provider_test.php` | 8 | Metadata declara `local_virtuallab_batch_teachers`; descoberta de contexto e de usuários escopada ao contexto de categoria da turma; exportação grava o nome da turma; exclusão de contexto completo e por usuário/usuários; contextos que não são de categoria são ignorados com segurança |
 | `report_repository_test.php` | 3 | Rótulo de componente a partir do pluginname do módulo; componente core e fallback; rótulo de ação conhecido e fallback |
 | `task_manager_test.php` | 8 | Parsing de `set_tasks_from_text()` (LF, CRLF, linhas em branco, trim); semântica de substituição de `set_tasks()`; sortorder de `get_tasks()`; round-trip de `get_tasks_text()`; casos limite de lista vazia |
-| **Total** | **99** | |
+| **Total** | **107** | |
 
 ```bash
 vendor/bin/phpunit --testsuite local_virtuallab_testsuite
@@ -423,7 +425,7 @@ vendor/bin/behat --tags @local_virtuallab
 * Cada ação de escrita verifica a capability no contexto correto e valida `require_sesskey()`.
 * Todas as queries usam parâmetros nomeados — sem superfície de SQL injection.
 * Verificação de propriedade cruzada em todo reset e exclusão: um lab só pode ser modificado pela turma em que foi criado. A exclusão da subcategoria é protegida para remover apenas uma subcategoria vazia e pertencente ao plugin.
-* O plugin não armazena dados pessoais. O Privacy Provider declara isso explicitamente.
+* O único dado pessoal armazenado é a designação de professor responsável por turma (`local_virtuallab_batch_teachers.userid`). O Privacy Provider o declara, escopado ao contexto de categoria da turma, e oferece exportação/exclusão (um usuário, um conjunto de usuários ou o contexto inteiro).
 
 ---
 
