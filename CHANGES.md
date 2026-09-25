@@ -1,5 +1,11 @@
 # Changelog — Virtual Lab
 
+## [v1.0.3] — 2026-09-25
+
+### Confirmed
+
+- Tested and confirmed compatible with Moodle 5.3.
+
 ## [v1.0.2] — 2026-07-08
 
 ### Fixed
