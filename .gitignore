@@ -20,5 +20,6 @@ Thumbs.db
 
 SCOPE.md
 CLAUDE.md
-docs/
+docs/*
+!docs/badges/
 .plans
