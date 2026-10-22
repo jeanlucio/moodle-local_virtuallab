@@ -27,6 +27,7 @@ namespace local_virtuallab\output;
 use local_virtuallab\local\batch_settings;
 use local_virtuallab\local\lifecycle;
 use local_virtuallab\local\report_repository;
+use local_virtuallab\local\text;
 use plugin_renderer_base;
 
 /**
@@ -104,7 +105,7 @@ class renderer extends plugin_renderer_base {
         }
 
         $context = [
-            'batchname'       => format_string($batch->name),
+            'batchname'       => text::plain($batch->name),
             'teachername'     => $teachernames,
             'batchid'         => $batchid,
             'canmanage'       => $canmanage,
@@ -132,9 +133,9 @@ class renderer extends plugin_renderer_base {
         foreach ($batches as $batch) {
             $rows[] = [
                 'id'           => $batch->id,
-                'name'         => format_string($batch->name),
+                'name'         => text::plain($batch->name),
                 'teachername'  => $batch->teachernames,
-                'categoryname' => format_string($batch->categoryname),
+                'categoryname' => text::plain($batch->categoryname),
                 'labcount'     => (int) $batch->labcount,
                 'manageurl'    => (new \moodle_url(
                     '/local/virtuallab/manage.php',
@@ -144,12 +145,12 @@ class renderer extends plugin_renderer_base {
                     '/local/virtuallab/report.php',
                     ['batchid' => $batch->id]
                 ))->out(false),
-                'reportlabel'  => get_string('report_view_report_label', 'local_virtuallab', format_string($batch->name)),
+                'reportlabel'  => get_string('report_view_report_label', 'local_virtuallab', text::plain($batch->name)),
                 'deleteurl'    => (new \moodle_url('/local/virtuallab/manage.php', [
                     'action'        => 'deletebatch',
                     'targetbatchid' => $batch->id,
                 ]))->out(false),
-                'deletelabel'  => get_string('delete_batch_label', 'local_virtuallab', format_string($batch->name)),
+                'deletelabel'  => get_string('delete_batch_label', 'local_virtuallab', text::plain($batch->name)),
             ];
         }
 
@@ -210,8 +211,8 @@ class renderer extends plugin_renderer_base {
             $deadline = $deadlines[$lab->id];
             $rows[] = [
                 'id'          => $lab->id,
-                'coursename'  => format_string($lab->coursename),
-                'shortname'   => s($lab->shortname),
+                'coursename'  => text::plain($lab->coursename),
+                'shortname'   => $lab->shortname,
                 'courseurl'   => (new \moodle_url('/course/view.php', ['id' => $lab->courseid]))->out(false),
                 'nextaction'  => $deadline > 0
                     ? get_string(
@@ -233,13 +234,13 @@ class renderer extends plugin_renderer_base {
                     'action'  => 'deletelab',
                     'labid'   => $lab->id,
                 ]))->out(false),
-                'resetlabel'  => get_string('reset_lab_label', 'local_virtuallab', format_string($lab->coursename)),
-                'deletelabel' => get_string('delete_lab_label', 'local_virtuallab', format_string($lab->coursename)),
+                'resetlabel'  => get_string('reset_lab_label', 'local_virtuallab', text::plain($lab->coursename)),
+                'deletelabel' => get_string('delete_lab_label', 'local_virtuallab', text::plain($lab->coursename)),
             ];
         }
 
         $context = [
-            'batchname'    => format_string($batch->name),
+            'batchname'    => text::plain($batch->name),
             'batchid'      => $batch->id,
             'manageurl'    => (new \moodle_url('/local/virtuallab/manage.php'))->out(false),
             'labs'         => $rows,
@@ -292,12 +293,12 @@ class renderer extends plugin_renderer_base {
             $eventcount = $logentry ? $logentry['eventcount'] : 0;
 
             $rows[] = [
-                'labname'       => format_string($row->coursename),
+                'labname'       => text::plain($row->coursename),
                 'labdetailurl'  => (new \moodle_url(
                     '/local/virtuallab/report.php',
                     ['batchid' => $batchid, 'labid' => $lid]
                 ))->out(false),
-                'fullname'      => s(fullname($row)),
+                'fullname'      => fullname($row),
                 'iseditor'      => $iseditor,
                 'rolelabel'     => get_string(
                     $iseditor ? 'report_role_editor' : 'report_role_visitor',
@@ -311,7 +312,7 @@ class renderer extends plugin_renderer_base {
         }
 
         $context = [
-            'batchname'      => format_string($batch->name),
+            'batchname'      => text::plain($batch->name),
             'manageurl'      => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
             'exportcsvurl'   => (new \moodle_url(
                 '/local/virtuallab/report_export.php',
@@ -359,15 +360,15 @@ class renderer extends plugin_renderer_base {
             $eventrows = [];
             foreach ($breakdown[$uid] ?? [] as $entry) {
                 $eventrows[] = [
-                    'componentlabel' => s(report_repository::component_label($entry['component'])),
-                    'actionlabel'    => s(report_repository::action_label($entry['action'])),
+                    'componentlabel' => report_repository::component_label($entry['component']),
+                    'actionlabel'    => report_repository::action_label($entry['action']),
                     'cnt'            => $entry['cnt'],
                     'lasttime'       => userdate($entry['lasttime'], $dtformat),
                 ];
             }
 
             $users[] = [
-                'fullname'  => s(fullname($row)),
+                'fullname'  => fullname($row),
                 'iseditor'  => $iseditor,
                 'rolelabel' => get_string(
                     $iseditor ? 'report_role_editor' : 'report_role_visitor',
@@ -380,8 +381,8 @@ class renderer extends plugin_renderer_base {
         }
 
         $context = [
-            'batchname'      => format_string($batch->name),
-            'labname'        => format_string($lab->coursename),
+            'batchname'      => text::plain($batch->name),
+            'labname'        => text::plain($lab->coursename),
             'reporturl'      => (new \moodle_url('/local/virtuallab/report.php', ['batchid' => $batchid]))->out(false),
             'manageurl'      => (new \moodle_url('/local/virtuallab/manage.php', ['batchid' => $batchid]))->out(false),
             'exportcsvurl'   => (new \moodle_url(

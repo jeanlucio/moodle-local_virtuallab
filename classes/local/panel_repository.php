@@ -158,7 +158,7 @@ class panel_repository {
                 $labs[$row->courseid] = [
                     'labid'                   => $row->labid,
                     'courseid'                => $row->courseid,
-                    'coursename'              => format_string($row->coursename),
+                    'coursename'              => text::plain($row->coursename),
                     'user_enrolled_here'      => !empty($enrolledcourseids[(int) $row->courseid]),
                     'user_is_editor_anywhere' => $useriseditoranywhere,
                     'deadline'                => lifecycle::deadline($this->batch, $row),
@@ -168,14 +168,14 @@ class panel_repository {
 
             if (!empty($row->editorid)) {
                 $labs[$row->courseid]['editors'][] = [
-                    'fullname' => s(fullname((object) [
+                    'fullname' => fullname((object) [
                         'firstname'         => $row->firstname,
                         'lastname'          => $row->lastname,
                         'firstnamephonetic' => $row->firstnamephonetic,
                         'lastnamephonetic'  => $row->lastnamephonetic,
                         'middlename'        => $row->middlename,
                         'alternatename'     => $row->alternatename,
-                    ])),
+                    ]),
                 ];
             }
         }

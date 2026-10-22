@@ -67,7 +67,7 @@ class report_exporter {
             $logentry = $logsummary[$uid][$cid] ?? null;
 
             $rows[] = [
-                format_string($row->coursename),
+                text::plain($row->coursename),
                 fullname($row),
                 get_string($iseditor ? 'report_role_editor' : 'report_role_visitor', 'local_virtuallab'),
                 userdate($row->enrolledat, $dtformat),
@@ -76,7 +76,7 @@ class report_exporter {
             ];
         }
 
-        $filename = 'virtuallab_report_' . clean_filename(format_string($batch->name)) . '_' . date('Ymd');
+        $filename = 'virtuallab_report_' . clean_filename(text::plain($batch->name)) . '_' . date('Ymd');
 
         \core\dataformat::download_data($filename, $format, $columns, $rows);
         die();
@@ -143,7 +143,7 @@ class report_exporter {
             }
         }
 
-        $filename = 'virtuallab_report_' . clean_filename(format_string($lab->coursename)) . '_' . date('Ymd');
+        $filename = 'virtuallab_report_' . clean_filename(text::plain($lab->coursename)) . '_' . date('Ymd');
 
         \core\dataformat::download_data($filename, $format, $columns, $rows);
         die();
