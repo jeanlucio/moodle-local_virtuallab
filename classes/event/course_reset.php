@@ -52,4 +52,29 @@ class course_reset extends \core\event\base {
     public function get_url(): \moodle_url {
         return new \moodle_url('/course/view.php', ['id' => $this->objectid]);
     }
+
+    /**
+     * Maps the logged object id, which is the lab course, to the course the restore creates.
+     *
+     * @return array
+     */
+    #[\Override]
+    public static function get_objectid_mapping(): array {
+        return ['db' => 'course', 'restore' => 'course'];
+    }
+
+    /**
+     * Declares that the batch and lab ids in the event's other data are not remapped on restore.
+     *
+     * The plugin keeps no backup of its own, so the batch and the lab are not restored with the course.
+     *
+     * @return array
+     */
+    #[\Override]
+    public static function get_other_mapping(): array {
+        return [
+            'batchid' => \core\event\base::NOT_MAPPED,
+            'labid'   => \core\event\base::NOT_MAPPED,
+        ];
+    }
 }
