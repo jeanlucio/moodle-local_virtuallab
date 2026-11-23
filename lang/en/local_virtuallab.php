@@ -23,7 +23,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-// phpcs:disable moodle.Files.LineLength
 
 $string['access_as_editor'] = 'Access {$a} as slot holder';
 $string['access_as_visitor'] = 'Access {$a} as visitor';
